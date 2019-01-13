@@ -8,18 +8,17 @@
     Common Identity Module for decentralized user identity authentication
 """
 
-from mkm.crypto import *
-from mkm.entity import *
+from mkm.crypto import SymmetricKey, PrivateKey, PublicKey
+from mkm.address import NetworkID, Address
+from mkm.meta import Meta
+from mkm.entity import ID, Entity
 
 __author__ = 'Albert Moky'
 
 __all__ = [
-    'sha256', 'ripemd160',
-    'base58_encode', 'base58_decode',
-    'base64_encode', 'base64_decode',
-
     'SymmetricKey',
     'PrivateKey', 'PublicKey',
 
-    'Meta', 'Address', 'ID', 'Entity',
+    'NetworkID', 'Address', 'ID', 'Meta',
+    'Entity',
 ]

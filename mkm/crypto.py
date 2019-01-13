@@ -5,7 +5,7 @@
     Crypto
     ~~~~~~
 
-    Crypto Keys
+    Crypto Keys: AES, RSA
 """
 
 import numpy
@@ -15,20 +15,26 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from Crypto.Signature import PKCS1_v1_5 as Signature_PKCS1_v1_5
 
-from mkm.utils import *
+from mkm.utils import base64_encode, base64_decode
 
 
 class SymmetricKey(dict):
     """ Symmetric Key """
 
-    @classmethod
-    def new(cls, key: object):
-        if isinstance(key, SymmetricKey):
+    def __new__(cls, key: dict):
+        if cls is not SymmetricKey:
+            if issubclass(cls, SymmetricKey):
+                return super(SymmetricKey, cls).__new__(cls, key)
+            else:
+                raise TypeError('Not subclass of SymmetricKey')
+        elif isinstance(key, SymmetricKey):
             return key
         elif isinstance(key, dict):
             algorithm = key['algorithm']
             if algorithm == 'AES':
                 return AESKey.new(key)
+        else:
+            raise ValueError('Invalid symmetric key')
 
     def encrypt(self, plaintext: bytes) -> bytes:
         pass
@@ -83,17 +89,49 @@ class AESKey(SymmetricKey):
         return plaintext.rstrip(pad)
 
 
+def unwrap_key_content(content, tag):
+    # search tags
+    begin = '-----BEGIN RSA ' + tag + ' KEY-----'
+    end = '-----END RSA ' + tag + ' KEY-----'
+    pos1 = content.find(begin)
+    if pos1 < 0:
+        begin = '-----BEGIN ' + tag + ' KEY-----'
+        end = '-----END ' + tag + ' KEY-----'
+        pos1 = content.find(begin)
+    # unwrap tags
+    if pos1 < 0:
+        # tags not found
+        pos2 = -1
+    else:
+        pos1 += len(begin)
+        pos2 = content.find(end, pos1)
+    if pos1 != -1 and pos2 != -1:
+        content = content[pos1:pos2]
+    # remove spaces
+    content = content.replace('\r', '')
+    content = content.replace('\n', '')
+    content = content.replace('\t', '')
+    content = content.replace(' ', '')
+    return content
+
+
 class PublicKey(dict):
     """ Public Key """
 
-    @classmethod
-    def new(cls, key: object):
-        if isinstance(key, PublicKey):
+    def __new__(cls, key: dict):
+        if cls is not PublicKey:
+            if issubclass(cls, PublicKey):
+                return super(PublicKey, cls).__new__(cls, key)
+            else:
+                raise TypeError('Not subclass of PublicKey')
+        elif isinstance(key, PublicKey):
             return key
         elif isinstance(key, dict):
             algorithm = key['algorithm']
             if algorithm == 'RSA':
                 return RSAPublicKey.new(key)
+        else:
+            raise ValueError('Invalid public key')
 
     def encrypt(self, plaintext: bytes) -> bytes:
         pass
@@ -118,7 +156,7 @@ class RSAPublicKey(PublicKey):
     def new(cls, key: dict) -> PublicKey:
         # data
         if 'data' in key:
-            data = base64_decode(key['data'])
+            data = base64_decode(unwrap_key_content(key['data'], 'PUBLIC'))
         else:
             raise ValueError('Public key data empty')
         # create key
@@ -158,14 +196,20 @@ class RSAPublicKey(PublicKey):
 class PrivateKey(dict):
     """ Private Key """
 
-    @classmethod
-    def new(cls, key: object):
-        if isinstance(key, PublicKey):
+    def __new__(cls, key: object):
+        if cls is not PrivateKey:
+            if issubclass(cls, PrivateKey):
+                return super(PrivateKey, cls).__new__(cls, key)
+            else:
+                raise TypeError('Not subclass of PrivateKey')
+        elif isinstance(key, PublicKey):
             return key
         elif isinstance(key, dict):
             algorithm = key['algorithm']
             if algorithm == 'RSA':
                 return RSAPrivateKey.new(key)
+        else:
+            raise ValueError('Invalid private key')
 
     def decrypt(self, data: bytes) -> bytes:
         pass
@@ -187,7 +231,7 @@ class RSAPrivateKey(PrivateKey):
     def new(cls, key: dict) -> PrivateKey:
         # data
         if 'data' in key:
-            data = base64_decode(key['data'])
+            data = base64_decode(unwrap_key_content(key['data'], 'PRIVATE'))
         else:
             # generate key
             if 'keySizeInBits' in key:
@@ -217,7 +261,7 @@ class RSAPrivateKey(PrivateKey):
 
 ]       """
         cipher = Cipher_PKCS1_v1_5.new(self.key)
-        sentinel = 'whenever'
+        sentinel = ''
         plaintext = cipher.decrypt(data, sentinel)
         if sentinel:
             print('error: ' + sentinel)
