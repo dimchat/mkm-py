@@ -19,9 +19,16 @@ from mkm.utils import base64_encode, base64_decode
 
 
 class SymmetricKey(dict):
-    """ Symmetric Key """
+    """
+        This class is used to encrypt or decrypt message data
+    """
 
     def __new__(cls, key: dict):
+        """
+
+        :param key: key info with algorithm='AES'
+        :return: symmetric key
+        """
         if cls is not SymmetricKey:
             if issubclass(cls, SymmetricKey):
                 return super(SymmetricKey, cls).__new__(cls, key)
@@ -33,8 +40,10 @@ class SymmetricKey(dict):
             algorithm = key['algorithm']
             if algorithm == 'AES':
                 return AESKey.new(key)
+            else:
+                raise ModuleNotFoundError('Invalid algorithm')
         else:
-            raise ValueError('Invalid symmetric key')
+            raise AssertionError('Invalid symmetric key')
 
     def encrypt(self, plaintext: bytes) -> bytes:
         pass
@@ -44,7 +53,7 @@ class SymmetricKey(dict):
 
 
 class AESKey(SymmetricKey):
-    """ AES """
+    """ AES Key """
 
     data: bytes = None
     iv: bytes = None
@@ -70,6 +79,7 @@ class AESKey(SymmetricKey):
             # self.key = AES.new(data, AES.MODE_CBC, iv)
         else:
             iv = b'0000000000000000'
+            key['iv'] = base64_encode(iv)
         # create key
         self = AESKey(key)
         self.data = data
@@ -116,9 +126,16 @@ def unwrap_key_content(content, tag):
 
 
 class PublicKey(dict):
-    """ Public Key """
+    """
+        This class is used to encrypt symmetric key or verify signature with message data
+    """
 
     def __new__(cls, key: dict):
+        """
+
+        :param key: key info with algorithm='RSA'
+        :return: public key
+        """
         if cls is not PublicKey:
             if issubclass(cls, PublicKey):
                 return super(PublicKey, cls).__new__(cls, key)
@@ -130,6 +147,8 @@ class PublicKey(dict):
             algorithm = key['algorithm']
             if algorithm == 'RSA':
                 return RSAPublicKey.new(key)
+            else:
+                raise ModuleNotFoundError('Invalid algorithm')
         else:
             raise ValueError('Invalid public key')
 
@@ -166,37 +185,30 @@ class RSAPublicKey(PublicKey):
         return self
 
     def encrypt(self, plaintext: bytes) -> bytes:
-        """
-
-        :Raises ValueError:
-            If the RSA key length is not sufficiently long to deal with the given
-            message.
-
-        """
         cipher = Cipher_PKCS1_v1_5.new(self.key)
         return cipher.encrypt(plaintext)
 
     def verify(self, data: bytes, signature: bytes) -> bool:
-        """
-
-        :raise ValueError: if the signature is not valid.
-
-        """
         hash_obj = SHA256.new(data)
         verifier = Signature_PKCS1_v1_5.new(self.key)
         try:
-            verifier.verify(hash_obj, signature)
+            return verifier.verify(hash_obj, signature)
         except ValueError:
             # raise ValueError("Invalid signature")
             return False
 
-        return True
-
 
 class PrivateKey(dict):
-    """ Private Key """
+    """
+        This class is used to decrypt symmetric key or sign message data
+    """
 
     def __new__(cls, key: object):
+        """
+
+        :param key: key info with algorithm='RSA'
+        :return: private key
+        """
         if cls is not PrivateKey:
             if issubclass(cls, PrivateKey):
                 return super(PrivateKey, cls).__new__(cls, key)
@@ -208,6 +220,8 @@ class PrivateKey(dict):
             algorithm = key['algorithm']
             if algorithm == 'RSA':
                 return RSAPrivateKey.new(key)
+            else:
+                raise ModuleNotFoundError('Invalid algorithm')
         else:
             raise ValueError('Invalid private key')
 
@@ -238,8 +252,8 @@ class RSAPrivateKey(PrivateKey):
                 bits = int(key['keySizeInBits'])
             else:
                 bits = 1024
-            sk = RSA.generate(bits)
-            data = sk.export_key()
+            private_key = RSA.generate(bits)
+            data = private_key.export_key()
             key = {
                 'algorithm': 'RSA',
                 'data': base64_encode(data),
@@ -252,14 +266,6 @@ class RSAPrivateKey(PrivateKey):
         return self
 
     def decrypt(self, data: bytes) -> bytes:
-        """
-
-        :Raises ValueError:
-            If the data length is incorrect
-        :Raises TypeError:
-            If the RSA key has no private half (i.e. it cannot be used for decyption).
-
-]       """
         cipher = Cipher_PKCS1_v1_5.new(self.key)
         sentinel = ''
         plaintext = cipher.decrypt(data, sentinel)
@@ -268,12 +274,6 @@ class RSAPrivateKey(PrivateKey):
         return plaintext
 
     def sign(self, data: bytes) -> bytes:
-        """
-
-        :raise ValueError: if the RSA key is not long enough for the given hash algorithm.
-        :raise TypeError: if the RSA key has no private half.
-
-        """
         hash_obj = SHA256.new(data)
         signer = Signature_PKCS1_v1_5.new(self.key)
         return signer.sign(hash_obj)

@@ -8,10 +8,22 @@
     Unit test for Ming-Ke-Ming
 """
 
+from binascii import b2a_hex, a2b_hex
+
 from mkm.utils import *
 import mkm
 
 __author__ = 'Albert Moky'
+
+
+def hex_encode(data: bytes) -> str:
+    """ HEX Encode """
+    return b2a_hex(data).decode('utf-8')
+
+
+def hex_decode(string: str) -> bytes:
+    """ HEX Decode """
+    return a2b_hex(string)
 
 
 def test_aes():
@@ -59,25 +71,26 @@ def test_rsa():
     print('---------------- test RSA end')
 
 
-def print_address(obj):
+def print_address(address):
     info = {
-        'network': obj.network,
-        'number': obj.number,
-        'valid': obj.valid,
+        'network': address.network,
+        'number': address.number,
     }
-    print(obj + ':' + info.__str__())
+    print(address, ':', info)
 
 
-def print_id(obj):
+def print_id(identity):
     info = {
-        'name': obj.name,
-        'address': obj.address,
-        'terminal': obj.terminal,
+        'name': identity.name,
+        'address': identity.address,
+        'terminal': identity.terminal,
     }
-    print(obj + ':' + info.__str__())
+    print(identity, ':', info)
 
 
 def test_meta():
+    print('---------------- test Meta begin ')
+
     id1 = mkm.ID('moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk')
     seed = 'moki'
     key = {
@@ -100,17 +113,19 @@ def test_meta():
     }
 
     meta = mkm.Meta(meta)
-    print(meta)
+    print('meta: ', meta)
 
-    if meta.match_id(id1):
+    if meta.match_identity(id1):
         print('meta match ID')
     else:
         print('meta NOT match ID')
 
-    id2 = meta.build_id(0x08)
-    address2 = meta.build_address(0x08)
+    id2 = meta.build_identity(mkm.NetworkID.Main)
+    address2 = meta.build_address(mkm.NetworkID.Main)
     print_id(id2)
     print_address(address2)
+
+    print('---------------- test Meta end')
 
 
 def test_entity():
@@ -127,18 +142,24 @@ def test_entity():
     print_address(address)
 
     ct = base64_decode(fingerprint)
-    address = mkm.Address(fingerprint=ct, network=0x08, version=0x01)
+    address = mkm.Address.new(fingerprint=ct, network=mkm.NetworkID.Main)
     print_address(address)
 
     address = '4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk'
     address = mkm.Address(address)
     print_address(address)
 
-    my_id = mkm.ID(string="moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk")
+    my_id = mkm.ID("moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk")
     print_id(my_id)
 
     my_id = mkm.ID(name='moky', address=address)
     print_id(my_id)
+
+    entity = mkm.Entity(my_id)
+    print(entity)
+
+    entity.name = 'Albert Moky'
+    print(entity)
 
     print('---------------- test Entity end')
 

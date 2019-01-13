@@ -22,78 +22,81 @@
 
 from mkm.utils import base64_encode, base64_decode
 from mkm.crypto import PublicKey, PrivateKey
+
 from mkm.address import NetworkID, Address
 from mkm.entity import ID
 
 
 class Meta(dict):
 
-    version: chr = 1
+    version: chr = 0x01
     seed: str = ''
     key: PublicKey = None
     fingerprint: bytes = None
 
-    valid: bool = False
-
     def __new__(cls, dictionary: dict=None,
-                seed: str='', public_key: PublicKey=None, private_key: PrivateKey=None,
-                fingerprint: bytes=None, version: chr=0x01):
-        valid = False
+                seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=0x01):
+        """ Create meta object with meta info """
         if dictionary:
             # return Meta object directory
             if isinstance(dictionary, Meta):
                 return dictionary
             # get fields from dictionary
-            version = dictionary['version']
+            version = int(dictionary['version'])
             seed = dictionary['seed']
-            key = dictionary['key']
-            fingerprint = dictionary['fingerprint']
-            # verify fingerprint with public key
-            public_key = PublicKey(key)
-            fingerprint = base64_decode(fingerprint)
-            valid = public_key.verify(seed.encode('utf-8'), fingerprint)
-        elif private_key:
-            if version == 0x01:
-                # generate fingerprint with private key
-                public_key = private_key.publicKey()
-                fingerprint = private_key.sign(seed.encode('utf-8'))
-                valid = True
-                dictionary = {
-                    'version': version,
-                    'seed': seed,
-                    'key': public_key,
-                    'fingerprint': base64_encode(fingerprint),
-                }
-        elif fingerprint:
-            # verify fingerprint with public key
-            valid = public_key.verify(seed.encode('utf-8'), fingerprint)
-            if valid:
-                dictionary = {
-                    'version': version,
-                    'seed': seed,
-                    'key': public_key,
-                    'fingerprint': base64_encode(fingerprint),
-                }
+            key = PublicKey(dictionary['key'])
+            fingerprint = base64_decode(dictionary['fingerprint'])
+        elif seed and key and fingerprint:
+            # build meta info
+            dictionary = {
+                'version': version,
+                'seed': seed,
+                'key': key,
+                'fingerprint': base64_encode(fingerprint),
+            }
+        else:
+            raise AssertionError('Parameters error')
+        # verify seed and fingerprint
+        if version == 0x01 and key.verify(seed.encode('utf-8'), fingerprint):
+            # new dict
+            self = super(Meta, cls).__new__(cls, dictionary)
+            self.version = version
+            self.seed = seed
+            self.key = key
+            self.fingerprint = fingerprint
+            return self
+        else:
+            raise ValueError('Meta data not math')
 
-        # new dict
-        self = super(Meta, cls).__new__(cls, dictionary)
-        self.version = version
-        self.seed = seed
-        self.key = public_key
-        self.fingerprint = fingerprint
-        self.valid = valid
-        return self
+    @classmethod
+    def new(cls, seed: str, private_key: PrivateKey, version: chr=0x01):
+        """ Create meta info with seed and private key """
+        if version == 0x01:
+            # generate fingerprint with private key
+            fingerprint = private_key.sign(seed.encode('utf-8'))
+            dictionary = {
+                'version': version,
+                'seed': seed,
+                'key': private_key.publicKey(),
+                'fingerprint': base64_encode(fingerprint),
+            }
+            return Meta(dictionary)
+        else:
+            raise AssertionError('Invalid version')
 
-    def match_id(self, identity: ID) -> bool:
+    def match_identity(self, identity: ID) -> bool:
+        """ Check ID with meta info """
         return identity.name == self.seed and self.match_address(identity.address)
 
     def match_address(self, address: Address) -> bool:
+        """ Check address with meta info """
         return self.build_address(address.network) == address
 
-    def build_id(self, network: NetworkID) -> ID:
+    def build_identity(self, network: NetworkID) -> ID:
+        """ Build ID with meta info and network ID """
         address = self.build_address(network)
         return ID(name=self.seed, address=address)
 
     def build_address(self, network: NetworkID) -> Address:
-        if self.valid:
-            return Address(fingerprint=self.fingerprint, network=network, version=self.version)
+        """ Build address with meta info and network ID """
+        return Address.new(fingerprint=self.fingerprint, network=network, version=self.version)

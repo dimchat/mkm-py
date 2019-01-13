@@ -93,25 +93,25 @@ class NetworkID(IntEnum):
     Robot = 0xC8        # 1100 1000
 
     def is_communicator(self):
-        return self & self.Main
+        return self.value & self.Main
 
     def is_person(self):
-        return self == self.Main
+        return self.value == self.Main
 
     def is_group(self):
-        return self & self.Group
+        return self.value & self.Group
 
     def is_station(self):
-        return self == self.Station
+        return self.value == self.Station
 
     def is_provider(self):
-        return self == self.Provider
+        return self.value == self.Provider
 
     def is_thing(self):
-        return self & self.Thing
+        return self.value & self.Thing
 
     def is_robot(self):
-        return self == self.Robot
+        return self.value == self.Robot
 
 
 def user_number(code: bytes) -> int:
@@ -120,15 +120,20 @@ def user_number(code: bytes) -> int:
 
 
 class Address(str):
+    """
+        This class is used to build address for ID
+    """
 
     network: NetworkID = 0x00
     number: int = 0
-    valid: bool = False
 
-    def __new__(cls, string: str='',
-                fingerprint: bytes=None, network: NetworkID=0x00, version: chr=0x01):
-        number = 0
-        valid = False
+    def __new__(cls, string: str=''):
+        """
+        Create address object with string
+
+        :param string:
+        :return:
+        """
         if string:
             # return Address object directory
             if isinstance(string, Address):
@@ -140,20 +145,27 @@ class Address(str):
             code = data[-4:]
             network = ord(prefix)
             number = user_number(code)
-            valid = (sha256(sha256(prefix + digest))[:4] == code)
-        elif fingerprint:
-            if version == 0x01:
-                # calculate address string with fingerprint
-                prefix = chr(network).encode('utf-8')
-                digest = ripemd160(sha256(fingerprint))
-                code = sha256(sha256(prefix + digest))[:4]
-                string = base58_encode(prefix + digest + code)
-                number = user_number(code)
-                valid = True
+        else:
+            raise AssertionError('Parameter error')
+        # verify
+        if sha256(sha256(prefix + digest))[:4] == code:
+            # new str
+            self = super(Address, cls).__new__(cls, string)
+            self.network = NetworkID(network)
+            self.number = number
+            return self
+        else:
+            raise ValueError('Invalid address')
 
-        # new str
-        self = super(Address, cls).__new__(cls, string)
-        self.network = network
-        self.number = number
-        self.valid = valid
-        return self
+    @classmethod
+    def new(cls, fingerprint: bytes=None, network: NetworkID=0x00, version: chr=0x01):
+        """ Create address with fingerprint and network ID """
+        if version == 0x01 and fingerprint and network:
+            # calculate address string with fingerprint
+            prefix = chr(network).encode('utf-8')
+            digest = ripemd160(sha256(fingerprint))
+            code = sha256(sha256(prefix + digest))[:4]
+            string = base58_encode(prefix + digest + code)
+            return Address(string)
+        else:
+            raise AssertionError('Parameters error')

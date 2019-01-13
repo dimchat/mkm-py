@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 
 __version__ = '0.1.0'
 __author__ = 'Albert Moky'
-__contact__ = 'alber.moky@gmail.com'
+__contact__ = 'albert.moky@gmail.com'
 
 with open('README.md', 'r') as fh:
     readme = fh.read()
@@ -33,6 +33,6 @@ setup(
         'Operating System :: OS Independent',
     ],
     install_requires=[
-        'base58', 'Crypto', 'numpy'
+        'base58', 'Crypto', 'numpy',
     ]
 )

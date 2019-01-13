@@ -13,6 +13,8 @@ from mkm.address import NetworkID, Address
 from mkm.meta import Meta
 from mkm.entity import ID, Entity
 
+name = "MingKeMing"
+
 __author__ = 'Albert Moky'
 
 __all__ = [
