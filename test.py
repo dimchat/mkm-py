@@ -32,7 +32,7 @@ def test_aes():
     info = {
         'algorithm': 'AES',
     }
-    key = mkm.SymmetricKey(info)
+    key = mkm.SymmetricKey.generate(info)
     print(key)
     text = 'Hello world'
     data = text.encode('utf-8')
@@ -54,7 +54,7 @@ def test_rsa():
     info = {
         'algorithm': 'RSA',
     }
-    sk = mkm.PrivateKey(info)
+    sk = mkm.PrivateKey.generate(info)
     pk = sk.publicKey()
     print(sk)
     print(pk)
@@ -131,8 +131,8 @@ def test_meta():
     else:
         raise AssertionError('Test meta failed')
 
-    id2 = meta.build_identifier(mkm.NetworkID.Main)
-    address2 = meta.build_address(mkm.NetworkID.Main)
+    id2 = meta.generate_identifier(mkm.NetworkID.Main)
+    address2 = meta.generate_address(mkm.NetworkID.Main)
     print_id(id2)
     print_address(address2)
 
@@ -153,7 +153,7 @@ def test_entity():
     print_address(address)
 
     ct = base64_decode(fingerprint)
-    address = mkm.Address.new(fingerprint=ct, network=mkm.NetworkID.Main)
+    address = mkm.Address.generate(fingerprint=ct, network=mkm.NetworkID.Main)
     print_address(address)
 
     address = '4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk'

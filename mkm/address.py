@@ -158,8 +158,8 @@ class Address(str):
             raise ValueError('Invalid address')
 
     @classmethod
-    def new(cls, fingerprint: bytes, network: NetworkID, version: chr=0x01):
-        """ Create address with fingerprint and network ID """
+    def generate(cls, fingerprint: bytes, network: NetworkID, version: chr=0x01):
+        """ Generate address with fingerprint and network ID """
         if version == 0x01 and fingerprint and network:
             # calculate address string with fingerprint
             prefix = chr(network).encode('utf-8')

@@ -78,8 +78,8 @@ class Meta(dict):
             raise ValueError('Meta data not math')
 
     @classmethod
-    def new(cls, seed: str, private_key: PrivateKey, version: chr=0x01):
-        """ Create meta info with seed and private key """
+    def generate(cls, seed: str, private_key: PrivateKey, version: chr=0x01):
+        """ Generate meta info with seed and private key """
         if version == 0x01:
             # generate fingerprint with private key
             fingerprint = private_key.sign(seed.encode('utf-8'))
@@ -99,12 +99,12 @@ class Meta(dict):
 
     def match_address(self, address: Address) -> bool:
         """ Check address with meta info """
-        return self.build_address(address.network) == address
+        return self.generate_address(address.network) == address
 
-    def build_identifier(self, network: NetworkID) -> ID:
-        """ Build ID with meta info and network ID """
-        return ID.new(seed=self.seed, fingerprint=self.fingerprint, network=network, version=self.version)
+    def generate_identifier(self, network: NetworkID) -> ID:
+        """ Generate ID with meta info and network ID """
+        return ID.generate(seed=self.seed, fingerprint=self.fingerprint, network=network, version=self.version)
 
-    def build_address(self, network: NetworkID) -> Address:
-        """ Build address with meta info and network ID """
-        return Address.new(fingerprint=self.fingerprint, network=network, version=self.version)
+    def generate_address(self, network: NetworkID) -> Address:
+        """ Generate address with meta info and network ID """
+        return Address.generate(fingerprint=self.fingerprint, network=network, version=self.version)

@@ -30,13 +30,16 @@ class SymmetricKey(dict):
         :return: symmetric key
         """
         if cls is not SymmetricKey:
+            # subclass
             if issubclass(cls, SymmetricKey):
                 return super(SymmetricKey, cls).__new__(cls, key)
             else:
                 raise TypeError('Not subclass of SymmetricKey')
         elif isinstance(key, SymmetricKey):
+            # key object
             return key
         elif isinstance(key, dict):
+            # get class by algorithm name
             algorithm = key['algorithm']
             clazz = symmetric_key_classes[algorithm]
             if issubclass(clazz, SymmetricKey):
@@ -52,6 +55,16 @@ class SymmetricKey(dict):
     def decrypt(self, data: bytes) -> bytes:
         pass
 
+    @classmethod
+    def generate(cls, key: dict):
+        # get class by algorithm name
+        algorithm = key['algorithm']
+        clazz = symmetric_key_classes[algorithm]
+        if issubclass(clazz, SymmetricKey):
+            return clazz.generate(key)
+        else:
+            raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
+
 
 class PublicKey(dict):
     """
@@ -65,13 +78,16 @@ class PublicKey(dict):
         :return: public key
         """
         if cls is not PublicKey:
+            # subclass
             if issubclass(cls, PublicKey):
                 return super(PublicKey, cls).__new__(cls, key)
             else:
                 raise TypeError('Not subclass of PublicKey')
         elif isinstance(key, PublicKey):
+            # key object
             return key
         elif isinstance(key, dict):
+            # get class by algorithm name
             algorithm = key['algorithm']
             clazz = public_key_classes[algorithm]
             if issubclass(clazz, PublicKey):
@@ -106,13 +122,16 @@ class PrivateKey(dict):
         :return: private key
         """
         if cls is not PrivateKey:
+            # subclass
             if issubclass(cls, PrivateKey):
                 return super(PrivateKey, cls).__new__(cls, key)
             else:
                 raise TypeError('Not subclass of PrivateKey')
         elif isinstance(key, PublicKey):
+            # key object
             return key
         elif isinstance(key, dict):
+            # get class by algorithm name
             algorithm = key['algorithm']
             clazz = private_key_classes[algorithm]
             if issubclass(clazz, PrivateKey):
@@ -130,6 +149,16 @@ class PrivateKey(dict):
 
     def publicKey(self) -> PublicKey:
         pass
+
+    @classmethod
+    def generate(cls, key: dict):
+        # get algorithm name
+        algorithm = key['algorithm']
+        clazz = private_key_classes[algorithm]
+        if issubclass(clazz, PrivateKey):
+            return clazz.generate(key)
+        else:
+            raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
 
 
 """
@@ -153,18 +182,11 @@ class AESKey(SymmetricKey):
             # import key from data
             data = base64_decode(key['data'])
         else:
-            # generate key
-            if 'size' in key:
-                size = int(key['size'])
-            else:
-                size = 32
-            data = bytes(numpy.random.bytes(size))
-            key['data'] = base64_encode(data)
+            raise ValueError('AES key data empty')
         # iv
         if 'iv' in key:
             iv = key['iv']
             iv = base64_decode(iv)
-            # self.key = AES.new(data, AES.MODE_CBC, iv)
         else:
             iv = b'0000000000000000'
             key['iv'] = base64_encode(iv)
@@ -173,6 +195,16 @@ class AESKey(SymmetricKey):
         self.data = data
         self.iv = iv
         return self
+
+    @classmethod
+    def generate(cls, key: dict) -> SymmetricKey:
+        if 'size' in key:
+            size = int(key['size'])
+        else:
+            size = 32
+        data = bytes(numpy.random.bytes(size))
+        key['data'] = base64_encode(data)
+        return AESKey(key)
 
     def encrypt(self, plaintext: bytes) -> bytes:
         key = AES.new(self.data, AES.MODE_CBC, self.iv)
@@ -256,23 +288,23 @@ class RSAPrivateKey(PrivateKey):
         if 'data' in key:
             data = base64_decode(unwrap_key_content(key['data'], 'PRIVATE'))
         else:
-            # generate key
-            if 'keySizeInBits' in key:
-                bits = int(key['keySizeInBits'])
-            else:
-                bits = 1024
-            private_key = RSA.generate(bits)
-            data = private_key.export_key()
-            key = {
-                'algorithm': 'RSA',
-                'data': base64_encode(data),
-                'keySizeInBits': bits,
-            }
+            raise ValueError('RSA key data empty')
         # create key
         self = super(RSAPrivateKey, cls).__new__(cls, key)
         self.data = data
         self.key = RSA.importKey(data)
         return self
+
+    @classmethod
+    def generate(cls, key: dict) -> PrivateKey:
+        if 'keySizeInBits' in key:
+            bits = int(key['keySizeInBits'])
+        else:
+            bits = 1024
+        private_key = RSA.generate(bits)
+        data = private_key.export_key()
+        key['data'] = base64_encode(data)
+        return RSAPrivateKey(key)
 
     def decrypt(self, data: bytes) -> bytes:
         cipher = Cipher_PKCS1_v1_5.new(self.key)
@@ -296,6 +328,10 @@ class RSAPrivateKey(PrivateKey):
         }
         return RSAPublicKey(info)
 
+
+"""
+    Key Classes Maps
+"""
 
 symmetric_key_classes = {
     'AES': AESKey,

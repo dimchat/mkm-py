@@ -12,7 +12,7 @@ class ID(str):
         data format: "name@address[/terminal]"
 
         filed(s):
-            name     - entity name, the seed of fingerprint to build address
+            name     - entity name, the seed of fingerprint to generate address
             address  - a string to identify an entity
             terminal - entity login resource(device), OPTIONAL
     """
@@ -24,12 +24,13 @@ class ID(str):
     def __new__(cls, identifier: str='',
                 name: str='', address: Address=None, terminal: str=None):
         """
+        Create ID object with ID string or name + address
 
-        :param identifier:   ID string with format 'name@address/terminal'
-        :param name:     A string for ID.name
-        :param address:  An Address object for ID.address
-        :param terminal: A string for login point
-        :return:         ID object
+        :param identifier: ID string with format 'name@address/terminal'
+        :param name:       A string for ID.name
+        :param address:    An Address object for ID.address
+        :param terminal:   A string for login point
+        :return: ID object
         """
         if identifier:
             # return ID object directory
@@ -71,9 +72,9 @@ class ID(str):
         return self.address.number
 
     @classmethod
-    def new(cls, seed: str, fingerprint: bytes, network: NetworkID, version: chr=0x01):
-        """ Create ID with seed, fingerprint and network ID """
-        address = Address.new(fingerprint=fingerprint, network=network, version=version)
+    def generate(cls, seed: str, fingerprint: bytes, network: NetworkID, version: chr=0x01):
+        """ Generate ID with seed, fingerprint and network ID """
+        address = Address.generate(fingerprint=fingerprint, network=network, version=version)
         if address.number > 0 and seed:
             return ID(name=seed, address=address)
         else:
