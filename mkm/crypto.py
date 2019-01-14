@@ -5,7 +5,7 @@
     Crypto
     ~~~~~~
 
-    Crypto Keys: AES, RSA
+    Crypto Keys: SymmetricKey(AES, ...), PrivateKey(RSA, ...), PublicKey(RSA, ...)
 """
 
 import numpy
@@ -38,10 +38,11 @@ class SymmetricKey(dict):
             return key
         elif isinstance(key, dict):
             algorithm = key['algorithm']
-            if algorithm == 'AES':
-                return AESKey.new(key)
+            clazz = symmetric_key_classes[algorithm]
+            if issubclass(clazz, SymmetricKey):
+                return clazz(key)
             else:
-                raise ModuleNotFoundError('Invalid algorithm')
+                raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
         else:
             raise AssertionError('Invalid symmetric key')
 
@@ -52,14 +53,101 @@ class SymmetricKey(dict):
         pass
 
 
+class PublicKey(dict):
+    """
+        This class is used to encrypt symmetric key or verify signature with message data
+    """
+
+    def __new__(cls, key: dict):
+        """
+
+        :param key: key info with algorithm='RSA'
+        :return: public key
+        """
+        if cls is not PublicKey:
+            if issubclass(cls, PublicKey):
+                return super(PublicKey, cls).__new__(cls, key)
+            else:
+                raise TypeError('Not subclass of PublicKey')
+        elif isinstance(key, PublicKey):
+            return key
+        elif isinstance(key, dict):
+            algorithm = key['algorithm']
+            clazz = public_key_classes[algorithm]
+            if issubclass(clazz, PublicKey):
+                return clazz(key)
+            else:
+                raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
+        else:
+            raise ValueError('Invalid public key')
+
+    def encrypt(self, plaintext: bytes) -> bytes:
+        pass
+
+    def verify(self, data: bytes, signature: bytes) -> bool:
+        pass
+
+    def match(self, private_key) -> bool:
+        promise = 'Moky loves May Lee forever!'
+        data = promise.encode('utf-8')
+        signature = private_key.sign(data)
+        return self.verify(data, signature)
+
+
+class PrivateKey(dict):
+    """
+        This class is used to decrypt symmetric key or sign message data
+    """
+
+    def __new__(cls, key: dict):
+        """
+
+        :param key: key info with algorithm='RSA'
+        :return: private key
+        """
+        if cls is not PrivateKey:
+            if issubclass(cls, PrivateKey):
+                return super(PrivateKey, cls).__new__(cls, key)
+            else:
+                raise TypeError('Not subclass of PrivateKey')
+        elif isinstance(key, PublicKey):
+            return key
+        elif isinstance(key, dict):
+            algorithm = key['algorithm']
+            clazz = private_key_classes[algorithm]
+            if issubclass(clazz, PrivateKey):
+                return clazz(key)
+            else:
+                raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
+        else:
+            raise ValueError('Invalid private key')
+
+    def decrypt(self, data: bytes) -> bytes:
+        pass
+
+    def sign(self, data: bytes) -> bytes:
+        pass
+
+    def publicKey(self) -> PublicKey:
+        pass
+
+
+"""
+    Extends Crypto Keys
+    
+    AESKey        as SymmetricKey
+    RSAPublicKey  as PublicKey
+    RSAPrivateKey as PrivateKey
+"""
+
+
 class AESKey(SymmetricKey):
     """ AES Key """
 
     data: bytes = None
     iv: bytes = None
 
-    @classmethod
-    def new(cls, key: dict) -> SymmetricKey:
+    def __new__(cls, key: dict):
         # data
         if 'data' in key:
             # import key from data
@@ -81,7 +169,7 @@ class AESKey(SymmetricKey):
             iv = b'0000000000000000'
             key['iv'] = base64_encode(iv)
         # create key
-        self = AESKey(key)
+        self = super(AESKey, cls).__new__(cls, key)
         self.data = data
         self.iv = iv
         return self
@@ -125,61 +213,20 @@ def unwrap_key_content(content, tag):
     return content
 
 
-class PublicKey(dict):
-    """
-        This class is used to encrypt symmetric key or verify signature with message data
-    """
-
-    def __new__(cls, key: dict):
-        """
-
-        :param key: key info with algorithm='RSA'
-        :return: public key
-        """
-        if cls is not PublicKey:
-            if issubclass(cls, PublicKey):
-                return super(PublicKey, cls).__new__(cls, key)
-            else:
-                raise TypeError('Not subclass of PublicKey')
-        elif isinstance(key, PublicKey):
-            return key
-        elif isinstance(key, dict):
-            algorithm = key['algorithm']
-            if algorithm == 'RSA':
-                return RSAPublicKey.new(key)
-            else:
-                raise ModuleNotFoundError('Invalid algorithm')
-        else:
-            raise ValueError('Invalid public key')
-
-    def encrypt(self, plaintext: bytes) -> bytes:
-        pass
-
-    def verify(self, data: bytes, signature: bytes) -> bool:
-        pass
-
-    def match(self, private_key) -> bool:
-        promise = 'Moky loves May Lee forever!'
-        data = promise.encode('utf-8')
-        signature = private_key.sign(data)
-        return self.verify(data, signature)
-
-
 class RSAPublicKey(PublicKey):
     """ RSA Public Key """
 
     data: bytes = None
     key = None
 
-    @classmethod
-    def new(cls, key: dict) -> PublicKey:
+    def __new__(cls, key: dict):
         # data
         if 'data' in key:
             data = base64_decode(unwrap_key_content(key['data'], 'PUBLIC'))
         else:
             raise ValueError('Public key data empty')
         # create key
-        self = RSAPublicKey(key)
+        self = super(RSAPublicKey, cls).__new__(cls, key)
         self.data = data
         self.key = RSA.importKey(data)
         return self
@@ -198,51 +245,13 @@ class RSAPublicKey(PublicKey):
             return False
 
 
-class PrivateKey(dict):
-    """
-        This class is used to decrypt symmetric key or sign message data
-    """
-
-    def __new__(cls, key: object):
-        """
-
-        :param key: key info with algorithm='RSA'
-        :return: private key
-        """
-        if cls is not PrivateKey:
-            if issubclass(cls, PrivateKey):
-                return super(PrivateKey, cls).__new__(cls, key)
-            else:
-                raise TypeError('Not subclass of PrivateKey')
-        elif isinstance(key, PublicKey):
-            return key
-        elif isinstance(key, dict):
-            algorithm = key['algorithm']
-            if algorithm == 'RSA':
-                return RSAPrivateKey.new(key)
-            else:
-                raise ModuleNotFoundError('Invalid algorithm')
-        else:
-            raise ValueError('Invalid private key')
-
-    def decrypt(self, data: bytes) -> bytes:
-        pass
-
-    def sign(self, data: bytes) -> bytes:
-        pass
-
-    def publicKey(self) -> PublicKey:
-        pass
-
-
 class RSAPrivateKey(PrivateKey):
     """ RSA Private Key """
 
     data: bytes = None
     key = None
 
-    @classmethod
-    def new(cls, key: dict) -> PrivateKey:
+    def __new__(cls, key: dict):
         # data
         if 'data' in key:
             data = base64_decode(unwrap_key_content(key['data'], 'PRIVATE'))
@@ -260,7 +269,7 @@ class RSAPrivateKey(PrivateKey):
                 'keySizeInBits': bits,
             }
         # create key
-        self = RSAPrivateKey(key)
+        self = super(RSAPrivateKey, cls).__new__(cls, key)
         self.data = data
         self.key = RSA.importKey(data)
         return self
@@ -285,4 +294,17 @@ class RSAPrivateKey(PrivateKey):
             'algorithm': 'RSA',
             'data': base64_encode(data),
         }
-        return RSAPublicKey.new(info)
+        return RSAPublicKey(info)
+
+
+symmetric_key_classes = {
+    'AES': AESKey,
+}
+
+public_key_classes = {
+    'RSA': RSAPublicKey,
+}
+
+private_key_classes = {
+    'RSA': RSAPrivateKey,
+}

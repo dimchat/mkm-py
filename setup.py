@@ -3,7 +3,8 @@
 
 """
     Ming-Ke-Ming
-    ~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~
+
     Common Identity Module for decentralized user identity authentication
 """
 

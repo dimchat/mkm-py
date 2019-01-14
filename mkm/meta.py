@@ -34,21 +34,30 @@ class Meta(dict):
     key: PublicKey = None
     fingerprint: bytes = None
 
-    def __new__(cls, dictionary: dict=None,
+    def __new__(cls, meta: dict=None,
                 seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=0x01):
-        """ Create meta object with meta info """
-        if dictionary:
+        """
+        Create meta object with meta info
+
+        :param meta:        A dictionary as meta info
+        :param seed:        A string as seed (name)
+        :param key:         A public key
+        :param fingerprint: A data signed by private keys with seed
+        :param version:     Algorithm version
+        :return: Meta object
+        """
+        if meta:
             # return Meta object directory
-            if isinstance(dictionary, Meta):
-                return dictionary
+            if isinstance(meta, Meta):
+                return meta
             # get fields from dictionary
-            version = int(dictionary['version'])
-            seed = dictionary['seed']
-            key = PublicKey(dictionary['key'])
-            fingerprint = base64_decode(dictionary['fingerprint'])
-        elif seed and key and fingerprint:
+            version = int(meta['version'])
+            seed = meta['seed']
+            key = PublicKey(meta['key'])
+            fingerprint = base64_decode(meta['fingerprint'])
+        elif version == 0x01 and seed and key and fingerprint:
             # build meta info
-            dictionary = {
+            meta = {
                 'version': version,
                 'seed': seed,
                 'key': key,
@@ -58,8 +67,8 @@ class Meta(dict):
             raise AssertionError('Parameters error')
         # verify seed and fingerprint
         if version == 0x01 and key.verify(seed.encode('utf-8'), fingerprint):
-            # new dict
-            self = super(Meta, cls).__new__(cls, dictionary)
+            # new Meta(dict)
+            self = super(Meta, cls).__new__(cls, meta)
             self.version = version
             self.seed = seed
             self.key = key
@@ -84,18 +93,17 @@ class Meta(dict):
         else:
             raise AssertionError('Invalid version')
 
-    def match_identity(self, identity: ID) -> bool:
+    def match_identifier(self, identifier: ID) -> bool:
         """ Check ID with meta info """
-        return identity.name == self.seed and self.match_address(identity.address)
+        return identifier.name == self.seed and self.match_address(identifier.address)
 
     def match_address(self, address: Address) -> bool:
         """ Check address with meta info """
         return self.build_address(address.network) == address
 
-    def build_identity(self, network: NetworkID) -> ID:
+    def build_identifier(self, network: NetworkID) -> ID:
         """ Build ID with meta info and network ID """
-        address = self.build_address(network)
-        return ID(name=self.seed, address=address)
+        return ID.new(seed=self.seed, fingerprint=self.fingerprint, network=network, version=self.version)
 
     def build_address(self, network: NetworkID) -> Address:
         """ Build address with meta info and network ID """

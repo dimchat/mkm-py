@@ -127,19 +127,19 @@ class Address(str):
     network: NetworkID = 0x00
     number: int = 0
 
-    def __new__(cls, string: str=''):
+    def __new__(cls, address: str=''):
         """
         Create address object with string
 
-        :param string:
-        :return:
+        :param address: address string
+        :return: Address object
         """
-        if string:
+        if address:
             # return Address object directory
-            if isinstance(string, Address):
-                return string
+            if isinstance(address, Address):
+                return address
             # get fields from string
-            data = base58_decode(string)
+            data = base58_decode(address)
             prefix = data[:1]
             digest = data[1:-4]
             code = data[-4:]
@@ -149,8 +149,8 @@ class Address(str):
             raise AssertionError('Parameter error')
         # verify
         if sha256(sha256(prefix + digest))[:4] == code:
-            # new str
-            self = super(Address, cls).__new__(cls, string)
+            # new Address(str)
+            self = super(Address, cls).__new__(cls, address)
             self.network = NetworkID(network)
             self.number = number
             return self
@@ -158,7 +158,7 @@ class Address(str):
             raise ValueError('Invalid address')
 
     @classmethod
-    def new(cls, fingerprint: bytes=None, network: NetworkID=0x00, version: chr=0x01):
+    def new(cls, fingerprint: bytes, network: NetworkID, version: chr=0x01):
         """ Create address with fingerprint and network ID """
         if version == 0x01 and fingerprint and network:
             # calculate address string with fingerprint

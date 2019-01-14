@@ -40,6 +40,11 @@ def test_aes():
     pt = key.decrypt(ct)
     print(hex_encode(data) + ' -> ' + hex_encode(ct) + ' -> ' + hex_encode(pt))
 
+    if data == pt:
+        print("Test AES OK!")
+    else:
+        raise AssertionError('Test AES failed!')
+
     print('---------------- test AES end')
 
 
@@ -61,12 +66,18 @@ def test_rsa():
     print(text + ' -> ' + base64_encode(ct))
     print(' -> ' + base64_encode(pt) + ' -> ' + pt.decode('utf-8'))
 
+    if data == pt:
+        print("Test RSA OK!")
+    else:
+        raise AssertionError('Test RSA failed!')
+
     sig = sk.sign(data)
     print('signature: ' + base64_encode(sig))
+
     if pk.verify(data, sig):
-        print('signature verify OK!')
+        print('Test RSA signature verify OK!')
     else:
-        print('signature error!')
+        raise AssertionError('Test RSA signature error!')
 
     print('---------------- test RSA end')
 
@@ -115,12 +126,12 @@ def test_meta():
     meta = mkm.Meta(meta)
     print('meta: ', meta)
 
-    if meta.match_identity(id1):
-        print('meta match ID')
+    if meta.match_identifier(id1):
+        print('Test meta OK!')
     else:
-        print('meta NOT match ID')
+        raise AssertionError('Test meta failed')
 
-    id2 = meta.build_identity(mkm.NetworkID.Main)
+    id2 = meta.build_identifier(mkm.NetworkID.Main)
     address2 = meta.build_address(mkm.NetworkID.Main)
     print_id(id2)
     print_address(address2)

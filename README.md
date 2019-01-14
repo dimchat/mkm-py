@@ -127,18 +127,17 @@ you must verify it with the consensus algorithm before accept its **key**.
         3. if matches, get public key from meta
 """
 
-def match_identity(self, identity: ID) -> bool:
+def match_identifier(self, identifier: ID) -> bool:
     """ Check ID with meta info """
-    return identity.name == self.seed and self.match_address(identity.address)
+    return identifier.name == self.seed and self.match_address(identifier.address)
 
 def match_address(self, address: Address) -> bool:
     """ Check address with meta info """
     return self.build_address(address.network) == address
 
-def build_identity(self, network: NetworkID) -> ID:
+def build_identifier(self, network: NetworkID) -> ID:
     """ Build ID with meta info and network ID """
-    address = self.build_address(network)
-    return ID(name=self.seed, address=address)
+    return ID.new(seed=self.seed, fingerprint=self.fingerprint, network=network, version=self.version)
 
 def build_address(self, network: NetworkID) -> Address:
     """ Build address with meta info and network ID """
