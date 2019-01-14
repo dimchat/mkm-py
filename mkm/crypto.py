@@ -32,11 +32,11 @@ class SymmetricKey(dict):
         if cls is not SymmetricKey:
             # subclass
             if issubclass(cls, SymmetricKey):
-                return super(SymmetricKey, cls).__new__(cls, key)
+                return super().__new__(cls, key)
             else:
                 raise TypeError('Not subclass of SymmetricKey')
         elif isinstance(key, SymmetricKey):
-            # key object
+            # return SymmetricKey object directly
             return key
         elif isinstance(key, dict):
             # get class by algorithm name
@@ -80,11 +80,11 @@ class PublicKey(dict):
         if cls is not PublicKey:
             # subclass
             if issubclass(cls, PublicKey):
-                return super(PublicKey, cls).__new__(cls, key)
+                return super().__new__(cls, key)
             else:
                 raise TypeError('Not subclass of PublicKey')
         elif isinstance(key, PublicKey):
-            # key object
+            # return PublicKey object directly
             return key
         elif isinstance(key, dict):
             # get class by algorithm name
@@ -95,7 +95,7 @@ class PublicKey(dict):
             else:
                 raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
         else:
-            raise ValueError('Invalid public key')
+            raise AssertionError('Invalid public key')
 
     def encrypt(self, plaintext: bytes) -> bytes:
         pass
@@ -124,11 +124,11 @@ class PrivateKey(dict):
         if cls is not PrivateKey:
             # subclass
             if issubclass(cls, PrivateKey):
-                return super(PrivateKey, cls).__new__(cls, key)
+                return super().__new__(cls, key)
             else:
                 raise TypeError('Not subclass of PrivateKey')
-        elif isinstance(key, PublicKey):
-            # key object
+        elif isinstance(key, PrivateKey):
+            # return PrivateKey object directly
             return key
         elif isinstance(key, dict):
             # get class by algorithm name
@@ -139,7 +139,7 @@ class PrivateKey(dict):
             else:
                 raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
         else:
-            raise ValueError('Invalid private key')
+            raise AssertionError('Invalid private key')
 
     def decrypt(self, data: bytes) -> bytes:
         pass
@@ -191,7 +191,7 @@ class AESKey(SymmetricKey):
             iv = b'0000000000000000'
             key['iv'] = base64_encode(iv)
         # create key
-        self = super(AESKey, cls).__new__(cls, key)
+        self = super().__new__(cls, key)
         self.data = data
         self.iv = iv
         return self
@@ -258,7 +258,7 @@ class RSAPublicKey(PublicKey):
         else:
             raise ValueError('Public key data empty')
         # create key
-        self = super(RSAPublicKey, cls).__new__(cls, key)
+        self = super().__new__(cls, key)
         self.data = data
         self.key = RSA.importKey(data)
         return self
@@ -290,7 +290,7 @@ class RSAPrivateKey(PrivateKey):
         else:
             raise ValueError('RSA key data empty')
         # create key
-        self = super(RSAPrivateKey, cls).__new__(cls, key)
+        self = super().__new__(cls, key)
         self.data = data
         self.key = RSA.importKey(data)
         return self

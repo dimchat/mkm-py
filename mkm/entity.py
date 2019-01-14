@@ -33,7 +33,7 @@ class ID(str):
         :return: ID object
         """
         if identifier:
-            # return ID object directory
+            # return ID object directly
             if isinstance(identifier, ID):
                 return identifier
             # get fields from string
@@ -50,7 +50,6 @@ class ID(str):
                 raise ValueError('Invalid ID string')
         elif name and address:
             # concatenate ID string
-            address = Address(address)
             if terminal:
                 identifier = name + '@' + address + '/' + terminal
             else:
@@ -60,7 +59,7 @@ class ID(str):
         # verify ID.address, which number must not be ZERO
         if address.number > 0:
             # new str
-            self = super(ID, cls).__new__(cls, identifier)
+            self = super().__new__(cls, identifier)
             self.name = name
             self.address = address
             self.terminal = terminal
@@ -93,7 +92,7 @@ class Entity:
     name: str = ''
 
     def __init__(self, identifier: ID):
-        super(Entity, self).__init__()
+        super().__init__()
         self.identifier = identifier
         self.name = identifier.name
 

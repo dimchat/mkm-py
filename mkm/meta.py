@@ -47,7 +47,7 @@ class Meta(dict):
         :return: Meta object
         """
         if meta:
-            # return Meta object directory
+            # return Meta object directly
             if isinstance(meta, Meta):
                 return meta
             # get fields from dictionary
@@ -64,11 +64,11 @@ class Meta(dict):
                 'fingerprint': base64_encode(fingerprint),
             }
         else:
-            raise AssertionError('Parameters error')
+            raise AssertionError('Meta parameters error')
         # verify seed and fingerprint
         if version == 0x01 and key.verify(seed.encode('utf-8'), fingerprint):
             # new Meta(dict)
-            self = super(Meta, cls).__new__(cls, meta)
+            self = super().__new__(cls, meta)
             self.version = version
             self.seed = seed
             self.key = key

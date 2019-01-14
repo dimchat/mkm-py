@@ -135,7 +135,7 @@ class Address(str):
         :return: Address object
         """
         if address:
-            # return Address object directory
+            # return Address object directly
             if isinstance(address, Address):
                 return address
             # get fields from string
@@ -150,7 +150,7 @@ class Address(str):
         # verify
         if sha256(sha256(prefix + digest))[:4] == code:
             # new Address(str)
-            self = super(Address, cls).__new__(cls, address)
+            self = super().__new__(cls, address)
             self.network = NetworkID(network)
             self.number = number
             return self
