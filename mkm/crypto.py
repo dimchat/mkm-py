@@ -188,7 +188,7 @@ class AESKey(SymmetricKey):
             iv = key['iv']
             iv = base64_decode(iv)
         else:
-            iv = b'0000000000000000'
+            iv = AES.block_size * chr(0).encode('utf-8')  # b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'
             key['iv'] = base64_encode(iv)
         # create key
         self = super().__new__(cls, key)
@@ -202,20 +202,24 @@ class AESKey(SymmetricKey):
             size = int(key['size'])
         else:
             size = 32
+        # key data
         data = bytes(numpy.random.bytes(size))
         key['data'] = base64_encode(data)
+        # initialized vector
+        iv = bytes(numpy.random.bytes(AES.block_size))
+        key['iv'] = base64_encode(iv)
         return AESKey(key)
 
     def encrypt(self, plaintext: bytes) -> bytes:
         key = AES.new(self.data, AES.MODE_CBC, self.iv)
         size = key.block_size
-        pad = (size - len(plaintext) % size) * chr(0)
-        return key.encrypt(plaintext + pad.encode('utf-8'))
+        pad = (size - len(plaintext) % size) * chr(0).encode('utf-8')
+        return key.encrypt(plaintext + pad)
 
     def decrypt(self, data: bytes) -> bytes:
         key = AES.new(self.data, AES.MODE_CBC, self.iv)
         plaintext = key.decrypt(data)
-        pad = chr(0).encode('utf-8')
+        pad = plaintext[-1:]  # chr(0).encode('utf-8')
         return plaintext.rstrip(pad)
 
 
