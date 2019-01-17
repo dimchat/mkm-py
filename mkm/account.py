@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-#
-#   Ming-Ke-Ming : Decentralized user identity authentication
-#
-#                                Written in 2019 by Moky <albert.moky@gmail.com>
-#
 # ==============================================================================
 # MIT License
 #
@@ -28,23 +23,44 @@
 # SOFTWARE.
 # ==============================================================================
 
-from mkm.crypto import SymmetricKey, PrivateKey, PublicKey
-from mkm.address import NetworkID, Address
-from mkm.meta import Meta
+from mkm.crypto import PublicKey, PrivateKey
 from mkm.entity import ID, Entity
-from mkm.account import Account, User
-from mkm.group import Group
 
-name = "MingKeMing"
 
-__author__ = 'Albert Moky'
+class Account(Entity):
 
-__all__ = [
-    'SymmetricKey',
-    'PrivateKey', 'PublicKey',
+    publicKey: PublicKey = None
 
-    'NetworkID', 'Address', 'ID', 'Meta',
-    'Entity',
-    'Account', 'User',
-    'Group',
-]
+    def __init__(self, identifier: ID, public_key: PublicKey):
+        if identifier.address.network.is_communicator():
+            super().__init__(identifier)
+            # must verify the ID with meta info before creating an account with meta.key
+            self.publicKey = public_key
+        else:
+            raise ValueError('Account ID error')
+
+
+class User(Account):
+
+    privateKey: PrivateKey = None
+    contacts: list = []
+
+    def __init__(self, identifier: ID, private_key: PrivateKey):
+        if identifier.address.network.is_person():
+            super().__init__(identifier, private_key.publicKey())
+            self.privateKey = private_key
+        else:
+            raise ValueError('User ID error')
+
+    def addContact(self, contact: ID):
+        if not contact.address.network.is_person():
+            raise AssertionError('Contact must be a person')
+        if contact not in self.contacts:
+            self.contacts.append(contact)
+
+    def removeContact(self, contact: ID):
+        if contact in self.contacts:
+            self.contacts.remove(contact)
+
+    def hasContact(self, contact: ID) -> bool:
+        return contact in self.contacts

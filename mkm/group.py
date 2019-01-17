@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-#
-#   Ming-Ke-Ming : Decentralized user identity authentication
-#
-#                                Written in 2019 by Moky <albert.moky@gmail.com>
-#
 # ==============================================================================
 # MIT License
 #
@@ -28,23 +23,26 @@
 # SOFTWARE.
 # ==============================================================================
 
-from mkm.crypto import SymmetricKey, PrivateKey, PublicKey
-from mkm.address import NetworkID, Address
-from mkm.meta import Meta
 from mkm.entity import ID, Entity
-from mkm.account import Account, User
-from mkm.group import Group
 
-name = "MingKeMing"
 
-__author__ = 'Albert Moky'
+class Group(Entity):
 
-__all__ = [
-    'SymmetricKey',
-    'PrivateKey', 'PublicKey',
+    members: list = []
 
-    'NetworkID', 'Address', 'ID', 'Meta',
-    'Entity',
-    'Account', 'User',
-    'Group',
-]
+    def __init__(self, identifier: ID):
+        if identifier.address.network.is_group():
+            super().__init__(identifier)
+        else:
+            raise ValueError('Group ID error')
+
+    def addMember(self, member: ID):
+        if member not in self.members:
+            self.members.append(member)
+
+    def removeMember(self, member: ID):
+        if member in self.members:
+            self.members.remove(member)
+
+    def hasMember(self, member: ID) -> bool:
+        return member in self.members
