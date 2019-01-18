@@ -60,7 +60,7 @@ class NetworkID(IntEnum):
             which should have a founder (also the owner), and some members.
 
             MKMNetwork_Moments indicates a special personal social network,
-            where the owner can share informations and interact with its friends.
+            where the owner can share information and interact with its friends.
             The owner is the king here, it can do anything and no one can stop it.
 
             MKMNetwork_Polylogue indicates a virtual (temporary) social network.
