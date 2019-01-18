@@ -12,11 +12,9 @@ import unittest
 
 from binascii import b2a_hex, a2b_hex
 
-from mkm.utils import *
 import mkm
-
-from tests.moki import *
-from tests.hulk import *
+from mkm.utils import *
+from mkm.immortals import *
 
 
 __author__ = 'Albert Moky'
@@ -175,18 +173,24 @@ class AccountTestCase(unittest.TestCase):
     def test(self):
         print('---------------- test Account begin')
 
-        id1 = mkm.ID(id_moki)
-        meta1 = mkm.Meta(meta_moki)
+        id1 = mkm.ID(moki_id)
+        meta1 = mkm.Meta(moki_meta)
+        print('ID: ', id1, ', meta: ', meta1)
         self.assertTrue(meta1.match_identifier(id1))
+
+        sk1 = mkm.PrivateKey(moki_sk)
+        print('private key: ', sk1)
+        self.assertTrue(meta1.key.match(sk1))
 
         account1 = mkm.Account(id1, meta1.key)
         print('account1: ', account1)
 
-        id2 = mkm.ID(id_hulk)
-        sk2 = mkm.PrivateKey(sk_hulk)
+        id2 = mkm.ID(hulk_id)
+        sk2 = mkm.PrivateKey(hulk_sk)
 
         user2 = mkm.User(id2, sk2)
         print('user2: ', user2)
+        self.assertTrue(user2.publicKey.match(user2.privateKey))
 
         print('---------------- test Account end')
 
