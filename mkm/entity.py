@@ -39,10 +39,6 @@ class ID(str):
             terminal - entity login resource(device), OPTIONAL
     """
 
-    name: str = ''
-    address: Address = None
-    terminal: str = None
-
     def __new__(cls, identifier: str='',
                 name: str='', address: Address=None, terminal: str=None):
         """
@@ -93,7 +89,7 @@ class ID(str):
         return self.address.number
 
     @classmethod
-    def generate(cls, seed: str, fingerprint: bytes, network: NetworkID, version: chr=0x01):
+    def generate(cls, seed: str, fingerprint: bytes, network: NetworkID, version: chr=Address.DefaultVersion):
         """ Generate ID with seed, fingerprint and network ID """
         address = Address.generate(fingerprint=fingerprint, network=network, version=version)
         if address.number > 0 and seed:
@@ -109,9 +105,6 @@ class Entity:
 
         Entity with ID and name
     """
-
-    identifier: ID = None
-    name: str = ''
 
     def __init__(self, identifier: ID):
         if identifier.name and identifier.number() > 0:

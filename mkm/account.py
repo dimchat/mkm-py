@@ -29,8 +29,6 @@ from mkm.entity import ID, Entity
 
 class Account(Entity):
 
-    publicKey: PublicKey = None
-
     def __init__(self, identifier: ID, public_key: PublicKey):
         if identifier.address.network.is_communicator():
             super().__init__(identifier)
@@ -42,13 +40,11 @@ class Account(Entity):
 
 class User(Account):
 
-    privateKey: PrivateKey = None
-    contacts: list = []
-
     def __init__(self, identifier: ID, private_key: PrivateKey):
         if identifier.address.network.is_person():
             super().__init__(identifier, private_key.publicKey())
             self.privateKey = private_key
+            self.contacts: list = []
         else:
             raise ValueError('User ID error')
 

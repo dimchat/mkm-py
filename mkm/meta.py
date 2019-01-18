@@ -51,13 +51,10 @@ from mkm.entity import ID
 
 class Meta(dict):
 
-    version: chr = 0x01
-    seed: str = ''
-    key: PublicKey = None
-    fingerprint: bytes = None
+    DefaultVersion = 0x01
 
     def __new__(cls, meta: dict=None,
-                seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=0x01):
+                seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=DefaultVersion):
         """
         Create meta object with meta info
 
@@ -77,7 +74,7 @@ class Meta(dict):
             seed = meta['seed']
             key = PublicKey(meta['key'])
             fingerprint = base64_decode(meta['fingerprint'])
-        elif version == 0x01 and seed and key and fingerprint:
+        elif version and seed and key and fingerprint:
             # build meta info
             meta = {
                 'version': version,
@@ -88,7 +85,7 @@ class Meta(dict):
         else:
             raise AssertionError('Meta parameters error')
         # verify seed and fingerprint
-        if version == 0x01 and key.verify(seed.encode('utf-8'), fingerprint):
+        if version == Meta.DefaultVersion and key.verify(seed.encode('utf-8'), fingerprint):
             # new Meta(dict)
             self = super().__new__(cls, meta)
             self.version = version
@@ -100,9 +97,9 @@ class Meta(dict):
             raise ValueError('Meta data not math')
 
     @classmethod
-    def generate(cls, seed: str, private_key: PrivateKey, version: chr=0x01):
+    def generate(cls, seed: str, private_key: PrivateKey, version: chr=DefaultVersion):
         """ Generate meta info with seed and private key """
-        if version == 0x01:
+        if version == Meta.DefaultVersion:
             # generate fingerprint with private key
             fingerprint = private_key.sign(seed.encode('utf-8'))
             dictionary = {

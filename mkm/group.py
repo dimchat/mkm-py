@@ -28,11 +28,10 @@ from mkm.entity import ID, Entity
 
 class Group(Entity):
 
-    members: list = []
-
     def __init__(self, identifier: ID):
         if identifier.address.network.is_group():
             super().__init__(identifier)
+            self.members = []
         else:
             raise ValueError('Group ID error')
 

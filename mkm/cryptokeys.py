@@ -48,9 +48,6 @@ from mkm.crypto import PrivateKey, private_key_classes
 class AESKey(SymmetricKey):
     """ AES Key """
 
-    data: bytes = None
-    iv: bytes = None
-
     def __new__(cls, key: dict):
         # data
         if 'data' in key:
@@ -80,7 +77,7 @@ class AESKey(SymmetricKey):
         # key data
         data = bytes(numpy.random.bytes(size))
         key['data'] = base64_encode(data)
-        # initialized vector
+        # initialization vector
         iv = bytes(numpy.random.bytes(AES.block_size))
         key['iv'] = base64_encode(iv)
         return AESKey(key)
@@ -127,9 +124,6 @@ def unwrap_key_content(content, tag):
 class RSAPublicKey(PublicKey):
     """ RSA Public Key """
 
-    data: bytes = None
-    key = None
-
     def __new__(cls, key: dict):
         # data
         if 'data' in key:
@@ -158,9 +152,6 @@ class RSAPublicKey(PublicKey):
 
 class RSAPrivateKey(PrivateKey):
     """ RSA Private Key """
-
-    data: bytes = None
-    key = None
 
     def __new__(cls, key: dict):
         # data

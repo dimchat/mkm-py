@@ -98,41 +98,60 @@ class NetworkID(IntEnum):
 
             (All above are just some advices to help choosing numbers :P)
     """
-    # Person Account
+    ################################
+    #  Person Account
+    ################################
     Main = 0x08         # 0000 1000 (Person)
 
-    # Virtual Groups
+    ################################
+    #  Virtual Groups
+    ################################
     Group = 0x10        # 0001 0000 (Multi-Persons)
+    # Moments = 0x18    # 0001 1000 (Twitter)
     Polylogue = 0x10    # 0001 0000 (Multi-Persons Chat, N < 100)
     Chatroom = 0x30     # 0011 0000 (Multi-Persons Chat, N >= 100)
 
-    # Network
-    Provider = 0x76     # 0111 0110 (Service Provider)
-    Station = 0x88      # 1000 1000 (Server Node)
+    ################################
+    #  Social Entities in Reality
+    ################################
+    # SocialEntity = 0x50  # 0101 0000
+    # Organization = 0x74  # 0111 0100
+    # Company = 0x76       # 0111 0110
+    # School = 0x77        # 0111 0111
+    # Government = 0x73    # 0111 0011
+    # Department = 0x52    # 0101 0010
 
-    # Internet of Things
-    Thing = 0x80        # 1000 0000 (IoT)
-    Robot = 0xC8        # 1100 1000
+    ################################
+    #  Network
+    ################################
+    Provider = 0x76        # 0111 0110 (Service Provider)
+    Station = 0x88         # 1000 1000 (Server Node)
 
-    def is_communicator(self):
+    ################################
+    #  Internet of Things
+    ################################
+    Thing = 0x80           # 1000 0000 (IoT)
+    Robot = 0xC8           # 1100 1000
+
+    def is_communicator(self) -> bool:
         return self.value & self.Main
 
-    def is_person(self):
+    def is_person(self) -> bool:
         return self.value == self.Main
 
-    def is_group(self):
+    def is_group(self) -> bool:
         return self.value & self.Group
 
-    def is_station(self):
+    def is_station(self) -> bool:
         return self.value == self.Station
 
-    def is_provider(self):
+    def is_provider(self) -> bool:
         return self.value == self.Provider
 
-    def is_thing(self):
+    def is_thing(self) -> bool:
         return self.value & self.Thing
 
-    def is_robot(self):
+    def is_robot(self) -> bool:
         return self.value == self.Robot
 
 
@@ -146,8 +165,7 @@ class Address(str):
         This class is used to build address for ID
     """
 
-    network: NetworkID = 0x00
-    number: int = 0
+    DefaultVersion = 0x01
 
     def __new__(cls, address: str=''):
         """
@@ -162,11 +180,14 @@ class Address(str):
                 return address
             # get fields from string
             data = base58_decode(address)
-            prefix = data[:1]
-            digest = data[1:-4]
-            code = data[-4:]
-            network = ord(prefix)
-            number = user_number(code)
+            if len(data) == 25:
+                prefix = data[:1]
+                digest = data[1:-4]
+                code = data[-4:]
+                network = ord(prefix)
+                number = user_number(code)
+            else:
+                raise ValueError('Address error')
         else:
             raise AssertionError('Parameter error')
         # verify
@@ -180,9 +201,9 @@ class Address(str):
             raise ValueError('Invalid address')
 
     @classmethod
-    def generate(cls, fingerprint: bytes, network: NetworkID, version: chr=0x01):
+    def generate(cls, fingerprint: bytes, network: NetworkID, version: chr=DefaultVersion):
         """ Generate address with fingerprint and network ID """
-        if version == 0x01 and fingerprint and network:
+        if version == Address.DefaultVersion and fingerprint and network:
             # calculate address string with fingerprint
             prefix = chr(network).encode('utf-8')
             digest = ripemd160(sha256(fingerprint))
