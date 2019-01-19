@@ -85,6 +85,7 @@ class ID(str):
         else:
             raise ValueError('Invalid ID (address) string')
 
+    @property
     def number(self) -> int:
         return self.address.number
 
@@ -107,7 +108,12 @@ class Entity:
     """
 
     def __init__(self, identifier: ID):
-        if identifier.name and identifier.number() > 0:
+        """
+        Create Entity with ID
+
+        :param identifier: User/Group ID
+        """
+        if identifier.name and identifier.address.number > 0:
             super().__init__()
             self.identifier = identifier
             self.name = identifier.name
@@ -122,5 +128,6 @@ class Entity:
         name = self.name
         return '<%s: %s(%d|%d) "%s">' % (clazz, identifier, network, number, name)
 
+    @property
     def number(self) -> int:
         return self.identifier.address.number

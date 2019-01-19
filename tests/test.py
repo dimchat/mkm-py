@@ -33,7 +33,7 @@ def hex_decode(string: str) -> bytes:
 class CryptoTestCase(unittest.TestCase):
 
     def test_aes(self):
-        print('---------------- test AES begin')
+        print('\n---------------- %s' % self)
 
         info = {
             'algorithm': 'AES',
@@ -47,10 +47,9 @@ class CryptoTestCase(unittest.TestCase):
         print(hex_encode(data) + ' -> ' + hex_encode(ct) + ' -> ' + hex_encode(pt))
 
         self.assertEqual(data, pt)
-        print('---------------- test AES end')
 
     def test_rsa(self):
-        print('---------------- test RSA begin')
+        print('\n---------------- %s' % self)
 
         info = {
             'algorithm': 'RSA',
@@ -73,7 +72,6 @@ class CryptoTestCase(unittest.TestCase):
         print('signature: ' + base64_encode(sig))
 
         self.assertTrue(pk.verify(data, sig))
-        print('---------------- test RSA end')
 
 
 def print_address(address):
@@ -89,6 +87,7 @@ def print_id(identity):
         'name': identity.name,
         'address': identity.address,
         'terminal': identity.terminal,
+        'number': identity.number,
     }
     print(identity, ':', info)
 
@@ -96,7 +95,7 @@ def print_id(identity):
 class BaseTestCase(unittest.TestCase):
 
     def test_meta(self):
-        print('---------------- test Meta begin ')
+        print('\n---------------- %s' % self)
 
         id1 = mkm.ID('moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk')
         seed = 'moki'
@@ -130,10 +129,8 @@ class BaseTestCase(unittest.TestCase):
         print_id(id2)
         print_address(address2)
 
-        print('---------------- test Meta end')
-
     def test_entity(self):
-        print('---------------- test Entity begin')
+        print('\n---------------- %s' % self)
 
         my_id = 'moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk'
         fingerprint = 'ld68TnzYqzFQMxeJ6N+aZa2jRf9d4zVx4BUiBlmur67ne8YZF08plhCiIhfyYDIwwW7K' \
@@ -165,13 +162,26 @@ class BaseTestCase(unittest.TestCase):
         entity.name = 'Albert Moky'
         print(entity)
 
-        print('---------------- test Entity end')
-
 
 class AccountTestCase(unittest.TestCase):
 
-    def test(self):
-        print('---------------- test Account begin')
+    def test_register(self):
+        print('\n---------------- %s' % self)
+
+        name = 'moky'
+
+        for x in range(0, 10):
+            sk = mkm.PrivateKey.generate({'algorithm': 'RSA'})
+            meta = mkm.Meta.generate(name, sk)
+            print(x, 'meta: ', meta)
+            self.assertTrue(meta.key.match(sk))
+
+            id1 = meta.generate_identifier(mkm.NetworkID.Main)
+            print_id(id1)
+            self.assertTrue(meta.match_identifier(id1))
+
+    def test_account(self):
+        print('\n---------------- %s' % self)
 
         id1 = mkm.ID(moki_id)
         meta1 = mkm.Meta(moki_meta)
@@ -190,9 +200,11 @@ class AccountTestCase(unittest.TestCase):
 
         user2 = mkm.User(id2, sk2)
         print('user2: ', user2)
+        # print('number: ', user2.number())
+        print('number: ', user2.number)
+        print('number: ', user2.number)
+        print('number: ', user2.number)
         self.assertTrue(user2.publicKey.match(user2.privateKey))
-
-        print('---------------- test Account end')
 
 
 if __name__ == '__main__':

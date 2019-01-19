@@ -29,6 +29,11 @@ from mkm.entity import ID, Entity
 class Group(Entity):
 
     def __init__(self, identifier: ID):
+        """
+        Create Group with ID
+
+        :param identifier: Group ID
+        """
         if identifier.address.network.is_group():
             super().__init__(identifier)
             self.members = []
@@ -36,12 +41,28 @@ class Group(Entity):
             raise ValueError('Group ID error')
 
     def addMember(self, member: ID):
+        """
+        Add group member by ID
+
+        :param member: ID
+        """
         if member not in self.members:
             self.members.append(member)
 
     def removeMember(self, member: ID):
+        """
+        Remove member by ID
+
+        :param member: ID
+        """
         if member in self.members:
             self.members.remove(member)
 
     def hasMember(self, member: ID) -> bool:
+        """
+        Check whether contains the member
+
+        :param member: ID
+        :return: True/False
+        """
         return member in self.members
