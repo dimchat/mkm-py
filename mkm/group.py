@@ -23,6 +23,13 @@
 # SOFTWARE.
 # ==============================================================================
 
+"""
+    Group for assembly
+    ~~~~~~~~~~~~~~~~~~
+
+    Group with members
+"""
+
 from mkm.entity import ID, Entity
 
 

@@ -205,7 +205,7 @@ class Address(str):
         """ Generate address with fingerprint and network ID """
         if version == Address.DefaultVersion and fingerprint and network:
             # calculate address string with fingerprint
-            prefix = chr(network).encode('utf-8')
+            prefix = chr(network).encode('latin1')
             digest = ripemd160(sha256(fingerprint))
             code = sha256(sha256(prefix + digest))[:4]
             string = base58_encode(prefix + digest + code)

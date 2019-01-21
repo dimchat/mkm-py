@@ -23,6 +23,13 @@
 # SOFTWARE.
 # ==============================================================================
 
+"""
+    Account for communication
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Account with ID and Public Key
+"""
+
 from mkm.crypto import PublicKey, PrivateKey
 from mkm.entity import ID, Entity
 
