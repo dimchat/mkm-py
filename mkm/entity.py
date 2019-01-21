@@ -126,7 +126,7 @@ class Entity:
         network = identifier.address.network
         number = identifier.address.number
         name = self.name
-        return '<%s: %s(%d|%d) "%s">' % (clazz, identifier, network, number, name)
+        return '<%s: %s(%d|%d) "%s" />' % (clazz, identifier, network, number, name)
 
     @property
     def number(self) -> int:

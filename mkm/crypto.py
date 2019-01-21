@@ -160,6 +160,7 @@ class PrivateKey(dict):
     def sign(self, data: bytes) -> bytes:
         pass
 
+    @property
     def publicKey(self) -> PublicKey:
         pass
 

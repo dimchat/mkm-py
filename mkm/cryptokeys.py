@@ -189,6 +189,7 @@ class RSAPrivateKey(PrivateKey):
         signer = Signature_PKCS1_v1_5.new(self.key)
         return signer.sign(hash_obj)
 
+    @property
     def publicKey(self) -> PublicKey:
         pk = self.key.publickey()
         data = pk.export_key()

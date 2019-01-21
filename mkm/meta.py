@@ -105,7 +105,7 @@ class Meta(dict):
             dictionary = {
                 'version': version,
                 'seed': seed,
-                'key': private_key.publicKey(),
+                'key': private_key.publicKey,
                 'fingerprint': base64_encode(fingerprint),
             }
             return Meta(dictionary)

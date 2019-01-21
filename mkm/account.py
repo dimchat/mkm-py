@@ -61,7 +61,7 @@ class User(Account):
         :param private_key: User Private key
         """
         if identifier.address.network.is_person():
-            super().__init__(identifier, private_key.publicKey())
+            super().__init__(identifier, private_key.publicKey)
             self.privateKey = private_key
             self.contacts: list = []
         else:
