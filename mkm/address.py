@@ -41,7 +41,7 @@
 
 from enum import IntEnum
 
-from mkm.utils import sha256, ripemd160, base58_encode, base58_decode
+from .utils import sha256, ripemd160, base58_encode, base58_decode
 
 
 class NetworkID(IntEnum):

@@ -7,9 +7,9 @@
     Genesis accounts for test: "Immortal Hulk", "Monkey King"
 """
 
-from mkm.crypto import PrivateKey
-from mkm.entity import ID
-from mkm.account import User
+from .crypto import PrivateKey
+from .entity import ID
+from .account import User
 
 
 #
@@ -19,16 +19,16 @@ hulk_id = 'hulk@4YeVEN3aUnvC1DNUufCq1bs9zoBSJTzVEj'
 
 hulk_pk = {
     'algorithm': 'RSA',
-    'data': '-----BEGIN PUBLIC KEY-----'
+    'data': '-----BEGIN PUBLIC KEY-----\n'
             'MIGJAoGBALB+vbUK48UU9rjlgnohQowME+3JtTb2hLPqtatVOW364/EKFq0/PSdn'
             'ZVE9V2Zq+pbX7dj3nCS4pWnYf40ELH8wuDm0Tc4jQ70v4LgAcdy3JGTnWUGiCsY+'
-            '0Z8kNzRkm3FJid592FL7ryzfvIzB9bjg8U2JqlyCVAyUYEnKv4lDAgMBAAE='
+            '0Z8kNzRkm3FJid592FL7ryzfvIzB9bjg8U2JqlyCVAyUYEnKv4lDAgMBAAE=\n'
             '-----END PUBLIC KEY-----'
 }
 
 hulk_sk = {
     'algorithm': 'RSA',
-    'data': '-----BEGIN RSA PRIVATE KEY-----'
+    'data': '-----BEGIN RSA PRIVATE KEY-----\n'
             'MIICXQIBAAKBgQCwfr21CuPFFPa45YJ6IUKMDBPtybU29oSz6rWrVTlt+uPxChat'
             'Pz0nZ2VRPVdmavqW1+3Y95wkuKVp2H+NBCx/MLg5tE3OI0O9L+C4AHHctyRk51lB'
             'ogrGPtGfJDc0ZJtxSYnefdhS+68s37yMwfW44PFNiapcglQMlGBJyr+JQwIDAQAB'
@@ -41,7 +41,7 @@ hulk_sk = {
             'Bd8dKcoHbNWiOJejIERibbO27xfVfkyxKvwwvqT4NIKLegrciVMcUWliivsCQQCi'
             'A1Z/XEQS2iUO89tVn8JhuuQ6Boav0NCN7OEhQxX3etFS0/+0KrD9psr2ha38qnww'
             'zaaJbzgoRdF12qpL39TZAkBPv2lXFNsn0/Jq3cUemof+5sm53KvtuLqxmZfZMAuT'
-            'SIbB+8i05JUVIc+mcYqTqGp4FDfz6snzt7sMBQdx6BZY'
+            'SIbB+8i05JUVIc+mcYqTqGp4FDfz6snzt7sMBQdx6BZY\n'
             '-----END RSA PRIVATE KEY-----'
 }
 
@@ -64,16 +64,16 @@ moki_id = 'moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk'
 
 moki_pk = {
     'algorithm': 'RSA',
-    'data': '-----BEGIN PUBLIC KEY-----'
+    'data': '-----BEGIN PUBLIC KEY-----\n'
             'MIGJAoGBALQOcgxhhV0XiHELKYdG587Tup261qQ3ahAGPuifZvxHXTq+GgulEyXi'
             'ovwrVjpz7rKXn+16HgspLHpp5agv0WsSn6k2MnQGk5RFXuilbFr/C1rEX2X7uXlU'
-            'XDMpsriKFndoB1lz9P3E8FkM5ycG84hejcHB+R5yzDa4KbGeOc0tAgMBAAE='
+            'XDMpsriKFndoB1lz9P3E8FkM5ycG84hejcHB+R5yzDa4KbGeOc0tAgMBAAE=\n'
             '-----END PUBLIC KEY-----'
 }
 
 moki_sk = {
     'algorithm': 'RSA',
-    'data': '-----BEGIN RSA PRIVATE KEY-----'
+    'data': '-----BEGIN RSA PRIVATE KEY-----\n'
             'MIICXQIBAAKBgQC0DnIMYYVdF4hxCymHRufO07qdutakN2oQBj7on2b8R106vhoL'
             'pRMl4qL8K1Y6c+6yl5/teh4LKSx6aeWoL9FrEp+pNjJ0BpOURV7opWxa/wtaxF9l'
             '+7l5VFwzKbK4ihZ3aAdZc/T9xPBZDOcnBvOIXo3Bwfkecsw2uCmxnjnNLQIDAQAB'
@@ -86,7 +86,7 @@ moki_sk = {
             'JZTKgB0SDZC1JQnsvCQJHld1u2TUfWcf3UZH1V2CK5sNnVpmOXHPpYZBmpECQBp1'
             'hJkseMGFDVneEEf86yIjZIM6JLHYq2vT4fNr6C+MqPzvsIjgboJkqyK2sLj2WVm3'
             'bJxQw4mXvGP0qBOQhQECQQCOepIyFl/a/KmjVZ5dvmU2lcHXkqrvjcAbpyO1Dw6p'
-            '2OFCBTTQf3QRmCoys5/dyBGLDhRzV5Obtg6Fll/caLXs'
+            '2OFCBTTQf3QRmCoys5/dyBGLDhRzV5Obtg6Fll/caLXs\n'
             '-----END RSA PRIVATE KEY-----'
 }
 

@@ -28,13 +28,14 @@
 # SOFTWARE.
 # ==============================================================================
 
-from mkm.crypto import SymmetricKey, PrivateKey, PublicKey
-from mkm.cryptokeys import AESKey, RSAPrivateKey, RSAPublicKey
-from mkm.address import NetworkID, Address
-from mkm.meta import Meta
-from mkm.entity import ID, Entity
-from mkm.account import Account, User
-from mkm.group import Group
+from .crypto import SymmetricKey, PrivateKey, PublicKey
+from .cryptokeys import AESKey, RSAPrivateKey, RSAPublicKey
+
+from .address import NetworkID, Address
+from .meta import Meta
+from .entity import ID, Entity
+from .account import Account, User
+from .group import Group
 
 name = "MingKeMing"
 

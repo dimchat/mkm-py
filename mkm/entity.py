@@ -23,7 +23,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from mkm.address import Address, NetworkID
+from .address import Address, NetworkID
 
 
 class ID(str):

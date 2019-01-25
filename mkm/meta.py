@@ -42,11 +42,11 @@
         number  = uint(code);
 """
 
-from mkm.utils import base64_encode, base64_decode
-from mkm.crypto import PublicKey, PrivateKey
+from .utils import base64_encode, base64_decode
+from .crypto import PublicKey, PrivateKey
 
-from mkm.address import NetworkID, Address
-from mkm.entity import ID
+from .address import NetworkID, Address
+from .entity import ID
 
 
 class Meta(dict):

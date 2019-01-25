@@ -39,10 +39,10 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from Crypto.Signature import PKCS1_v1_5 as Signature_PKCS1_v1_5
 
-from mkm.utils import base64_encode, base64_decode
-from mkm.crypto import SymmetricKey, symmetric_key_classes
-from mkm.crypto import PublicKey, public_key_classes
-from mkm.crypto import PrivateKey, private_key_classes
+from .utils import base64_encode, base64_decode
+from .crypto import SymmetricKey, symmetric_key_classes
+from .crypto import PublicKey, public_key_classes
+from .crypto import PrivateKey, private_key_classes
 
 
 class AESKey(SymmetricKey):
@@ -95,46 +95,17 @@ class AESKey(SymmetricKey):
         return plaintext.rstrip(pad)
 
 
-def unwrap_key_content(content, tag):
-    # search tags
-    begin = '-----BEGIN RSA ' + tag + ' KEY-----'
-    end = '-----END RSA ' + tag + ' KEY-----'
-    pos1 = content.find(begin)
-    if pos1 < 0:
-        begin = '-----BEGIN ' + tag + ' KEY-----'
-        end = '-----END ' + tag + ' KEY-----'
-        pos1 = content.find(begin)
-    # unwrap tags
-    if pos1 < 0:
-        # tags not found
-        pos2 = -1
-    else:
-        pos1 += len(begin)
-        pos2 = content.find(end, pos1)
-    if pos1 != -1 and pos2 != -1:
-        content = content[pos1:pos2]
-    # remove spaces
-    content = content.replace('\r', '')
-    content = content.replace('\n', '')
-    content = content.replace('\t', '')
-    content = content.replace(' ', '')
-    return content
-
-
 class RSAPublicKey(PublicKey):
     """ RSA Public Key """
 
     def __new__(cls, key: dict):
-        # data
         if 'data' in key:
-            data = base64_decode(unwrap_key_content(key['data'], 'PUBLIC'))
+            # create key
+            self = super().__new__(cls, key)
+            self.key = RSA.importKey(key['data'])
+            return self
         else:
             raise ValueError('Public key data empty')
-        # create key
-        self = super().__new__(cls, key)
-        self.data = data
-        self.key = RSA.importKey(data)
-        return self
 
     def encrypt(self, plaintext: bytes) -> bytes:
         cipher = Cipher_PKCS1_v1_5.new(self.key)
@@ -156,14 +127,12 @@ class RSAPrivateKey(PrivateKey):
     def __new__(cls, key: dict):
         # data
         if 'data' in key:
-            data = base64_decode(unwrap_key_content(key['data'], 'PRIVATE'))
+            # create key
+            self = super().__new__(cls, key)
+            self.key = RSA.importKey(key['data'])
+            return self
         else:
             raise ValueError('RSA key data empty')
-        # create key
-        self = super().__new__(cls, key)
-        self.data = data
-        self.key = RSA.importKey(data)
-        return self
 
     @classmethod
     def generate(cls, key: dict) -> PrivateKey:
@@ -173,7 +142,7 @@ class RSAPrivateKey(PrivateKey):
             bits = 1024
         private_key = RSA.generate(bits)
         data = private_key.export_key()
-        key['data'] = base64_encode(data)
+        key['data'] = data.decode('utf-8')
         return RSAPrivateKey(key)
 
     def decrypt(self, data: bytes) -> bytes:
@@ -195,7 +164,7 @@ class RSAPrivateKey(PrivateKey):
         data = pk.export_key()
         info = {
             'algorithm': 'RSA',
-            'data': base64_encode(data),
+            'data': data.decode('utf-8'),
         }
         return RSAPublicKey(info)
 

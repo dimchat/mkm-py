@@ -30,7 +30,7 @@
     Group with members
 """
 
-from mkm.entity import ID, Entity
+from .entity import ID, Entity
 
 
 class Group(Entity):

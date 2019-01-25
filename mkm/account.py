@@ -30,8 +30,8 @@
     Account with ID and Public Key
 """
 
-from mkm.crypto import PublicKey, PrivateKey
-from mkm.entity import ID, Entity
+from .crypto import PublicKey, PrivateKey
+from .entity import ID, Entity
 
 
 class Account(Entity):
