@@ -141,7 +141,7 @@ class RSAPrivateKey(PrivateKey):
         else:
             bits = 1024
         private_key = RSA.generate(bits)
-        data = private_key.export_key()
+        data = private_key.exportKey()
         key['data'] = data.decode('utf-8')
         return RSAPrivateKey(key)
 
@@ -161,7 +161,7 @@ class RSAPrivateKey(PrivateKey):
     @property
     def publicKey(self) -> PublicKey:
         pk = self.key.publickey()
-        data = pk.export_key()
+        data = pk.exportKey()
         info = {
             'algorithm': 'RSA',
             'data': data.decode('utf-8'),
