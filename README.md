@@ -1,7 +1,9 @@
 # Ming Ke Ming (名可名) -- Identity Module
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/dimchat/mkm-py/blob/master/LICENSE)
-[![Version](https://img.shields.io/badge/alpha-0.1.0-red.svg)](https://github.com/dimchat/mkm-py/wiki)
+[![Version](https://img.shields.io/badge/alpha-0.2.0-red.svg)](https://github.com/dimchat/mkm-py/wiki)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/dimchat/mkm-py/pulls)
+[![Platform](https://img.shields.io/badge/Platform-Python%203-brightgreen.svg)](https://github.com/dimchat/mkm-py/wiki)
 
 This document introduces a common **Identity Module** for decentralized user identity authentication.
 

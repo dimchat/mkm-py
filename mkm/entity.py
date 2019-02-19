@@ -33,7 +33,7 @@ class ID(str):
 
         data format: "name@address[/terminal]"
 
-        filed(s):
+        fields:
             name     - entity name, the seed of fingerprint to generate address
             address  - a string to identify an entity
             terminal - entity login resource(device), OPTIONAL
