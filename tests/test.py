@@ -142,13 +142,17 @@ class AccountTestCase(unittest.TestCase):
 
         for x in range(0, 10):
             sk = mkm.PrivateKey.generate({'algorithm': 'RSA'})
-            meta = mkm.Meta.generate(name, sk)
+            meta = mkm.Meta.generate(seed=name, private_key=sk)
             print(x, 'meta: ', meta)
             self.assertTrue(meta.key.match(sk))
 
             id1 = meta.generate_identifier(mkm.NetworkID.Main)
             print_id(id1)
             self.assertTrue(meta.match_identifier(id1))
+
+            if id1.number % 10000 == 9527:
+                print('Got it!')
+                break
 
     def test_account(self):
         print('\n---------------- %s' % self)

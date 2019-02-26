@@ -174,7 +174,8 @@ class Address(str):
     Algorithm_BTC = 0x01
     DefaultAlgorithm = Algorithm_BTC
 
-    def __new__(cls, address: str=''):
+    def __new__(cls, address: str='',
+                fingerprint: bytes=None, network: NetworkID=0, algorithm: chr=DefaultAlgorithm):
         """
         Create address object with string
 
@@ -191,31 +192,26 @@ class Address(str):
                 prefix = data[:1]
                 digest = data[1:-4]
                 code = data[-4:]
-                network = ord(prefix)
-                number = user_number(code)
+                if sha256(sha256(prefix + digest))[:4] == code:
+                    network = ord(prefix)
+                    number = user_number(code)
+                    algorithm = cls.Algorithm_BTC
+                else:
+                    raise ValueError('Address check code error')
             else:
-                raise ValueError('Address error')
-        else:
-            raise AssertionError('Parameter error')
-        # verify
-        if sha256(sha256(prefix + digest))[:4] == code:
-            # new Address(str)
-            self = super().__new__(cls, address)
-            self.network = NetworkID(network)
-            self.number = number
-            return self
-        else:
-            raise ValueError('Invalid address')
-
-    @classmethod
-    def generate(cls, fingerprint: bytes, network: NetworkID, algorithm: chr=DefaultAlgorithm):
-        """ Generate address with fingerprint and network ID """
-        if algorithm == cls.Algorithm_BTC and fingerprint:
+                raise ValueError('Address length error')
+        elif algorithm == cls.Algorithm_BTC and fingerprint:
             # calculate address string with fingerprint
             prefix = chr(network).encode('latin1')
             digest = ripemd160(sha256(fingerprint))
             code = sha256(sha256(prefix + digest))[:4]
-            string = base58_encode(prefix + digest + code)
-            return Address(string)
+            number = user_number(code)
+            address = base58_encode(prefix + digest + code)
         else:
-            raise AssertionError('Parameters error')
+            raise AssertionError('Parameter error')
+        # new Address(str)
+        self = super().__new__(cls, address)
+        self.network = NetworkID(network)
+        self.number = number
+        self.algorithm = algorithm
+        return self

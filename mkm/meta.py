@@ -37,7 +37,7 @@
     algorithm:
         fingerprint = sign(seed, SK);
 
-        CT      = fingerprint; // or key.data
+        CT      = fingerprint; // or key.data for BTC address
         hash    = ripemd160(sha256(CT));
         code    = sha256(sha256(network + hash)).prefix(4);
         address = base58_encode(network + hash + code);
@@ -67,15 +67,15 @@ class Meta(dict):
             This will get a firmly relationship between (username, address & key).
 
             MKMMetaVersion_BTC use the key data to generate address directly.
-            This can build a BTC address for the entity ID (no username).
+            This can build a BTC address for the entity ID without username.
 
             MKMMetaVersion_ExBTC use the key data to generate address directly, and
             sign the seed to get fingerprint (just for binding username & key).
-            This can build a BTC address, and bind a username to the entity ID.
+            This can build an entity ID with username and BTC address.
     """
-    Version_MKM = 0x01
-    Version_BTC = 0x02
-    Version_ExBTC = 0x03
+    Version_MKM = 0x01    # 0000 0001
+    Version_BTC = 0x02    # 0000 0010
+    Version_ExBTC = 0x03  # 0000 0011
     DefaultVersion = Version_MKM
 
     def __new__(cls, meta: dict=None,
@@ -138,7 +138,7 @@ class Meta(dict):
         return self
 
     @classmethod
-    def generate(cls, seed: str, private_key: PrivateKey, version: chr=DefaultVersion):
+    def generate(cls, private_key: PrivateKey, seed: str='', version: chr=DefaultVersion):
         """ Generate meta info with seed and private key """
         if version == cls.Version_MKM or version == cls.Version_ExBTC:
             # generate fingerprint with private key
@@ -160,21 +160,23 @@ class Meta(dict):
             raise AssertionError('Invalid version')
 
     def match_identifier(self, identifier: ID) -> bool:
-        """ Check ID with meta info """
-        return identifier.name == self.seed and self.match_address(identifier.address)
+        """ Check ID(name+address) with meta info """
+        return identifier.name == self.seed and self.match_address(address=identifier.address)
 
     def match_address(self, address: Address) -> bool:
         """ Check address with meta info """
-        return self.generate_address(address.network) == address
+        return self.generate_address(network=address.network, algorithm=address.algorithm) == address
 
-    def generate_identifier(self, network: NetworkID) -> ID:
+    def generate_identifier(self, network: NetworkID, algorithm=Address.DefaultAlgorithm) -> ID:
         """ Generate ID with meta info and network ID """
-        address = self.generate_address(network=network)
+        address = self.generate_address(network=network, algorithm=algorithm)
         return ID(name=self.seed, address=address)
 
-    def generate_address(self, network: NetworkID) -> Address:
+    def generate_address(self, network: NetworkID, algorithm: int=Address.DefaultAlgorithm) -> Address:
         """ Generate address with meta info and network ID """
         if self.version == Meta.Version_MKM:
-            return Address.generate(fingerprint=self.fingerprint, network=network)
+            # generate MKM address
+            return Address(fingerprint=self.fingerprint, network=network, algorithm=algorithm)
         elif self.version == Meta.Version_BTC or self.version == Meta.Version_ExBTC:
-            return Address.generate(fingerprint=self.key.data, network=network)
+            # generate BTC address
+            return Address(fingerprint=self.key.data, network=network, algorithm=algorithm)
