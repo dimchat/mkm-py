@@ -23,7 +23,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from .address import Address, NetworkID
+from .address import Address
 
 
 class ID(str):
@@ -54,49 +54,43 @@ class ID(str):
             # return ID object directly
             if isinstance(identifier, ID):
                 return identifier
-            # get fields from string
-            pair = identifier.split('@', 1)
+            # get terminal
+            pair = identifier.split('/', 1)
+            if len(pair) == 2:
+                terminal = pair[1]
+            else:
+                terminal = None
+            # get name & address
+            pair = pair[0].split('@', 1)
             if len(pair) == 2:
                 name = pair[0]
-                pair = pair[1].split('/', 1)
+                address = Address(pair[1])
+            else:
+                name = ''
                 address = Address(pair[0])
-                if len(pair) == 2:
-                    terminal = pair[1]
-                else:
-                    terminal = None
-            else:
-                raise ValueError('Invalid ID string')
-        elif name and address:
+        elif address:
             # concatenate ID string
-            if terminal:
-                identifier = name + '@' + address + '/' + terminal
-            else:
+            if name:
                 identifier = name + '@' + address
+            else:
+                identifier = address
+            if terminal:
+                identifier = identifier + '/' + terminal
         else:
             raise AssertionError('Parameters error')
         # verify ID.address, which number must not be ZERO
-        if address.number > 0:
-            # new str
-            self = super().__new__(cls, identifier)
-            self.name = name
-            self.address = address
-            self.terminal = terminal
-            return self
-        else:
+        if address.number <= 0:
             raise ValueError('Invalid ID (address) string')
+        # new ID(str)
+        self = super().__new__(cls, identifier)
+        self.name = name
+        self.address = address
+        self.terminal = terminal
+        return self
 
     @property
     def number(self) -> int:
         return self.address.number
-
-    @classmethod
-    def generate(cls, seed: str, fingerprint: bytes, network: NetworkID, version: chr=Address.DefaultVersion):
-        """ Generate ID with seed, fingerprint and network ID """
-        address = Address.generate(fingerprint=fingerprint, network=network, version=version)
-        if address.number > 0 and seed:
-            return ID(name=seed, address=address)
-        else:
-            raise ValueError('ID parameters error')
 
 
 class Entity:
@@ -113,12 +107,11 @@ class Entity:
 
         :param identifier: User/Group ID
         """
-        if identifier.name and identifier.address.number > 0:
-            super().__init__()
-            self.identifier = identifier
-            self.name = identifier.name
-        else:
+        if identifier.number <= 0:
             raise ValueError('Invalid ID')
+        super().__init__()
+        self.identifier = identifier
+        self.name = identifier.name
 
     def __str__(self):
         clazz = self.__class__.__name__

@@ -99,6 +99,12 @@ class NetworkID(IntEnum):
             (All above are just some advices to help choosing numbers :P)
     """
     ################################
+    #  BTC Network
+    ################################
+    BTCMain = 0x00      # 0000 0000 (BitCoin Address)
+    # BTCTest = 0x6f    # 0110 1111 (BitCoin Test)
+
+    ################################
     #  Person Account
     ################################
     Main = 0x08         # 0000 1000 (Person)
@@ -134,10 +140,10 @@ class NetworkID(IntEnum):
     Robot = 0xC8           # 1100 1000
 
     def is_communicator(self) -> bool:
-        return self.value & self.Main
+        return (self.value & self.Main) or (self.value == self.BTCMain)
 
     def is_person(self) -> bool:
-        return self.value == self.Main
+        return (self.value == self.Main) or (self.value == self.BTCMain)
 
     def is_group(self) -> bool:
         return self.value & self.Group
@@ -165,7 +171,8 @@ class Address(str):
         This class is used to build address for ID
     """
 
-    DefaultVersion = 0x01
+    Algorithm_BTC = 0x01
+    DefaultAlgorithm = Algorithm_BTC
 
     def __new__(cls, address: str=''):
         """
@@ -201,9 +208,9 @@ class Address(str):
             raise ValueError('Invalid address')
 
     @classmethod
-    def generate(cls, fingerprint: bytes, network: NetworkID, version: chr=DefaultVersion):
+    def generate(cls, fingerprint: bytes, network: NetworkID, algorithm: chr=DefaultAlgorithm):
         """ Generate address with fingerprint and network ID """
-        if version == Address.DefaultVersion and fingerprint and network:
+        if algorithm == cls.Algorithm_BTC and fingerprint:
             # calculate address string with fingerprint
             prefix = chr(network).encode('latin1')
             digest = ripemd160(sha256(fingerprint))

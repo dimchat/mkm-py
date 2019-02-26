@@ -35,7 +35,9 @@
     }
 
     algorithm:
-        CT      = sign(seed, SK);
+        fingerprint = sign(seed, SK);
+
+        CT      = fingerprint; // or key.data
         hash    = ripemd160(sha256(CT));
         code    = sha256(sha256(network + hash)).prefix(4);
         address = base58_encode(network + hash + code);
@@ -50,8 +52,31 @@ from .entity import ID
 
 
 class Meta(dict):
+    """
+        Meta for Identifier
+        ~~~~~~~~~~~~~~~~~~~
 
-    DefaultVersion = 0x01
+        @enum MKMMetaVersion
+
+        @abstract Defined for algorithm that generating address.
+
+        @discussion Generate & check ID/Address
+
+            MKMMetaVersion_MKM give a seed string first, and sign this seed to get
+            fingerprint; after that, use the fingerprint to generate address.
+            This will get a firmly relationship between (username, address & key).
+
+            MKMMetaVersion_BTC use the key data to generate address directly.
+            This can build a BTC address for the entity ID (no username).
+
+            MKMMetaVersion_ExBTC use the key data to generate address directly, and
+            sign the seed to get fingerprint (just for binding username & key).
+            This can build a BTC address, and bind a username to the entity ID.
+    """
+    Version_MKM = 0x01
+    Version_BTC = 0x02
+    Version_ExBTC = 0x03
+    DefaultVersion = Version_MKM
 
     def __new__(cls, meta: dict=None,
                 seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=DefaultVersion):
@@ -71,35 +96,51 @@ class Meta(dict):
                 return meta
             # get fields from dictionary
             version = int(meta['version'])
-            seed = meta['seed']
+            if version == cls.Version_MKM or version == cls.Version_ExBTC:
+                seed = meta['seed']
+                fingerprint = base64_decode(meta['fingerprint'])
+            elif version == cls.Version_BTC:
+                seed = ''
+                fingerprint = None
+            else:
+                raise ValueError('unsupported version:', version)
+            # public key
             key = PublicKey(meta['key'])
-            fingerprint = base64_decode(meta['fingerprint'])
-        elif version and seed and key and fingerprint:
+        elif version and key:
             # build meta info
-            meta = {
-                'version': version,
-                'seed': seed,
-                'key': key,
-                'fingerprint': base64_encode(fingerprint),
-            }
+            if version == cls.Version_MKM or version == cls.Version_ExBTC:
+                meta = {
+                    'version': version,
+                    'seed': seed,
+                    'key': key,
+                    'fingerprint': base64_encode(fingerprint),
+                }
+            elif version == cls.Version_BTC:
+                meta = {
+                    'version': version,
+                    'key': key,
+                }
+            else:
+                raise ValueError('unsupported version:', version)
         else:
             raise AssertionError('Meta parameters error')
-        # verify seed and fingerprint
-        if version == Meta.DefaultVersion and key.verify(seed.encode('utf-8'), fingerprint):
-            # new Meta(dict)
-            self = super().__new__(cls, meta)
-            self.version = version
-            self.seed = seed
-            self.key = key
-            self.fingerprint = fingerprint
-            return self
-        else:
-            raise ValueError('Meta data not math')
+        # check meta version
+        if version == cls.Version_MKM or version == cls.Version_ExBTC:
+            # verify seed and fingerprint
+            if not key.verify(seed.encode('utf-8'), fingerprint):
+                raise ValueError('Meta data not math')
+        # new Meta(dict)
+        self = super().__new__(cls, meta)
+        self.version = version
+        self.seed = seed
+        self.key = key
+        self.fingerprint = fingerprint
+        return self
 
     @classmethod
     def generate(cls, seed: str, private_key: PrivateKey, version: chr=DefaultVersion):
         """ Generate meta info with seed and private key """
-        if version == Meta.DefaultVersion:
+        if version == cls.Version_MKM or version == cls.Version_ExBTC:
             # generate fingerprint with private key
             fingerprint = private_key.sign(seed.encode('utf-8'))
             dictionary = {
@@ -107,6 +148,12 @@ class Meta(dict):
                 'seed': seed,
                 'key': private_key.publicKey,
                 'fingerprint': base64_encode(fingerprint),
+            }
+            return Meta(dictionary)
+        elif version == cls.Version_BTC:
+            dictionary = {
+                'version': version,
+                'key': private_key.publicKey,
             }
             return Meta(dictionary)
         else:
@@ -122,8 +169,12 @@ class Meta(dict):
 
     def generate_identifier(self, network: NetworkID) -> ID:
         """ Generate ID with meta info and network ID """
-        return ID.generate(seed=self.seed, fingerprint=self.fingerprint, network=network, version=self.version)
+        address = self.generate_address(network=network)
+        return ID(name=self.seed, address=address)
 
     def generate_address(self, network: NetworkID) -> Address:
         """ Generate address with meta info and network ID """
-        return Address.generate(fingerprint=self.fingerprint, network=network, version=self.version)
+        if self.version == Meta.Version_MKM:
+            return Address.generate(fingerprint=self.fingerprint, network=network)
+        elif self.version == Meta.Version_BTC or self.version == Meta.Version_ExBTC:
+            return Address.generate(fingerprint=self.key.data, network=network)

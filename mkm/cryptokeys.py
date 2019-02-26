@@ -107,6 +107,10 @@ class RSAPublicKey(PublicKey):
         else:
             raise ValueError('Public key data empty')
 
+    @property
+    def data(self) -> bytes:
+        return self.key.exportKey(format='DER')
+
     def encrypt(self, plaintext: bytes) -> bytes:
         cipher = Cipher_PKCS1_v1_5.new(self.key)
         return cipher.encrypt(plaintext)

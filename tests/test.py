@@ -11,6 +11,7 @@
 import unittest
 
 from binascii import b2a_hex, a2b_hex
+import json
 
 import mkm
 from mkm.utils import *
@@ -93,6 +94,15 @@ def print_id(identity):
 
 
 class BaseTestCase(unittest.TestCase):
+
+    def test_keys(self):
+        print('\n---------------- %s' % self)
+        key = {'algorithm': 'RSA', 'data': '-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDr2zVbMu4zFOdimKVD4DlW0Uol\nEtUocA9QESbKVdv8sjFY29JROrXNGHW0uD1cyGSLJyKVuDu7PnvgcUILeSpV+TEn\nNrMN5KSSTeWyOmh5n8NI5WqT3qpCk5vNMa4e/4/Yuh/Hy4d3KOmFO0cVa29e0GmV\nDHkGqw6f7uykdGVnNwIDAQAB\n-----END PUBLIC KEY-----'}
+        pk = mkm.PublicKey(key)
+        print('pk:', json.dumps(pk))
+        data = base64_encode(pk.data)
+        print('pk.data:', data)
+        self.assertEqual(data, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDr2zVbMu4zFOdimKVD4DlW0UolEtUocA9QESbKVdv8sjFY29JROrXNGHW0uD1cyGSLJyKVuDu7PnvgcUILeSpV+TEnNrMN5KSSTeWyOmh5n8NI5WqT3qpCk5vNMa4e/4/Yuh/Hy4d3KOmFO0cVa29e0GmVDHkGqw6f7uykdGVnNwIDAQAB')
 
     def test_meta(self):
         print('\n---------------- %s' % self)
