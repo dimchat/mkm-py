@@ -78,6 +78,13 @@ class SymmetricKey(dict):
         else:
             raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
 
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, SymmetricKey):
+            return False
+        promise = 'Moky loves May Lee forever!'
+        data = promise.encode('utf-8')
+        return other.decrypt(self.encrypt(data)) == data
+
 
 class PublicKey(dict):
     """
@@ -117,6 +124,8 @@ class PublicKey(dict):
         pass
 
     def match(self, private_key) -> bool:
+        if not isinstance(private_key, PrivateKey):
+            return False
         promise = 'Moky loves May Lee forever!'
         data = promise.encode('utf-8')
         signature = private_key.sign(data)
@@ -173,6 +182,9 @@ class PrivateKey(dict):
             return clazz.generate(key)
         else:
             raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
+
+    def __eq__(self, other) -> bool:
+        return self.publicKey.match(other)
 
 
 """

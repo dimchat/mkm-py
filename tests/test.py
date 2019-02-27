@@ -120,17 +120,43 @@ class BaseTestCase(unittest.TestCase):
         print_id(id2)
         print_address(address2)
 
+    def test_id(self):
+        print('\n---------------- %s' % self)
+
+        moki = "moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk"
+        id1 = mkm.ID(moki)
+        id2 = mkm.ID(moki + "/home")
+
+        print_id(id1)
+        print_id(id2)
+        self.assertTrue(id1 == id2)
+
+        satoshi = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+        id1 = mkm.ID(satoshi)
+        id2 = mkm.ID(satoshi + '/btc')
+
+        print_id(id1)
+        print_id(id2)
+        self.assertTrue(id1 == id2)
+
     def test_entity(self):
         print('\n---------------- %s' % self)
 
-        my_id = mkm.ID("moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk")
-        print_id(my_id)
+        id1 = mkm.ID("moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk")
+        id2 = mkm.ID("moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk/home")
+        print_id(id1)
+        print_id(id2)
 
-        entity = mkm.Entity(my_id)
-        print(entity)
+        e1 = mkm.Entity(id1)
+        e2 = mkm.Entity(id2)
+        e2.name = 'Albert Moky'
 
-        entity.name = 'Albert Moky'
-        print(entity)
+        print(e1)
+        print(e2)
+        self.assertTrue(e1 == e2)
+
+        e2 = None
+        self.assertTrue(e1 != e2)
 
 
 class AccountTestCase(unittest.TestCase):

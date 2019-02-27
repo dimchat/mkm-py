@@ -180,3 +180,13 @@ class Meta(dict):
         elif self.version == Meta.Version_BTC or self.version == Meta.Version_ExBTC:
             # generate BTC address
             return Address(fingerprint=self.key.data, network=network, algorithm=algorithm)
+
+    def __eq__(self, other) -> bool:
+        """ Check whether they can generate same IDs """
+        if other:
+            other = Meta(other)
+        else:
+            return False
+        id1 = self.generate_identifier(network=NetworkID.Main)
+        id2 = other.generate_identifier(network=NetworkID.Main)
+        return id1 == id2

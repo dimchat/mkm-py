@@ -88,6 +88,13 @@ class ID(str):
         self.terminal = terminal
         return self
 
+    def __eq__(self, other) -> bool:
+        if other:
+            other = ID(other)
+        else:
+            return False
+        return self.name == other.name and self.address == other.address
+
     @property
     def number(self) -> int:
         return self.address.number
@@ -120,6 +127,11 @@ class Entity:
         number = identifier.address.number
         name = self.name
         return '<%s: %s(%d|%d) "%s" />' % (clazz, identifier, network, number, name)
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Entity):
+            return False
+        return self.identifier == other.identifier
 
     @property
     def number(self) -> int:
