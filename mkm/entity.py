@@ -95,6 +95,9 @@ class ID(str):
             return False
         return self.name == other.name and self.address == other.address
 
+    def __hash__(self) -> int:
+        return hash(self.address)
+
     @property
     def number(self) -> int:
         return self.address.number
