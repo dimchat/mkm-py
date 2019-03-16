@@ -30,46 +30,71 @@
     Group with members
 """
 
-from .entity import ID, Entity
+from abc import abstractmethod, ABCMeta, ABC
+
+from .identifier import ID
+from .entity import Entity, IEntityDataSource
 
 
 class Group(Entity):
 
-    def __init__(self, identifier: ID):
-        """
-        Create Group with ID
+    @property
+    def founder(self) -> ID:
+        return self.delegate.group_founder(group=self)
 
-        :param identifier: Group ID
-        """
-        if identifier.address.network.is_group():
-            super().__init__(identifier)
-            self.members = []
-        else:
-            raise ValueError('Group ID error')
+    @property
+    def owner(self) -> ID:
+        return self.delegate.group_owner(group=self)
 
-    def addMember(self, member: ID):
-        """
-        Add group member by ID
+    @property
+    def members(self) -> list:
+        return self.delegate.group_members(group=self)
 
-        :param member: ID
-        """
-        if member not in self.members:
-            self.members.append(member)
 
-    def removeMember(self, member: ID):
-        """
-        Remove member by ID
+#
+#  Delegates
+#
 
-        :param member: ID
-        """
-        if member in self.members:
-            self.members.remove(member)
 
-    def hasMember(self, member: ID) -> bool:
-        """
-        Check whether contains the member
+class IGroupDelegate(metaclass=ABCMeta):
+    """
+        Group Delegate
+        ~~~~~~~~~~~~~~
+    """
 
-        :param member: ID
-        :return: True/False
-        """
-        return member in self.members
+    @abstractmethod
+    def group_create(self, identifier: ID) -> Group:
+        """ Create group with ID """
+        pass
+
+    @abstractmethod
+    def group_add_member(self, group: Group, member: ID) -> bool:
+        """ Add member to group """
+        pass
+
+    @abstractmethod
+    def group_remove_member(self, group: Group, member: ID) -> bool:
+        """ Remove member from group """
+        pass
+
+
+class IGroupDataSource(IEntityDataSource, ABC):
+    """
+        User Data Source
+        ~~~~~~~~~~~~~~~~
+    """
+
+    @abstractmethod
+    def group_founder(self, group: Group) -> ID:
+        """ Get founder of the group """
+        pass
+
+    @abstractmethod
+    def group_owner(self, group: Group) -> ID:
+        """ Get current owner of the group """
+        pass
+
+    @abstractmethod
+    def group_members(self, group: Group) -> list:
+        """ Get all members in the group """
+        pass

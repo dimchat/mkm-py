@@ -28,7 +28,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~
 
     data format: {
-        version: 1,          // algorithm version
+        version: 1,          // meta version
         seed: "moKy",        // user/group name
         key: "{public key}", // PK = secp256k1(SK);
         fingerprint: "..."   // CT = sign(seed, SK);
@@ -48,7 +48,7 @@ from .utils import base64_encode, base64_decode
 from .crypto import PublicKey, PrivateKey
 
 from .address import NetworkID, Address
-from .entity import ID
+from .identifier import ID
 
 
 class Meta(dict):
@@ -58,7 +58,7 @@ class Meta(dict):
 
         @enum MKMMetaVersion
 
-        @abstract Defined for algorithm that generating address.
+        @abstract Defined for meta data structure to generate identifier.
 
         @discussion Generate & check ID/Address
 
@@ -87,7 +87,7 @@ class Meta(dict):
         :param seed:        A string as seed (name)
         :param key:         A public key
         :param fingerprint: A data signed by private keys with seed
-        :param version:     Algorithm version
+        :param version:     Meta version
         :return: Meta object
         """
         if meta:
@@ -159,27 +159,37 @@ class Meta(dict):
         else:
             raise AssertionError('Invalid version')
 
+    def match_public_key(self, public_key: PublicKey) -> bool:
+        if self.key == public_key:
+            return True
+        if self.version == Meta.Version_BTC:
+            # ID with BTC address has no username
+            # so we can just compare the key.data to check matching
+            return False
+        # check whether keys equal by verifying signature
+        return public_key.verify(data=self.seed.encode('utf-8'), signature=self.fingerprint)
+
     def match_identifier(self, identifier: ID) -> bool:
         """ Check ID(name+address) with meta info """
         return identifier.name == self.seed and self.match_address(address=identifier.address)
 
     def match_address(self, address: Address) -> bool:
         """ Check address with meta info """
-        return self.generate_address(network=address.network, algorithm=address.algorithm) == address
+        return self.generate_address(network=address.network) == address
 
-    def generate_identifier(self, network: NetworkID, algorithm=Address.DefaultAlgorithm) -> ID:
+    def generate_identifier(self, network: NetworkID) -> ID:
         """ Generate ID with meta info and network ID """
-        address = self.generate_address(network=network, algorithm=algorithm)
+        address = self.generate_address(network=network)
         return ID(name=self.seed, address=address)
 
-    def generate_address(self, network: NetworkID, algorithm: int=Address.DefaultAlgorithm) -> Address:
+    def generate_address(self, network: NetworkID) -> Address:
         """ Generate address with meta info and network ID """
         if self.version == Meta.Version_MKM:
             # generate MKM address
-            return Address(fingerprint=self.fingerprint, network=network, algorithm=algorithm)
+            return Address(fingerprint=self.fingerprint, network=network)
         elif self.version == Meta.Version_BTC or self.version == Meta.Version_ExBTC:
             # generate BTC address
-            return Address(fingerprint=self.key.data, network=network, algorithm=algorithm)
+            return Address(fingerprint=self.key.data, network=network)
 
     def __eq__(self, other) -> bool:
         """ Check whether they can generate same IDs """

@@ -8,7 +8,7 @@
 """
 
 from .crypto import PrivateKey
-from .entity import ID
+from .identifier import ID
 from .account import User
 
 

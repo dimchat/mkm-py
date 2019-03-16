@@ -171,7 +171,7 @@ class PrivateKey(dict):
 
     @property
     def publicKey(self) -> PublicKey:
-        pass
+        yield None
 
     @classmethod
     def generate(cls, key: dict):

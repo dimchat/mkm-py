@@ -23,35 +23,31 @@
 # SOFTWARE.
 # ==============================================================================
 
-"""
-    Account for communication
-    ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Account with ID and Public Key
-"""
+from abc import abstractmethod, ABCMeta, ABC
 
 from .crypto import PublicKey, PrivateKey
-from .entity import ID, Entity
+from .identifier import ID
+from .entity import Entity, IEntityDataSource
 
 
 class Account(Entity):
+    """
+        Account for communication
+        ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def __init__(self, identifier: ID, public_key: PublicKey):
-        """
-        Create Account with ID and Public Key
+        Account with ID and Public Key
+    """
 
-        :param identifier: User ID
-        :param public_key: User Public Key
-        """
-        if identifier.address.network.is_communicator():
-            super().__init__(identifier)
-            # must verify the ID with meta info before creating an account with meta.key
-            self.publicKey = public_key
-        else:
-            raise ValueError('Account ID error')
+    @property
+    def publicKey(self) -> PublicKey:
+        return self.meta.key
 
 
 class User(Account):
+    """
+        User with private key
+        ~~~~~~~~~~~~~~~~~~~~~
+    """
 
     def __init__(self, identifier: ID, private_key: PrivateKey):
         """
@@ -60,38 +56,60 @@ class User(Account):
         :param identifier:  User ID
         :param private_key: User Private key
         """
-        if identifier.address.network.is_person():
-            super().__init__(identifier, private_key.publicKey)
-            self.privateKey = private_key
-            self.contacts: list = []
-        else:
-            raise ValueError('User ID error')
+        super().__init__(identifier)
+        self.privateKey = private_key
 
-    def addContact(self, contact: ID):
-        """
-        Add contact by ID
+    @property
+    def contacts(self) -> list:
+        return self.delegate.user_contacts(user=self)
 
-        :param contact: ID
-        """
-        if not contact.address.network.is_person():
-            raise AssertionError('Contact must be a person')
-        if contact not in self.contacts:
-            self.contacts.append(contact)
 
-    def removeContact(self, contact: ID):
-        """
-        Remove contact by ID
+#
+#  Delegates
+#
 
-        :param contact: ID
-        """
-        if contact in self.contacts:
-            self.contacts.remove(contact)
 
-    def hasContact(self, contact: ID) -> bool:
-        """
-        Check whether contains the contact ID
+class IAccountDelegate(metaclass=ABCMeta):
+    """
+        Account Delegate
+        ~~~~~~~~~~~~~~~~
+    """
 
-        :param contact: ID
-        :return: True/False
-        """
-        return contact in self.contacts
+    @abstractmethod
+    def account_create(self, identifier: ID) -> Account:
+        """ Create account with ID """
+        pass
+
+
+class IUserDelegate(IAccountDelegate, ABC):
+    """
+        User Delegate
+        ~~~~~~~~~~~~~
+    """
+
+    @abstractmethod
+    def user_create(self, identifier: ID) -> User:
+        """ Create user with ID """
+        pass
+
+    @abstractmethod
+    def user_add_contact(self, user: User, contact: ID) -> bool:
+        """ Add contact to user """
+        pass
+
+    @abstractmethod
+    def user_remove_contact(self, user: User, contact: ID) -> bool:
+        """ Remove contact from user """
+        pass
+
+
+class IUserDataSource(IEntityDataSource, ABC):
+    """
+        User Data Source
+        ~~~~~~~~~~~~~~~~
+    """
+
+    @abstractmethod
+    def user_contacts(self, user: User) -> int:
+        """ Get all contacts of user """
+        pass

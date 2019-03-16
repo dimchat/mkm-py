@@ -31,6 +31,29 @@ def hex_decode(string: str) -> bytes:
     return a2b_hex(string)
 
 
+class Database(mkm.IEntityDataSource):
+
+    def __init__(self):
+        super().__init__()
+        self.metas = {
+            ID(moki_id): mkm.Meta(moki_meta),
+            ID(hulk_id): mkm.Meta(hulk_meta),
+        }
+        self.names = {
+            ID(moki_id): 'Albert Moky',
+            ID(hulk_id): 'Super Hulk',
+        }
+
+    def entity_meta(self, entity: mkm.Entity) -> mkm.Meta:
+        return self.metas[entity.identifier]
+
+    def entity_name(self, entity: mkm.Entity) -> str:
+        return self.names[entity.identifier]
+
+
+database = Database()
+
+
 class CryptoTestCase(unittest.TestCase):
 
     def test_aes(self):
@@ -149,7 +172,9 @@ class BaseTestCase(unittest.TestCase):
 
         e1 = mkm.Entity(id1)
         e2 = mkm.Entity(id2)
-        e2.name = 'Albert Moky'
+
+        e1.delegate = database
+        e2.delegate = database
 
         print(e1)
         print(e2)
@@ -192,13 +217,17 @@ class AccountTestCase(unittest.TestCase):
         print('private key: ', sk1)
         self.assertTrue(meta1.key.match(sk1))
 
-        account1 = mkm.Account(id1, meta1.key)
+        account1 = mkm.Account(id1)
+        account1.delegate = database
+
         print('account1: ', account1)
 
         id2 = mkm.ID(hulk_id)
         sk2 = mkm.PrivateKey(hulk_sk)
 
         user2 = mkm.User(id2, sk2)
+        user2.delegate = database
+
         print('user2: ', user2)
         # print('number: ', user2.number())
         print('number: ', user2.number)

@@ -23,84 +23,11 @@
 # SOFTWARE.
 # ==============================================================================
 
-from .address import Address
+from abc import abstractmethod, ABCMeta
 
-
-class ID(str):
-    """
-        ID for entity (Account/Group)
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        data format: "name@address[/terminal]"
-
-        fields:
-            name     - entity name, the seed of fingerprint to generate address
-            address  - a string to identify an entity
-            terminal - entity login resource(device), OPTIONAL
-    """
-
-    def __new__(cls, identifier: str='',
-                name: str='', address: Address=None, terminal: str=None):
-        """
-        Create ID object with ID string or name + address
-
-        :param identifier: ID string with format 'name@address/terminal'
-        :param name:       A string for ID.name
-        :param address:    An Address object for ID.address
-        :param terminal:   A string for login point
-        :return: ID object
-        """
-        if identifier:
-            # return ID object directly
-            if isinstance(identifier, ID):
-                return identifier
-            # get terminal
-            pair = identifier.split('/', 1)
-            if len(pair) == 2:
-                terminal = pair[1]
-            else:
-                terminal = None
-            # get name & address
-            pair = pair[0].split('@', 1)
-            if len(pair) == 2:
-                name = pair[0]
-                address = Address(pair[1])
-            else:
-                name = ''
-                address = Address(pair[0])
-        elif address:
-            # concatenate ID string
-            if name:
-                identifier = name + '@' + address
-            else:
-                identifier = address
-            if terminal:
-                identifier = identifier + '/' + terminal
-        else:
-            raise AssertionError('Parameters error')
-        # verify ID.address, which number must not be ZERO
-        if address.number <= 0:
-            raise ValueError('Invalid ID (address) string')
-        # new ID(str)
-        self = super().__new__(cls, identifier)
-        self.name = name
-        self.address = address
-        self.terminal = terminal
-        return self
-
-    def __eq__(self, other) -> bool:
-        if other:
-            other = ID(other)
-        else:
-            return False
-        return self.name == other.name and self.address == other.address
-
-    def __hash__(self) -> int:
-        return hash(self.address)
-
-    @property
-    def number(self) -> int:
-        return self.address.number
+from .address import NetworkID
+from .identifier import ID
+from .meta import Meta
 
 
 class Entity:
@@ -108,7 +35,7 @@ class Entity:
         Entity (Account/Group)
         ~~~~~~~~~~~~~~~~~~~~~~
 
-        Entity with ID and name
+        Base class of Account and Group, ...
     """
 
     def __init__(self, identifier: ID):
@@ -117,11 +44,9 @@ class Entity:
 
         :param identifier: User/Group ID
         """
-        if identifier.number <= 0:
-            raise ValueError('Invalid ID')
         super().__init__()
         self.identifier = identifier
-        self.name = identifier.name
+        self.delegate = None  # IEntityDataSource
 
     def __str__(self):
         clazz = self.__class__.__name__
@@ -137,5 +62,48 @@ class Entity:
         return self.identifier == other.identifier
 
     @property
+    def type(self) -> NetworkID:
+        """ Entity type """
+        return self.identifier.address.network
+
+    @property
     def number(self) -> int:
+        """ Search number of this entity """
         return self.identifier.address.number
+
+    @property
+    def name(self) -> str:
+        nick = self.delegate.entity_name(entity=self)
+        if nick:
+            return nick
+        nick = self.identifier.name
+        if nick:
+            return nick
+        # BTC address
+        return self.identifier.address
+
+    @property
+    def meta(self) -> Meta:
+        return self.delegate.entity_meta(entity=self)
+
+
+#
+#  Delegate
+#
+
+
+class IEntityDataSource(metaclass=ABCMeta):
+    """
+        Entity Data Source
+        ~~~~~~~~~~~~~~~~~~
+    """
+
+    @abstractmethod
+    def entity_meta(self, entity: Entity) -> Meta:
+        """ Get meta for this entity ID """
+        pass
+
+    @abstractmethod
+    def entity_name(self, entity: Entity) ->str:
+        """ Get name in this entity's profile """
+        pass

@@ -195,7 +195,7 @@ class Address(str):
                 if sha256(sha256(prefix + digest))[:4] == code:
                     network = ord(prefix)
                     number = user_number(code)
-                    algorithm = cls.Algorithm_BTC
+                    # algorithm = cls.Algorithm_BTC
                 else:
                     raise ValueError('Address check code error')
             else:
@@ -213,5 +213,5 @@ class Address(str):
         self = super().__new__(cls, address)
         self.network = NetworkID(network)
         self.number = number
-        self.algorithm = algorithm
+        # self.algorithm = algorithm
         return self
