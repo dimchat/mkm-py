@@ -50,18 +50,15 @@ class AESKey(SymmetricKey):
 
     def __new__(cls, key: dict):
         # data
-        if 'data' in key:
-            # import key from data
-            data = base64_decode(key['data'])
-        else:
-            raise ValueError('AES key data empty')
+        data = base64_decode(key['data'])
         # iv
-        if 'iv' in key:
-            iv = key['iv']
-            iv = base64_decode(iv)
-        else:
-            iv = AES.block_size * chr(0).encode('utf-8')  # b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'
+        iv = key.get('iv')
+        if iv is None:
+            # iv = b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'
+            iv = AES.block_size * chr(0).encode('utf-8')
             key['iv'] = base64_encode(iv)
+        else:
+            iv = base64_decode(iv)
         # create key
         self = super().__new__(cls, key)
         self.data = data
@@ -70,10 +67,12 @@ class AESKey(SymmetricKey):
 
     @classmethod
     def generate(cls, key: dict) -> SymmetricKey:
-        if 'size' in key:
-            size = int(key['size'])
-        else:
+        # key size
+        size = key.get('size')
+        if size is None:
             size = 32
+        else:
+            size = int(size)
         # key data
         data = bytes(numpy.random.bytes(size))
         key['data'] = base64_encode(data)
@@ -99,13 +98,12 @@ class RSAPublicKey(PublicKey):
     """ RSA Public Key """
 
     def __new__(cls, key: dict):
-        if 'data' in key:
-            # create key
-            self = super().__new__(cls, key)
-            self.key = RSA.importKey(key['data'])
-            return self
-        else:
-            raise ValueError('Public key data empty')
+        # data in 'PEM' format
+        data = key['data']
+        # create key
+        self = super().__new__(cls, key)
+        self.key = RSA.importKey(data)
+        return self
 
     @property
     def data(self) -> bytes:
@@ -129,21 +127,22 @@ class RSAPrivateKey(PrivateKey):
     """ RSA Private Key """
 
     def __new__(cls, key: dict):
-        # data
-        if 'data' in key:
-            # create key
-            self = super().__new__(cls, key)
-            self.key = RSA.importKey(key['data'])
-            return self
-        else:
-            raise ValueError('RSA key data empty')
+        # data in 'PEM' format
+        data = key['data']
+        # create key
+        self = super().__new__(cls, key)
+        self.key = RSA.importKey(data)
+        return self
 
     @classmethod
     def generate(cls, key: dict) -> PrivateKey:
-        if 'keySizeInBits' in key:
-            bits = int(key['keySizeInBits'])
-        else:
+        # key size
+        bits = key.get('keySizeInBits')
+        if bits is None:
             bits = 1024
+        else:
+            bits = int(bits)
+        # generate with key size
         private_key = RSA.generate(bits)
         data = private_key.exportKey()
         key['data'] = data.decode('utf-8')
