@@ -36,19 +36,19 @@ class Database(mkm.IEntityDataSource):
     def __init__(self):
         super().__init__()
         self.metas = {
-            mkm.ID(moki_id): mkm.Meta(moki_meta),
-            mkm.ID(hulk_id): mkm.Meta(hulk_meta),
+            mkm.ID(moki_id).address: mkm.Meta(moki_meta),
+            mkm.ID(hulk_id).address: mkm.Meta(hulk_meta),
         }
         self.names = {
-            mkm.ID(moki_id): 'Albert Moky',
-            mkm.ID(hulk_id): 'Super Hulk',
+            mkm.ID(moki_id).address: 'Albert Moky',
+            mkm.ID(hulk_id).address: 'Super Hulk',
         }
 
     def entity_meta(self, entity: mkm.Entity) -> mkm.Meta:
-        return self.metas[entity.identifier]
+        return self.metas.get(entity.identifier.address)
 
     def entity_name(self, entity: mkm.Entity) -> str:
-        return self.names[entity.identifier]
+        return self.names.get(entity.identifier.address)
 
 
 database = Database()

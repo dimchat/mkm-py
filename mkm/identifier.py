@@ -96,7 +96,15 @@ class ID(str):
         return self.name == other.name and self.address == other.address
 
     def __hash__(self) -> int:
-        return hash(self.address)
+        if len(self.name) > 0:
+            if self.terminal is not None:
+                return hash('%s@%s/%s' % (self.name, self.address, self.terminal))
+            else:
+                return hash('%s@%s' % (self.name, self.address))
+        elif self.terminal is not None:
+            return hash('%s/%s' % (self.address, self.terminal))
+        else:
+            return hash(self.address)
 
     @property
     def type(self) -> NetworkID:
