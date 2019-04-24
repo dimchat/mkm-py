@@ -81,9 +81,10 @@ class SymmetricKey(dict):
     def __eq__(self, other) -> bool:
         if not isinstance(other, SymmetricKey):
             return False
-        promise = 'Moky loves May Lee forever!'
-        data = promise.encode('utf-8')
-        return other.decrypt(self.encrypt(data)) == data
+        if super().__eq__(other):
+            return True
+        promise = 'Moky loves May Lee forever!'.encode('utf-8')
+        return self.decrypt(other.encrypt(promise)) == promise
 
 
 class PublicKey(dict):
@@ -126,10 +127,14 @@ class PublicKey(dict):
     def match(self, private_key) -> bool:
         if not isinstance(private_key, PrivateKey):
             return False
-        promise = 'Moky loves May Lee forever!'
-        data = promise.encode('utf-8')
-        signature = private_key.sign(data)
-        return self.verify(data, signature)
+        # 1. if the SK has the same public key, return true
+        public_key = private_key.publicKey
+        if public_key is not None and public_key.__eq__(self):
+            return True
+        # 2. try to verify the SK's signature
+        promise = 'Moky loves May Lee forever!'.encode('utf-8')
+        signature = private_key.sign(promise)
+        return self.verify(promise, signature)
 
 
 class PrivateKey(dict):
@@ -184,6 +189,10 @@ class PrivateKey(dict):
             raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
 
     def __eq__(self, other) -> bool:
+        if not isinstance(other, PrivateKey):
+            return False
+        if super().__eq__(other):
+            return True
         return self.publicKey.match(other)
 
 
