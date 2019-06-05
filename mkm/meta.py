@@ -76,7 +76,26 @@ class Meta(dict):
     Version_MKM = 0x01    # 0000 0001
     Version_BTC = 0x02    # 0000 0010
     Version_ExBTC = 0x03  # 0000 0011
+    Version_ETH = 0x04    # 0000 0100
+    Version_ExETH = 0x05  # 0000 0101
     DefaultVersion = Version_MKM
+
+    @classmethod
+    def __meta(cls, seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=DefaultVersion) -> dict:
+        if version & cls.Version_MKM:  # MKM, ExBTC, ExETH, ...
+            return {
+                'version': version,
+                'seed': seed,
+                'key': key,
+                'fingerprint': base64_encode(fingerprint),
+            }
+        elif version == cls.Version_BTC:
+            return {
+                'version': version,
+                'key': key,
+            }
+        else:
+            raise ValueError('unsupported version:', version)
 
     def __new__(cls, meta: dict=None,
                 seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=DefaultVersion):
@@ -90,57 +109,42 @@ class Meta(dict):
         :param version:     Meta version
         :return: Meta object
         """
-        if meta:
+        if meta is None:
+            meta = Meta.__meta(seed=seed, key=key, fingerprint=fingerprint, version=version)
+        elif isinstance(meta, Meta):
             # return Meta object directly
-            if isinstance(meta, Meta):
-                return meta
-            # get fields from dictionary
-            version = int(meta['version'])
-            if version == cls.Version_MKM or version == cls.Version_ExBTC:
-                seed = meta['seed']
-                fingerprint = base64_decode(meta['fingerprint'])
-            elif version == cls.Version_BTC:
-                seed = ''
-                fingerprint = None
-            else:
-                raise ValueError('unsupported version:', version)
-            # public key
-            key = PublicKey(meta['key'])
-        elif version and key:
-            # build meta info
-            if version == cls.Version_MKM or version == cls.Version_ExBTC:
-                meta = {
-                    'version': version,
-                    'seed': seed,
-                    'key': key,
-                    'fingerprint': base64_encode(fingerprint),
-                }
-            elif version == cls.Version_BTC:
-                meta = {
-                    'version': version,
-                    'key': key,
-                }
-            else:
-                raise ValueError('unsupported version:', version)
+            return meta
+        # new Meta(dict)
+        return super().__new__(cls, meta)
+
+    def __init__(self, meta: dict=None,
+                 seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=DefaultVersion):
+        if meta is None:
+            meta = Meta.__meta(seed=seed, key=key, fingerprint=fingerprint, version=version)
         else:
-            raise AssertionError('Meta parameters error')
+            # get fields from dictionary
+            version = int(meta.get('version'))
+            key = PublicKey(meta.get('key'))
+            seed = meta.get('seed')
+            fingerprint = meta.get('fingerprint')
+            if fingerprint is not None:
+                fingerprint = base64_decode(fingerprint)
         # check meta version
-        if version == cls.Version_MKM or version == cls.Version_ExBTC:
+        if version == Meta.Version_MKM or version == Meta.Version_ExBTC:
             # verify seed and fingerprint
             if not key.verify(seed.encode('utf-8'), fingerprint):
                 raise ValueError('Meta data not math')
         # new Meta(dict)
-        self = super().__new__(cls, meta)
+        super().__init__(meta)
         self.version = version
         self.seed = seed
         self.key = key
         self.fingerprint = fingerprint
-        return self
 
     @classmethod
     def generate(cls, private_key: PrivateKey, seed: str='', version: chr=DefaultVersion):
         """ Generate meta info with seed and private key """
-        if version == cls.Version_MKM or version == cls.Version_ExBTC:
+        if version & cls.Version_MKM:  # MKM, ExBTC, ExETH, ...
             # generate fingerprint with private key
             fingerprint = private_key.sign(seed.encode('utf-8'))
             dictionary = {

@@ -23,7 +23,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import abstractmethod, ABCMeta, ABC
+from abc import abstractmethod, ABC
 
 from .crypto import PublicKey, PrivateKey
 from .identifier import ID
@@ -38,70 +38,99 @@ class Account(Entity):
         Account with ID and Public Key
     """
 
-    @property
-    def publicKey(self) -> PublicKey:
-        return self.meta.key
+    def verify(self, data: bytes, signature: bytes) -> bool:
+        """
+        Verify data with signature, use meta.key
+
+        :param data:
+        :param signature:
+        :return:
+        """
+        # 1. get key for signature from meta
+        key = self.__meta_key()
+        if key is not None:
+            # 2. verify with meta.key
+            return key.verify(data=data, signature=signature)
+
+    def encrypt(self, data: bytes) -> bytes:
+        """
+        Encrypt data, try profile.key first, if not found, use meta.key
+
+        :param data: message data
+        :return: encrypted data
+        """
+        # 1. get key for encryption from profile
+        key = self.__profile_key()
+        if key is None:
+            # 2. get key for encryption from meta instead
+            # NOTICE: meta.key will never changed, so use profile.key to encrypt is the better way
+            key = self.__meta_key()
+        if key is not None:
+            # 3. encrypt with profile.key
+            return key.encrypt(data=data)
+
+    def __meta_key(self) -> PublicKey:
+        meta = self.meta
+        if meta is not None:
+            return meta.key
+        raise AssertionError('failed to get meta.key for:' + self.identifier)
+
+    def __profile_key(self) -> PublicKey:
+        profile = self.profile
+        if profile is not None:
+            return profile.key
 
 
 class User(Account):
     """
-        User with private key
-        ~~~~~~~~~~~~~~~~~~~~~
+        User account
+        ~~~~~~~~~~~~
     """
-
-    def __init__(self, identifier: ID, private_key: PrivateKey):
-        """
-        Create User With ID and Private Key
-
-        :param identifier:  User ID
-        :param private_key: User Private key
-        """
-        super().__init__(identifier)
-        self.privateKey = private_key
 
     @property
     def contacts(self) -> list:
-        return self.delegate.user_contacts(user=self)
+        """
+        Get all contacts of the user
+
+        :return: contacts list
+        """
+        return self.delegate.user_contacts(identifier=self.identifier)
+
+    def sign(self, data: bytes) -> bytes:
+        """
+        Sign data with user's private key
+
+        :param data: message data
+        :return: signature
+        """
+        key = self.delegate.user_private_key_for_signature(identifier=self.identifier)
+        if key is not None:
+            return key.sign(data=data)
+
+    def decrypt(self, data: bytes) -> bytes:
+        """
+        Decrypt data with user's private key(s)
+
+        :param data: encrypted data
+        :return: plaintext
+        """
+        keys = self.delegate.user_private_keys_for_decryption(identifier=self.identifier)
+        plaintext = None
+        for key in keys:
+            try:
+                plaintext = key.decrypt(data=data)
+            except ValueError:
+                # If the dat length is incorrect
+                continue
+            if plaintext is not None:
+                # decryption success
+                break
+        return plaintext
 
 
 #
-#  Delegates
+#  Delegate
 #
-
-
-class IAccountDelegate(metaclass=ABCMeta):
-    """
-        Account Delegate
-        ~~~~~~~~~~~~~~~~
-    """
-
-    @abstractmethod
-    def account_create(self, identifier: ID) -> Account:
-        """ Create account with ID """
-        pass
-
-
-class IUserDelegate(IAccountDelegate, ABC):
-    """
-        User Delegate
-        ~~~~~~~~~~~~~
-    """
-
-    @abstractmethod
-    def user_create(self, identifier: ID) -> User:
-        """ Create user with ID """
-        pass
-
-    @abstractmethod
-    def user_add_contact(self, user: User, contact: ID) -> bool:
-        """ Add contact to user """
-        pass
-
-    @abstractmethod
-    def user_remove_contact(self, user: User, contact: ID) -> bool:
-        """ Remove contact from user """
-        pass
-
 
 class IUserDataSource(IEntityDataSource, ABC):
     """
@@ -110,6 +139,31 @@ class IUserDataSource(IEntityDataSource, ABC):
     """
 
     @abstractmethod
-    def user_contacts(self, user: User) -> int:
-        """ Get all contacts of user """
+    def user_private_key_for_signature(self, identifier: ID) -> PrivateKey:
+        """
+        Get user's private key for signature
+
+        :param identifier: user ID
+        :return: private key
+        """
+        pass
+
+    @abstractmethod
+    def user_private_keys_for_decryption(self, identifier: ID) -> list:
+        """
+        Get user's private keys for decryption
+
+        :param identifier: user ID
+        :return: private keys
+        """
+        pass
+
+    @abstractmethod
+    def user_contacts(self, identifier: ID) -> list:
+        """
+        Get contacts list
+
+        :param identifier: user ID
+        :return: contacts list (ID)
+        """
         pass

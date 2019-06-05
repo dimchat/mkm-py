@@ -13,9 +13,12 @@ import unittest
 from binascii import b2a_hex, a2b_hex
 import json
 
-import mkm
+from mkm import *
 from mkm.utils import *
-from mkm.immortals import *
+
+from tests.immortals import moki_id, moki_meta, moki_sk
+from tests.immortals import hulk_id, hulk_meta, hulk_sk
+from tests.facebook import facebook
 
 
 __author__ = 'Albert Moky'
@@ -31,29 +34,6 @@ def hex_decode(string: str) -> bytes:
     return a2b_hex(string)
 
 
-class Database(mkm.IEntityDataSource):
-
-    def __init__(self):
-        super().__init__()
-        self.metas = {
-            mkm.ID(moki_id).address: mkm.Meta(moki_meta),
-            mkm.ID(hulk_id).address: mkm.Meta(hulk_meta),
-        }
-        self.names = {
-            mkm.ID(moki_id).address: 'Albert Moky',
-            mkm.ID(hulk_id).address: 'Super Hulk',
-        }
-
-    def entity_meta(self, entity: mkm.Entity) -> mkm.Meta:
-        return self.metas.get(entity.identifier.address)
-
-    def entity_name(self, entity: mkm.Entity) -> str:
-        return self.names.get(entity.identifier.address)
-
-
-database = Database()
-
-
 class CryptoTestCase(unittest.TestCase):
 
     def test_aes(self):
@@ -62,7 +42,7 @@ class CryptoTestCase(unittest.TestCase):
         info = {
             'algorithm': 'AES',
         }
-        key = mkm.SymmetricKey.generate(info)
+        key = SymmetricKey.generate(info)
         print(key)
         text = 'Hello world'
         data = text.encode('utf-8')
@@ -70,7 +50,7 @@ class CryptoTestCase(unittest.TestCase):
         pt = key.decrypt(ct)
         print(hex_encode(data) + ' -> ' + hex_encode(ct) + ' -> ' + hex_encode(pt))
 
-        self.assertEqual(data, pt)
+        self.assertEqual(data, pt, 'AES error')
 
     def test_rsa(self):
         print('\n---------------- %s' % self)
@@ -78,7 +58,7 @@ class CryptoTestCase(unittest.TestCase):
         info = {
             'algorithm': 'RSA',
         }
-        sk = mkm.PrivateKey.generate(info)
+        sk = PrivateKey.generate(info)
         pk = sk.publicKey
         print(sk)
         print(pk)
@@ -90,12 +70,12 @@ class CryptoTestCase(unittest.TestCase):
         print(text + ' -> ' + base64_encode(ct))
         print(' -> ' + base64_encode(pt) + ' -> ' + pt.decode('utf-8'))
 
-        self.assertEqual(data, pt)
+        self.assertEqual(data, pt, 'RSA error')
 
         sig = sk.sign(data)
         print('signature: ' + base64_encode(sig))
 
-        self.assertTrue(pk.verify(data, sig))
+        self.assertTrue(pk.verify(data, sig), 'signature not match')
 
 
 def print_address(address):
@@ -121,67 +101,65 @@ class BaseTestCase(unittest.TestCase):
     def test_keys(self):
         print('\n---------------- %s' % self)
         key = {'algorithm': 'RSA', 'data': '-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDr2zVbMu4zFOdimKVD4DlW0Uol\nEtUocA9QESbKVdv8sjFY29JROrXNGHW0uD1cyGSLJyKVuDu7PnvgcUILeSpV+TEn\nNrMN5KSSTeWyOmh5n8NI5WqT3qpCk5vNMa4e/4/Yuh/Hy4d3KOmFO0cVa29e0GmV\nDHkGqw6f7uykdGVnNwIDAQAB\n-----END PUBLIC KEY-----'}
-        pk = mkm.PublicKey(key)
+        pk = PublicKey(key)
         print('pk:', json.dumps(pk))
         data = base64_encode(pk.data)
         print('pk.data:', data)
-        self.assertEqual(data, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDr2zVbMu4zFOdimKVD4DlW0UolEtUocA9QESbKVdv8sjFY29JROrXNGHW0uD1cyGSLJyKVuDu7PnvgcUILeSpV+TEnNrMN5KSSTeWyOmh5n8NI5WqT3qpCk5vNMa4e/4/Yuh/Hy4d3KOmFO0cVa29e0GmVDHkGqw6f7uykdGVnNwIDAQAB')
+        exp = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDr2zVbMu4zFOdimKVD4DlW0UolEtUocA9QESbKVdv8sjFY29JROrXNGHW0uD1cyGSLJyKVuDu7PnvgcUILeSpV+TEnNrMN5KSSTeWyOmh5n8NI5WqT3qpCk5vNMa4e/4/Yuh/Hy4d3KOmFO0cVa29e0GmVDHkGqw6f7uykdGVnNwIDAQAB'
+        self.assertEqual(exp, data, 'RSA keys error')
 
     def test_meta(self):
         print('\n---------------- %s' % self)
 
-        id1 = mkm.ID(moki_id)
+        print('meta: ', moki_meta)
 
-        meta = mkm.Meta(moki_meta)
-        print('meta: ', meta)
+        ok = moki_meta.match_identifier(moki_id)
+        self.assertTrue(ok, 'meta algorithm error')
 
-        ok = meta.match_identifier(id1)
-        self.assertTrue(ok)
-
-        id2 = meta.generate_identifier(mkm.NetworkID.Main)
-        address2 = meta.generate_address(mkm.NetworkID.Main)
-        print_id(id2)
-        print_address(address2)
+        identifier = moki_meta.generate_identifier(NetworkID.Main)
+        address = moki_meta.generate_address(NetworkID.Main)
+        print_id(identifier)
+        print_address(address)
 
     def test_id(self):
         print('\n---------------- %s' % self)
 
         moki = "moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk"
-        id1 = mkm.ID(moki)
-        id2 = mkm.ID(moki + "/home")
+        id1 = ID(moki)
+        id2 = ID(moki + "/home")
 
         print_id(id1)
         print_id(id2)
-        self.assertTrue(id1 == id2)
+        self.assertTrue(id1 == id2, 'ID error with terminal')
 
         satoshi = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
-        id1 = mkm.ID(satoshi)
-        id2 = mkm.ID(satoshi + '/btc')
+        id1 = ID(satoshi)
+        id2 = ID(satoshi + '/btc')
 
         print_id(id1)
         print_id(id2)
-        self.assertTrue(id1 == id2)
+        self.assertTrue(id1 == id2, 'ID error with terminal')
 
     def test_entity(self):
         print('\n---------------- %s' % self)
 
-        id1 = mkm.ID("moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk")
-        id2 = mkm.ID("moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk/home")
+        id1 = ID("moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk")
+        id2 = ID("moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk/home")
         print_id(id1)
         print_id(id2)
 
-        e1 = mkm.Entity(id1)
-        e2 = mkm.Entity(id2)
+        e1 = Entity(id1)
+        e2 = Entity(id2)
 
-        e1.delegate = database
-        e2.delegate = database
+        e1.delegate = facebook
+        e2.delegate = facebook
 
         print(e1)
         print(e2)
-        self.assertTrue(e1 == e2)
+        self.assertTrue(e1 == e2, 'entity error with terminal')
 
         e2 = None
-        self.assertTrue(e1 != e2)
+        self.assertTrue(e1 != e2, 'entity error')
 
 
 class AccountTestCase(unittest.TestCase):
@@ -192,14 +170,14 @@ class AccountTestCase(unittest.TestCase):
         name = 'moky'
 
         for x in range(0, 10):
-            sk = mkm.PrivateKey.generate({'algorithm': 'RSA'})
-            meta = mkm.Meta.generate(seed=name, private_key=sk)
+            sk = PrivateKey.generate({'algorithm': 'RSA'})
+            meta = Meta.generate(seed=name, private_key=sk)
             print(x, 'meta: ', meta)
-            self.assertTrue(meta.key.match(sk))
+            self.assertTrue(meta.key.match(sk), 'meta key not match private key')
 
-            id1 = meta.generate_identifier(mkm.NetworkID.Main)
+            id1 = meta.generate_identifier(NetworkID.Main)
             print_id(id1)
-            self.assertTrue(meta.match_identifier(id1))
+            self.assertTrue(meta.match_identifier(id1), 'meta not match ID')
 
             if id1.number % 10000 == 9527:
                 print('Got it!')
@@ -208,32 +186,40 @@ class AccountTestCase(unittest.TestCase):
     def test_account(self):
         print('\n---------------- %s' % self)
 
-        id1 = mkm.ID(moki_id)
-        meta1 = mkm.Meta(moki_meta)
+        id1 = ID(moki_id)
+        meta1 = Meta(moki_meta)
         print('ID: ', id1, ', meta: ', meta1)
-        self.assertTrue(meta1.match_identifier(id1))
+        self.assertTrue(meta1.match_identifier(id1), 'meta not match ID')
 
-        sk1 = mkm.PrivateKey(moki_sk)
+        sk1 = PrivateKey(moki_sk)
         print('private key: ', sk1)
-        self.assertTrue(meta1.key.match(sk1))
+        self.assertTrue(meta1.key.match(sk1), 'meta key not match private key')
 
-        account1 = mkm.Account(id1)
-        account1.delegate = database
+        account1 = Account(id1)
+        account1.delegate = facebook
 
         print('account1: ', account1)
 
-        id2 = mkm.ID(hulk_id)
-        sk2 = mkm.PrivateKey(hulk_sk)
+        id2 = ID(hulk_id)
+        sk2 = PrivateKey(hulk_sk)
 
-        user2 = mkm.User(id2, sk2)
-        user2.delegate = database
+        user2 = User(id2)
+        user2.delegate = facebook
 
         print('user2: ', user2)
         # print('number: ', user2.number())
         print('number: ', user2.number)
         print('number: ', user2.number)
         print('number: ', user2.number)
-        self.assertTrue(user2.publicKey.match(user2.privateKey))
+
+        data = 'moky'.encode('utf-8')
+        ct = user2.encrypt(data)
+        pt = user2.decrypt(ct)
+        self.assertEqual(data, pt, 'decryption error')
+
+        sig = user2.sign(data)
+        ok = user2.verify(data, sig)
+        self.assertTrue(ok, 'signature error')
 
 
 if __name__ == '__main__':

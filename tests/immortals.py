@@ -7,15 +7,18 @@
     Genesis accounts for test: "Immortal Hulk", "Monkey King"
 """
 
-from .crypto import PrivateKey
-from .identifier import ID
-from .account import User
+from mkm import PublicKey, PrivateKey
+from mkm import ID, Meta, User
 
 
 #
 #  Immortal Hulk
 #
+
 hulk_id = 'hulk@4YeVEN3aUnvC1DNUufCq1bs9zoBSJTzVEj'
+hulk_id = ID(hulk_id)
+
+hulk_name = 'Hulk'
 
 hulk_pk = {
     'algorithm': 'RSA',
@@ -25,6 +28,7 @@ hulk_pk = {
             '0Z8kNzRkm3FJid592FL7ryzfvIzB9bjg8U2JqlyCVAyUYEnKv4lDAgMBAAE=\n'
             '-----END PUBLIC KEY-----'
 }
+hulk_pk = PublicKey(hulk_pk)
 
 hulk_sk = {
     'algorithm': 'RSA',
@@ -44,6 +48,7 @@ hulk_sk = {
             'SIbB+8i05JUVIc+mcYqTqGp4FDfz6snzt7sMBQdx6BZY\n'
             '-----END RSA PRIVATE KEY-----'
 }
+hulk_sk = PrivateKey(hulk_sk)
 
 hulk_meta = {
     'version': 0x01,
@@ -53,14 +58,19 @@ hulk_meta = {
                    '8wfXJQXjYiWqNWKQmQe/gK8M8NkU7lRwm+2nh9wSBYV6Q4WXsCboKbnM0+HVn9Vd'
                    'fp21hMMGrxTX1pBPRbi0567ZjNQC8ffdW2WvQSoec2I='
 }
+hulk_meta = Meta(hulk_meta)
 
-hulk = User(identifier=ID(hulk_id), private_key=PrivateKey(hulk_sk))
+hulk = User(hulk_id)
 
 
 #
 #  Monkey King
 #
+
 moki_id = 'moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk'
+moki_id = ID(moki_id)
+
+moki_name = 'Monkey King'
 
 moki_pk = {
     'algorithm': 'RSA',
@@ -70,6 +80,7 @@ moki_pk = {
             'XDMpsriKFndoB1lz9P3E8FkM5ycG84hejcHB+R5yzDa4KbGeOc0tAgMBAAE=\n'
             '-----END PUBLIC KEY-----'
 }
+moki_pk = PublicKey(moki_pk)
 
 moki_sk = {
     'algorithm': 'RSA',
@@ -89,6 +100,7 @@ moki_sk = {
             '2OFCBTTQf3QRmCoys5/dyBGLDhRzV5Obtg6Fll/caLXs\n'
             '-----END RSA PRIVATE KEY-----'
 }
+moki_sk = PrivateKey(moki_sk)
 
 moki_meta = {
     'version': 0x01,
@@ -98,5 +110,6 @@ moki_meta = {
                    'wW7KLaAHvK8gJbp0pPIzLR4bhzu6zRpDLzUQsq6bXgMp+WAiZtFm6IHWNUwUEYcr'
                    '3iSvTn5L1HunRt7kBglEjv8RKtbNcK0t1Xto375kMlo='
 }
+moki_meta = Meta(moki_meta)
 
-moki = User(identifier=ID(moki_id), private_key=PrivateKey(moki_sk))
+moki = User(moki_id)

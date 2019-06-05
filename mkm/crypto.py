@@ -62,7 +62,7 @@ class SymmetricKey(dict):
         else:
             raise AssertionError('Invalid symmetric key')
 
-    def encrypt(self, plaintext: bytes) -> bytes:
+    def encrypt(self, data: bytes) -> bytes:
         pass
 
     def decrypt(self, data: bytes) -> bytes:
@@ -118,7 +118,7 @@ class PublicKey(dict):
         else:
             raise AssertionError('Invalid public key')
 
-    def encrypt(self, plaintext: bytes) -> bytes:
+    def encrypt(self, data: bytes) -> bytes:
         pass
 
     def verify(self, data: bytes, signature: bytes) -> bool:

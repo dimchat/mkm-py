@@ -28,6 +28,7 @@ from abc import abstractmethod, ABCMeta
 from .address import NetworkID
 from .identifier import ID
 from .meta import Meta
+from .profile import Profile
 
 
 class Entity:
@@ -73,24 +74,28 @@ class Entity:
 
     @property
     def name(self) -> str:
-        nick = self.delegate.entity_name(entity=self)
-        if nick:
-            return nick
-        nick = self.identifier.name
-        if nick:
-            return nick
-        # BTC address
-        return self.identifier.address
+        # get from profile
+        profile = self.profile
+        if profile is not None:
+            name = profile.name
+            if name is not None:
+                return name
+        # get from identifier
+        return self.identifier.name
 
     @property
     def meta(self) -> Meta:
-        return self.delegate.entity_meta(entity=self)
+        return self.delegate.entity_meta(identifier=self.identifier)
+
+    @property
+    def profile(self) -> Profile:
+        # TODO: verify profile with meta.key
+        return self.delegate.entity_profile(identifier=self.identifier)
 
 
 #
 #  Delegate
 #
-
 
 class IEntityDataSource(metaclass=ABCMeta):
     """
@@ -99,11 +104,11 @@ class IEntityDataSource(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def entity_meta(self, entity: Entity) -> Meta:
+    def entity_meta(self, identifier: ID) -> Meta:
         """ Get meta for this entity ID """
         pass
 
     @abstractmethod
-    def entity_name(self, entity: Entity) ->str:
+    def entity_profile(self, identifier: ID) -> Profile:
         """ Get name in this entity's profile """
         pass

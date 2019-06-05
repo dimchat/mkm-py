@@ -34,9 +34,10 @@ from .cryptokeys import AESKey, RSAPrivateKey, RSAPublicKey
 from .address import NetworkID, Address
 from .identifier import ID
 from .meta import Meta
+from .profile import Profile
 from .entity import Entity, IEntityDataSource
-from .account import Account, User, IAccountDelegate, IUserDelegate, IUserDataSource
-from .group import Group, IGroupDelegate, IGroupDataSource
+from .account import Account, User, IUserDataSource
+from .group import Group, IGroupDataSource
 
 name = "MingKeMing"
 
@@ -48,8 +49,8 @@ __all__ = [
     'PrivateKey', 'PublicKey',
 
     # MingKeMing
-    'NetworkID', 'Address', 'ID', 'Meta',
+    'NetworkID', 'Address', 'ID', 'Meta', 'Profile',
     'Entity', 'IEntityDataSource',
-    'Account', 'User', 'IAccountDelegate', 'IUserDelegate', 'IUserDataSource',
-    'Group', 'IGroupDelegate', 'IGroupDataSource',
+    'Account', 'User', 'IUserDataSource',
+    'Group', 'IGroupDataSource',
 ]

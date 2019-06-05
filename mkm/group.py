@@ -30,7 +30,7 @@
     Group with members
 """
 
-from abc import abstractmethod, ABCMeta, ABC
+from abc import abstractmethod, ABC
 
 from .identifier import ID
 from .entity import Entity, IEntityDataSource
@@ -40,43 +40,20 @@ class Group(Entity):
 
     @property
     def founder(self) -> ID:
-        return self.delegate.group_founder(group=self)
+        return self.delegate.group_founder(identifier=self.identifier)
 
     @property
     def owner(self) -> ID:
-        return self.delegate.group_owner(group=self)
+        return self.delegate.group_owner(identifier=self.identifier)
 
     @property
     def members(self) -> list:
-        return self.delegate.group_members(group=self)
+        return self.delegate.group_members(identifier=self.identifier)
 
 
 #
 #  Delegates
 #
-
-
-class IGroupDelegate(metaclass=ABCMeta):
-    """
-        Group Delegate
-        ~~~~~~~~~~~~~~
-    """
-
-    @abstractmethod
-    def group_create(self, identifier: ID) -> Group:
-        """ Create group with ID """
-        pass
-
-    @abstractmethod
-    def group_add_member(self, group: Group, member: ID) -> bool:
-        """ Add member to group """
-        pass
-
-    @abstractmethod
-    def group_remove_member(self, group: Group, member: ID) -> bool:
-        """ Remove member from group """
-        pass
-
 
 class IGroupDataSource(IEntityDataSource, ABC):
     """
@@ -85,16 +62,16 @@ class IGroupDataSource(IEntityDataSource, ABC):
     """
 
     @abstractmethod
-    def group_founder(self, group: Group) -> ID:
+    def group_founder(self, identifier: ID) -> ID:
         """ Get founder of the group """
         pass
 
     @abstractmethod
-    def group_owner(self, group: Group) -> ID:
+    def group_owner(self, identifier: ID) -> ID:
         """ Get current owner of the group """
         pass
 
     @abstractmethod
-    def group_members(self, group: Group) -> list:
+    def group_members(self, identifier: ID) -> list:
         """ Get all members in the group """
         pass

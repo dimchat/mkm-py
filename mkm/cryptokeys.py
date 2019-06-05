@@ -81,11 +81,11 @@ class AESKey(SymmetricKey):
         key['iv'] = base64_encode(iv)
         return AESKey(key)
 
-    def encrypt(self, plaintext: bytes) -> bytes:
+    def encrypt(self, data: bytes) -> bytes:
         key = AES.new(self.data, AES.MODE_CBC, self.iv)
         size = key.block_size
-        pad = (size - len(plaintext) % size) * chr(0).encode('utf-8')
-        return key.encrypt(plaintext + pad)
+        pad = (size - len(data) % size) * chr(0).encode('utf-8')
+        return key.encrypt(data + pad)
 
     def decrypt(self, data: bytes) -> bytes:
         key = AES.new(self.data, AES.MODE_CBC, self.iv)
@@ -109,9 +109,9 @@ class RSAPublicKey(PublicKey):
     def data(self) -> bytes:
         return self.key.exportKey(format='DER')
 
-    def encrypt(self, plaintext: bytes) -> bytes:
+    def encrypt(self, data: bytes) -> bytes:
         cipher = Cipher_PKCS1_v1_5.new(self.key)
-        return cipher.encrypt(plaintext)
+        return cipher.encrypt(data)
 
     def verify(self, data: bytes, signature: bytes) -> bool:
         hash_obj = SHA256.new(data)
@@ -176,6 +176,14 @@ class RSAPrivateKey(PrivateKey):
     Key Classes Maps
 """
 
-symmetric_key_classes['AES'] = AESKey
-public_key_classes['RSA'] = RSAPublicKey
-private_key_classes['RSA'] = RSAPrivateKey
+# AES
+symmetric_key_classes['AES'] = AESKey       # default
+symmetric_key_classes['AES/CBC/PKCS5Padding'] = AESKey
+
+# RSA
+public_key_classes['RSA'] = RSAPublicKey    # default
+private_key_classes['RSA'] = RSAPrivateKey  # default
+public_key_classes['SHA256withRSA'] = RSAPublicKey
+private_key_classes['SHA256withRSA'] = RSAPrivateKey
+public_key_classes['RSA/ECB/PKCS1Padding'] = RSAPublicKey
+private_key_classes['RSA/ECB/PKCS1Padding'] = RSAPrivateKey
