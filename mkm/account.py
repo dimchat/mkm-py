@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+#
+#   Ming-Ke-Ming : Decentralized User Identity Authentication
+#
+#                                Written in 2019 by Moky <albert.moky@gmail.com>
+#
 # ==============================================================================
 # MIT License
 #
@@ -94,7 +99,7 @@ class User(Account):
 
         :return: contacts list
         """
-        return self.delegate.user_contacts(identifier=self.identifier)
+        return self.delegate.contacts(identifier=self.identifier)
 
     def sign(self, data: bytes) -> bytes:
         """
@@ -103,7 +108,7 @@ class User(Account):
         :param data: message data
         :return: signature
         """
-        key = self.delegate.user_private_key_for_signature(identifier=self.identifier)
+        key = self.delegate.private_key_for_signature(identifier=self.identifier)
         if key is not None:
             return key.sign(data=data)
 
@@ -114,7 +119,7 @@ class User(Account):
         :param data: encrypted data
         :return: plaintext
         """
-        keys = self.delegate.user_private_keys_for_decryption(identifier=self.identifier)
+        keys = self.delegate.private_keys_for_decryption(identifier=self.identifier)
         plaintext = None
         for key in keys:
             try:
@@ -139,7 +144,7 @@ class IUserDataSource(IEntityDataSource, ABC):
     """
 
     @abstractmethod
-    def user_private_key_for_signature(self, identifier: ID) -> PrivateKey:
+    def private_key_for_signature(self, identifier: ID) -> PrivateKey:
         """
         Get user's private key for signature
 
@@ -149,7 +154,7 @@ class IUserDataSource(IEntityDataSource, ABC):
         pass
 
     @abstractmethod
-    def user_private_keys_for_decryption(self, identifier: ID) -> list:
+    def private_keys_for_decryption(self, identifier: ID) -> list:
         """
         Get user's private keys for decryption
 
@@ -159,7 +164,7 @@ class IUserDataSource(IEntityDataSource, ABC):
         pass
 
     @abstractmethod
-    def user_contacts(self, identifier: ID) -> list:
+    def contacts(self, identifier: ID) -> list:
         """
         Get contacts list
 

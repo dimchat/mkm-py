@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+#
+#   Ming-Ke-Ming : Decentralized User Identity Authentication
+#
+#                                Written in 2019 by Moky <albert.moky@gmail.com>
+#
 # ==============================================================================
 # MIT License
 #

@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-#
-#   Ming-Ke-Ming : Decentralized User Identity Authentication
-#
-#                                Written in 2019 by Moky <albert.moky@gmail.com>
-#
 # ==============================================================================
 # MIT License
 #
@@ -28,55 +23,18 @@
 # SOFTWARE.
 # ==============================================================================
 
-"""
-    Group for assembly
-    ~~~~~~~~~~~~~~~~~~
-
-    Group with members
-"""
-
-from abc import abstractmethod, ABC
-
-from .identifier import ID
-from .entity import Entity, IEntityDataSource
+from abc import ABCMeta
 
 
-class Group(Entity):
+class CryptographyKey(dict, metaclass=ABCMeta):
+
+    ALGORITHM = 'algorithm'
+
+    def __init__(self, key: dict):
+        super().__init__(key)
+        # process by subclass
+        self.data = None
 
     @property
-    def founder(self) -> ID:
-        return self.delegate.founder(identifier=self.identifier)
-
-    @property
-    def owner(self) -> ID:
-        return self.delegate.owner(identifier=self.identifier)
-
-    @property
-    def members(self) -> list:
-        return self.delegate.members(identifier=self.identifier)
-
-
-#
-#  Delegates
-#
-
-class IGroupDataSource(IEntityDataSource, ABC):
-    """
-        User Data Source
-        ~~~~~~~~~~~~~~~~
-    """
-
-    @abstractmethod
-    def founder(self, identifier: ID) -> ID:
-        """ Get founder of the group """
-        pass
-
-    @abstractmethod
-    def owner(self, identifier: ID) -> ID:
-        """ Get current owner of the group """
-        pass
-
-    @abstractmethod
-    def members(self, identifier: ID) -> list:
-        """ Get all members in the group """
-        pass
+    def algorithm(self) -> str:
+        return self.get(CryptographyKey.ALGORITHM)

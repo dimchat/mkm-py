@@ -8,7 +8,7 @@
 """
 
 from mkm import PublicKey, PrivateKey
-from mkm import ID, Meta, User
+from mkm import ID, Meta, Profile, User
 
 
 #
@@ -59,6 +59,10 @@ hulk_meta = {
                    'fp21hMMGrxTX1pBPRbi0567ZjNQC8ffdW2WvQSoec2I='
 }
 hulk_meta = Meta(hulk_meta)
+
+hulk_profile = Profile(identifier=hulk_id)
+hulk_profile.name = hulk_name
+hulk_profile.sign(private_key=hulk_sk)
 
 hulk = User(hulk_id)
 
@@ -111,5 +115,9 @@ moki_meta = {
                    '3iSvTn5L1HunRt7kBglEjv8RKtbNcK0t1Xto375kMlo='
 }
 moki_meta = Meta(moki_meta)
+
+moki_profile = Profile(identifier=moki_id)
+moki_profile.name = moki_name
+moki_profile.sign(private_key=moki_sk)
 
 moki = User(moki_id)

@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-#
-#   Ming-Ke-Ming : Decentralized User Identity Authentication
-#
-#                                Written in 2019 by Moky <albert.moky@gmail.com>
-#
 # ==============================================================================
 # MIT License
 #
@@ -29,54 +24,21 @@
 # ==============================================================================
 
 """
-    Group for assembly
-    ~~~~~~~~~~~~~~~~~~
+    Crypto
+    ~~~~~~
 
-    Group with members
+    Crypto Keys: SymmetricKey, PrivateKey, PublicKey
 """
 
-from abc import abstractmethod, ABC
+from .symmetric import SymmetricKey
+from .asymmetric import PrivateKey, PublicKey
 
-from .identifier import ID
-from .entity import Entity, IEntityDataSource
-
-
-class Group(Entity):
-
-    @property
-    def founder(self) -> ID:
-        return self.delegate.founder(identifier=self.identifier)
-
-    @property
-    def owner(self) -> ID:
-        return self.delegate.owner(identifier=self.identifier)
-
-    @property
-    def members(self) -> list:
-        return self.delegate.members(identifier=self.identifier)
+from .aes import AESKey
+from .rsa import RSAPublicKey, RSAPrivateKey
 
 
-#
-#  Delegates
-#
-
-class IGroupDataSource(IEntityDataSource, ABC):
-    """
-        User Data Source
-        ~~~~~~~~~~~~~~~~
-    """
-
-    @abstractmethod
-    def founder(self, identifier: ID) -> ID:
-        """ Get founder of the group """
-        pass
-
-    @abstractmethod
-    def owner(self, identifier: ID) -> ID:
-        """ Get current owner of the group """
-        pass
-
-    @abstractmethod
-    def members(self, identifier: ID) -> list:
-        """ Get all members in the group """
-        pass
+__all__ = [
+    # Crypto
+    'SymmetricKey',
+    'PrivateKey', 'PublicKey',
+]

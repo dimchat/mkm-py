@@ -14,7 +14,7 @@ from binascii import b2a_hex, a2b_hex
 import json
 
 from mkm import *
-from mkm.utils import *
+from mkm.crypto.utils import *
 
 from tests.immortals import moki_id, moki_meta, moki_sk
 from tests.immortals import hulk_id, hulk_meta, hulk_sk
@@ -42,7 +42,7 @@ class CryptoTestCase(unittest.TestCase):
         info = {
             'algorithm': 'AES',
         }
-        key = SymmetricKey.generate(info)
+        key = SymmetricKey(info)
         print(key)
         text = 'Hello world'
         data = text.encode('utf-8')
@@ -58,8 +58,8 @@ class CryptoTestCase(unittest.TestCase):
         info = {
             'algorithm': 'RSA',
         }
-        sk = PrivateKey.generate(info)
-        pk = sk.publicKey
+        sk = PrivateKey(info)
+        pk = sk.public_key
         print(sk)
         print(pk)
 
@@ -170,10 +170,10 @@ class AccountTestCase(unittest.TestCase):
         name = 'moky'
 
         for x in range(0, 10):
-            sk = PrivateKey.generate({'algorithm': 'RSA'})
+            sk = PrivateKey({'algorithm': 'RSA'})
             meta = Meta.generate(seed=name, private_key=sk)
             print(x, 'meta: ', meta)
-            self.assertTrue(meta.key.match(sk), 'meta key not match private key')
+            self.assertTrue(meta.key.matches(sk), 'meta key not match private key')
 
             id1 = meta.generate_identifier(NetworkID.Main)
             print_id(id1)
@@ -193,7 +193,7 @@ class AccountTestCase(unittest.TestCase):
 
         sk1 = PrivateKey(moki_sk)
         print('private key: ', sk1)
-        self.assertTrue(meta1.key.match(sk1), 'meta key not match private key')
+        self.assertTrue(meta1.key.matches(sk1), 'meta key not match private key')
 
         account1 = Account(id1)
         account1.delegate = facebook

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-#   Ming-Ke-Ming : Decentralized user identity authentication
+#   Ming-Ke-Ming : Decentralized User Identity Authentication
 #
 #                                Written in 2019 by Moky <albert.moky@gmail.com>
 #
@@ -29,7 +29,6 @@
 # ==============================================================================
 
 from .crypto import SymmetricKey, PrivateKey, PublicKey
-from .cryptokeys import AESKey, RSAPrivateKey, RSAPublicKey
 
 from .address import NetworkID, Address
 from .identifier import ID
@@ -45,8 +44,7 @@ __author__ = 'Albert Moky'
 
 __all__ = [
     # Crypto
-    'SymmetricKey',
-    'PrivateKey', 'PublicKey',
+    'SymmetricKey', 'PrivateKey', 'PublicKey',
 
     # MingKeMing
     'NetworkID', 'Address', 'ID', 'Meta', 'Profile',

@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+#
+#   Ming-Ke-Ming : Decentralized User Identity Authentication
+#
+#                                Written in 2019 by Moky <albert.moky@gmail.com>
+#
 # ==============================================================================
 # MIT License
 #
@@ -25,9 +30,9 @@
 
 import json
 
-from mkm.utils import base64_decode, base64_encode
-
-from mkm import ID, PublicKey, PrivateKey
+from .crypto.utils import base64_decode, base64_encode
+from .crypto import PublicKey, PrivateKey
+from .identifier import ID
 
 
 class TAO(dict):

@@ -23,73 +23,20 @@
 # SOFTWARE.
 # ==============================================================================
 
-"""
-    Crypto
-    ~~~~~~
+from abc import ABCMeta, abstractmethod
 
-    Crypto Keys: SymmetricKey, PrivateKey, PublicKey
-"""
+from .cryptography import CryptographyKey
 
 
-class SymmetricKey(dict):
+class AsymmetricKey(CryptographyKey, metaclass=ABCMeta):
+
+    RSA = 'RSA'
+    ECC = 'ECC'
+
+
+class PublicKey(AsymmetricKey, metaclass=ABCMeta):
     """
-        This class is used to encrypt or decrypt message data
-    """
-
-    def __new__(cls, key: dict):
-        """
-
-        :param key: key info with algorithm='AES'
-        :return: symmetric key
-        """
-        if cls is not SymmetricKey:
-            # subclass
-            if issubclass(cls, SymmetricKey):
-                return super().__new__(cls, key)
-            else:
-                raise TypeError('Not subclass of SymmetricKey')
-        elif isinstance(key, SymmetricKey):
-            # return SymmetricKey object directly
-            return key
-        elif isinstance(key, dict):
-            # get class by algorithm name
-            algorithm = key['algorithm']
-            clazz = symmetric_key_classes[algorithm]
-            if issubclass(clazz, SymmetricKey):
-                return clazz(key)
-            else:
-                raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
-        else:
-            raise AssertionError('Invalid symmetric key')
-
-    def encrypt(self, data: bytes) -> bytes:
-        pass
-
-    def decrypt(self, data: bytes) -> bytes:
-        pass
-
-    @classmethod
-    def generate(cls, key: dict):
-        # get class by algorithm name
-        algorithm = key['algorithm']
-        clazz = symmetric_key_classes[algorithm]
-        if issubclass(clazz, SymmetricKey):
-            return clazz.generate(key)
-        else:
-            raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, SymmetricKey):
-            return False
-        if super().__eq__(other):
-            return True
-        promise = 'Moky loves May Lee forever!'.encode('utf-8')
-        return self.decrypt(other.encrypt(promise)) == promise
-
-
-class PublicKey(dict):
-    """
-        This class is used to encrypt symmetric key or verify signature with message data
+        This class is used to en/decrypt symmetric key or sign/verify signature with message data
     """
 
     def __new__(cls, key: dict):
@@ -98,7 +45,9 @@ class PublicKey(dict):
         :param key: key info with algorithm='RSA'
         :return: public key
         """
-        if cls is not PublicKey:
+        if key is None:
+            return None
+        elif cls is not PublicKey:
             # subclass
             if issubclass(cls, PublicKey):
                 return super().__new__(cls, key)
@@ -109,7 +58,7 @@ class PublicKey(dict):
             return key
         elif isinstance(key, dict):
             # get class by algorithm name
-            algorithm = key['algorithm']
+            algorithm = key[cls.ALGORITHM]
             clazz = public_key_classes[algorithm]
             if issubclass(clazz, PublicKey):
                 return clazz(key)
@@ -118,17 +67,11 @@ class PublicKey(dict):
         else:
             raise AssertionError('Invalid public key')
 
-    def encrypt(self, data: bytes) -> bytes:
-        pass
-
-    def verify(self, data: bytes, signature: bytes) -> bool:
-        pass
-
-    def match(self, private_key) -> bool:
+    def matches(self, private_key) -> bool:
         if not isinstance(private_key, PrivateKey):
             return False
         # 1. if the SK has the same public key, return true
-        public_key = private_key.publicKey
+        public_key = private_key.public_key
         if public_key is not None and public_key.__eq__(self):
             return True
         # 2. try to verify the SK's signature
@@ -136,8 +79,29 @@ class PublicKey(dict):
         signature = private_key.sign(promise)
         return self.verify(promise, signature)
 
+    @abstractmethod
+    def encrypt(self, data: bytes) -> bytes:
+        """
+        ciphertext = encrypt(plaintext, PK)
 
-class PrivateKey(dict):
+        :param data: plaintext
+        :return:     ciphertext
+        """
+        pass
+
+    @abstractmethod
+    def verify(self, data: bytes, signature: bytes) -> bool:
+        """
+        OK = verify(data, signature, PK)
+
+        :param data:      message data
+        :param signature: signature of message data
+        :return:          True on signature matched
+        """
+        pass
+
+
+class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
     """
         This class is used to decrypt symmetric key or sign message data
     """
@@ -148,7 +112,9 @@ class PrivateKey(dict):
         :param key: key info with algorithm='RSA'
         :return: private key
         """
-        if cls is not PrivateKey:
+        if key is None:
+            return None
+        elif cls is not PrivateKey:
             # subclass
             if issubclass(cls, PrivateKey):
                 return super().__new__(cls, key)
@@ -159,7 +125,7 @@ class PrivateKey(dict):
             return key
         elif isinstance(key, dict):
             # get class by algorithm name
-            algorithm = key['algorithm']
+            algorithm = key[cls.ALGORITHM]
             clazz = private_key_classes[algorithm]
             if issubclass(clazz, PrivateKey):
                 return clazz(key)
@@ -168,40 +134,44 @@ class PrivateKey(dict):
         else:
             raise AssertionError('Invalid private key')
 
-    def decrypt(self, data: bytes) -> bytes:
-        pass
-
-    def sign(self, data: bytes) -> bytes:
-        pass
-
-    @property
-    def publicKey(self) -> PublicKey:
-        yield None
-
-    @classmethod
-    def generate(cls, key: dict):
-        # get algorithm name
-        algorithm = key['algorithm']
-        clazz = private_key_classes[algorithm]
-        if issubclass(clazz, PrivateKey):
-            return clazz.generate(key)
-        else:
-            raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
-
     def __eq__(self, other) -> bool:
         if not isinstance(other, PrivateKey):
             return False
         if super().__eq__(other):
             return True
-        return self.publicKey.match(other)
+        pk = self.public_key
+        if pk is not None:
+            return pk.matches(other)
 
+    @property
+    def public_key(self) -> PublicKey:
+        """
+        Get public key from private key
 
-"""
-    Key Classes Maps
-"""
+        :return: public key paired to this private key
+        """
+        yield None
 
-symmetric_key_classes = {
-}
+    @abstractmethod
+    def decrypt(self, data: bytes) -> bytes:
+        """
+        plaintext = decrypt(ciphertext, SK);
+
+        :param data: ciphertext
+        :return:     plaintext
+        """
+        pass
+
+    @abstractmethod
+    def sign(self, data: bytes) -> bytes:
+        """
+        signature = sign(data, SK);
+
+        :param data: message data
+        :return:     signature
+        """
+        pass
+
 
 public_key_classes = {
 }

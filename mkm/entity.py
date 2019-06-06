@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+#
+#   Ming-Ke-Ming : Decentralized User Identity Authentication
+#
+#                                Written in 2019 by Moky <albert.moky@gmail.com>
+#
 # ==============================================================================
 # MIT License
 #
@@ -85,12 +90,12 @@ class Entity:
 
     @property
     def meta(self) -> Meta:
-        return self.delegate.entity_meta(identifier=self.identifier)
+        return self.delegate.meta(identifier=self.identifier)
 
     @property
     def profile(self) -> Profile:
         # TODO: verify profile with meta.key
-        return self.delegate.entity_profile(identifier=self.identifier)
+        return self.delegate.profile(identifier=self.identifier)
 
 
 #
@@ -104,11 +109,11 @@ class IEntityDataSource(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def entity_meta(self, identifier: ID) -> Meta:
+    def meta(self, identifier: ID) -> Meta:
         """ Get meta for this entity ID """
         pass
 
     @abstractmethod
-    def entity_profile(self, identifier: ID) -> Profile:
+    def profile(self, identifier: ID) -> Profile:
         """ Get name in this entity's profile """
         pass

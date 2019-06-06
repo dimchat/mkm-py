@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+#
+#   Ming-Ke-Ming : Decentralized User Identity Authentication
+#
+#                                Written in 2019 by Moky <albert.moky@gmail.com>
+#
 # ==============================================================================
 # MIT License
 #
@@ -44,7 +49,7 @@
         number  = uint(code);
 """
 
-from .utils import base64_encode, base64_decode
+from .crypto.utils import base64_encode, base64_decode
 from .crypto import PublicKey, PrivateKey
 
 from .address import NetworkID, Address
@@ -150,14 +155,14 @@ class Meta(dict):
             dictionary = {
                 'version': version,
                 'seed': seed,
-                'key': private_key.publicKey,
+                'key': private_key.public_key,
                 'fingerprint': base64_encode(fingerprint),
             }
             return Meta(dictionary)
         elif version == cls.Version_BTC:
             dictionary = {
                 'version': version,
-                'key': private_key.publicKey,
+                'key': private_key.public_key,
             }
             return Meta(dictionary)
         else:

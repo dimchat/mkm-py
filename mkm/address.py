@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+#
+#   Ming-Ke-Ming : Decentralized User Identity Authentication
+#
+#                                Written in 2019 by Moky <albert.moky@gmail.com>
+#
 # ==============================================================================
 # MIT License
 #
@@ -41,7 +46,7 @@
 
 from enum import IntEnum
 
-from .utils import sha256, ripemd160, base58_encode, base58_decode
+from .crypto.utils import sha256, ripemd160, base58_encode, base58_decode
 
 
 class NetworkID(IntEnum):
