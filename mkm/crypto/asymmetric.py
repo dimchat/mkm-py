@@ -67,7 +67,7 @@ class PublicKey(AsymmetricKey, metaclass=ABCMeta):
         else:
             raise AssertionError('Invalid public key')
 
-    def matches(self, private_key) -> bool:
+    def match(self, private_key) -> bool:
         if not isinstance(private_key, PrivateKey):
             return False
         # 1. if the SK has the same public key, return true
@@ -141,7 +141,7 @@ class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
             return True
         pk = self.public_key
         if pk is not None:
-            return pk.matches(other)
+            return pk.match(other)
 
     @property
     def public_key(self) -> PublicKey:

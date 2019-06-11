@@ -173,7 +173,7 @@ class AccountTestCase(unittest.TestCase):
             sk = PrivateKey({'algorithm': 'RSA'})
             meta = Meta.generate(seed=name, private_key=sk)
             print(x, 'meta: ', meta)
-            self.assertTrue(meta.key.matches(sk), 'meta key not match private key')
+            self.assertTrue(meta.key.match(sk), 'meta key not match private key')
 
             id1 = meta.generate_identifier(NetworkID.Main)
             print_id(id1)
@@ -193,7 +193,7 @@ class AccountTestCase(unittest.TestCase):
 
         sk1 = PrivateKey(moki_sk)
         print('private key: ', sk1)
-        self.assertTrue(meta1.key.matches(sk1), 'meta key not match private key')
+        self.assertTrue(meta1.key.match(sk1), 'meta key not match private key')
 
         account1 = Account(id1)
         account1.delegate = facebook

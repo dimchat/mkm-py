@@ -87,20 +87,18 @@ class Meta(dict):
 
     @classmethod
     def __meta(cls, seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=DefaultVersion) -> dict:
-        if version & cls.Version_MKM:  # MKM, ExBTC, ExETH, ...
+        if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
             return {
                 'version': version,
                 'seed': seed,
                 'key': key,
                 'fingerprint': base64_encode(fingerprint),
             }
-        elif version == cls.Version_BTC:
+        else:  # BTC, ETH, ...
             return {
                 'version': version,
                 'key': key,
             }
-        else:
-            raise ValueError('unsupported version:', version)
 
     def __new__(cls, meta: dict=None,
                 seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=DefaultVersion):
@@ -122,11 +120,9 @@ class Meta(dict):
         # new Meta(dict)
         return super().__new__(cls, meta)
 
-    def __init__(self, meta: dict=None,
+    def __init__(self, meta: dict,
                  seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=DefaultVersion):
-        if meta is None:
-            meta = Meta.__meta(seed=seed, key=key, fingerprint=fingerprint, version=version)
-        else:
+        if meta is not None:
             # get fields from dictionary
             version = int(meta.get('version'))
             key = PublicKey(meta.get('key'))
@@ -135,21 +131,37 @@ class Meta(dict):
             if fingerprint is not None:
                 fingerprint = base64_decode(fingerprint)
         # check meta version
-        if version == Meta.Version_MKM or version == Meta.Version_ExBTC:
+        if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
             # verify seed and fingerprint
             if not key.verify(seed.encode('utf-8'), fingerprint):
-                raise ValueError('Meta data not math')
+                raise ValueError('Meta key not math: %s' % meta)
         # new Meta(dict)
         super().__init__(meta)
-        self.version = version
-        self.seed = seed
-        self.key = key
-        self.fingerprint = fingerprint
+        self.__version = version
+        self.__seed = seed
+        self.__key = key
+        self.__fingerprint = fingerprint
+
+    @property
+    def version(self) -> chr:
+        return self.__version
+
+    @property
+    def seed(self) -> str:
+        return self.__seed
+
+    @property
+    def key(self) -> PublicKey:
+        return self.__key
+
+    @property
+    def fingerprint(self) -> bytes:
+        return self.__fingerprint
 
     @classmethod
     def generate(cls, private_key: PrivateKey, seed: str='', version: chr=DefaultVersion):
         """ Generate meta info with seed and private key """
-        if version & cls.Version_MKM:  # MKM, ExBTC, ExETH, ...
+        if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
             # generate fingerprint with private key
             fingerprint = private_key.sign(seed.encode('utf-8'))
             dictionary = {
@@ -159,28 +171,32 @@ class Meta(dict):
                 'fingerprint': base64_encode(fingerprint),
             }
             return Meta(dictionary)
-        elif version == cls.Version_BTC:
+        else:  # BTC, ETH, ...
             dictionary = {
                 'version': version,
                 'key': private_key.public_key,
             }
             return Meta(dictionary)
-        else:
-            raise AssertionError('Invalid version')
 
     def match_public_key(self, public_key: PublicKey) -> bool:
         if self.key == public_key:
             return True
-        if self.version == Meta.Version_BTC:
-            # ID with BTC address has no username
+        if self.version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
+            # check whether keys equal by verifying signature
+            return public_key.verify(data=self.seed.encode('utf-8'), signature=self.fingerprint)
+        else:  # BTC, ETH, ...
+            # ID with BTC/ETH address has no username
             # so we can just compare the key.data to check matching
             return False
-        # check whether keys equal by verifying signature
-        return public_key.verify(data=self.seed.encode('utf-8'), signature=self.fingerprint)
 
     def match_identifier(self, identifier: ID) -> bool:
         """ Check ID(name+address) with meta info """
-        return identifier.name == self.seed and self.match_address(address=identifier.address)
+        if self.seed is None:
+            if identifier.name is not None:
+                return False
+        elif self.seed != identifier.name:
+            return False
+        return self.match_address(address=identifier.address)
 
     def match_address(self, address: Address) -> bool:
         """ Check address with meta info """
@@ -193,12 +209,17 @@ class Meta(dict):
 
     def generate_address(self, network: NetworkID) -> Address:
         """ Generate address with meta info and network ID """
-        if self.version == Meta.Version_MKM:
+        if self.version == Meta.Version_MKM:   # MKM
             # generate MKM address
             return Address(fingerprint=self.fingerprint, network=network)
-        elif self.version == Meta.Version_BTC or self.version == Meta.Version_ExBTC:
+        elif self.version & Meta.Version_BTC:  # BTC, ExBTC
             # generate BTC address
-            return Address(fingerprint=self.key.data, network=network)
+            return Address(fingerprint=self.key.data, network=network, algorithm=Address.Algorithm_BTC)
+        elif self.version & Meta.Version_ETH:  # ETH, ExETH
+            # generate ETH address
+            return Address(fingerprint=self.key.data, network=network, algorithm=Address.Algorithm_ETH)
+        else:
+            raise ArithmeticError('meta version error: %s' % self.version)
 
     def __eq__(self, other) -> bool:
         """ Check whether they can generate same IDs """

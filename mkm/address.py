@@ -166,8 +166,13 @@ class NetworkID(IntEnum):
         return self.value == self.Robot
 
 
+def check_code(data: bytes) -> bytes:
+    # check code in BTC address
+    return sha256(sha256(data))[:4]
+
+
 def user_number(code: bytes) -> int:
-    """ Get user number, which for remembering and searching user """
+    # get user number, which for remembering and searching user
     return int.from_bytes(code, byteorder='little')
 
 
@@ -177,6 +182,7 @@ class Address(str):
     """
 
     Algorithm_BTC = 0x01
+    Algorithm_ETH = 0x02
     DefaultAlgorithm = Algorithm_BTC
 
     def __new__(cls, address: str='',
@@ -197,7 +203,7 @@ class Address(str):
                 prefix = data[:1]
                 digest = data[1:-4]
                 code = data[-4:]
-                if sha256(sha256(prefix + digest))[:4] == code:
+                if check_code(prefix + digest) == code:
                     network = ord(prefix)
                     number = user_number(code)
                     # algorithm = cls.Algorithm_BTC
@@ -209,14 +215,22 @@ class Address(str):
             # calculate address string with fingerprint
             prefix = chr(network).encode('latin1')
             digest = ripemd160(sha256(fingerprint))
-            code = sha256(sha256(prefix + digest))[:4]
+            code = check_code(prefix + digest)
             number = user_number(code)
             address = base58_encode(prefix + digest + code)
         else:
             raise AssertionError('Parameter error')
         # new Address(str)
         self = super().__new__(cls, address)
-        self.network = NetworkID(network)
-        self.number = number
+        self.__network: NetworkID = NetworkID(network)
+        self.__number: int = number
         # self.algorithm = algorithm
         return self
+
+    @property
+    def network(self) -> NetworkID:
+        return self.__network
+
+    @property
+    def number(self) -> int:
+        return self.__number

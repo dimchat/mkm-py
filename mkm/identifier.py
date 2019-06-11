@@ -88,10 +88,22 @@ class ID(str):
             raise ValueError('Invalid ID (address) string')
         # new ID(str)
         self = super().__new__(cls, identifier)
-        self.name = name
-        self.address = address
-        self.terminal = terminal
+        self.__name = name
+        self.__address = address
+        self.__terminal = terminal
         return self
+
+    @property
+    def name(self) -> str:
+        return self.__name
+
+    @property
+    def address(self) -> Address:
+        return self.__address
+
+    @property
+    def terminal(self) -> str:
+        return self.__terminal
 
     def __eq__(self, other) -> bool:
         if other:
