@@ -25,7 +25,7 @@
 
 from abc import ABCMeta, abstractmethod
 
-from .cryptography import CryptographyKey
+from .cryptography import CryptographyKey, algorithm
 
 
 class AsymmetricKey(CryptographyKey, metaclass=ABCMeta):
@@ -49,23 +49,16 @@ class PublicKey(AsymmetricKey, metaclass=ABCMeta):
             return None
         elif cls is not PublicKey:
             # subclass
-            if issubclass(cls, PublicKey):
-                return super().__new__(cls, key)
-            else:
-                raise TypeError('Not subclass of PublicKey')
+            return super().__new__(cls, key)
         elif isinstance(key, PublicKey):
             # return PublicKey object directly
             return key
-        elif isinstance(key, dict):
-            # get class by algorithm name
-            algorithm = key[cls.ALGORITHM]
-            clazz = public_key_classes[algorithm]
-            if issubclass(clazz, PublicKey):
-                return clazz(key)
-            else:
-                raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
+        # get class by algorithm name
+        clazz = public_key_classes[algorithm(key)]
+        if issubclass(clazz, PublicKey):
+            return clazz(key)
         else:
-            raise AssertionError('Invalid public key')
+            raise ModuleNotFoundError('Invalid algorithm: %s' % key)
 
     def match(self, private_key) -> bool:
         if not isinstance(private_key, PrivateKey):
@@ -116,23 +109,16 @@ class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
             return None
         elif cls is not PrivateKey:
             # subclass
-            if issubclass(cls, PrivateKey):
-                return super().__new__(cls, key)
-            else:
-                raise TypeError('Not subclass of PrivateKey')
+            return super().__new__(cls, key)
         elif isinstance(key, PrivateKey):
             # return PrivateKey object directly
             return key
-        elif isinstance(key, dict):
-            # get class by algorithm name
-            algorithm = key[cls.ALGORITHM]
-            clazz = private_key_classes[algorithm]
-            if issubclass(clazz, PrivateKey):
-                return clazz(key)
-            else:
-                raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
+        # get class by algorithm name
+        clazz = private_key_classes[algorithm(key)]
+        if issubclass(clazz, PrivateKey):
+            return clazz(key)
         else:
-            raise AssertionError('Invalid private key')
+            raise ModuleNotFoundError('Invalid algorithm: %s' % key)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, PrivateKey):

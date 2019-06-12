@@ -44,72 +44,90 @@ class TAO(dict):
         'TAO' is the variable part, which contains the key for asymmetric encryption.
     """
 
-    @classmethod
-    def __tao(cls, identifier: ID = None, data: str = None, signature: bytes = None):
-        profile = {
-            'ID': identifier
-        }
-        if data is not None:
-            profile['data'] = data
-        if signature is not None:
-            profile['signature'] = base64_encode(signature)
-        return profile
-
-    def __new__(cls, profile: dict = None,
-                identifier: ID = None, data: str = None, signature: bytes = None):
-        """
-        Create The Additional Object for Identifier
-
-        :param profile:    A dictionary as profile info
-        :param identifier: A string as entity ID
-        :param data:       A json string encoded for profile properties
-        :param signature:  A signature with data
-        :return: The Additional Object
-        """
+    def __new__(cls, profile: dict):
         if profile is None:
-            profile = TAO.__tao(identifier=identifier, data=data, signature=signature)
+            return None
         elif isinstance(profile, TAO):
-            # return Profile object directly
+            # return Meta object directly
             return profile
         # new Profile(dict)
         return super().__new__(cls, profile)
 
-    def __init__(self, profile: dict = None,
-                 identifier: ID = None, data: str = None, signature: bytes = None):
-        if profile is None:
-            profile = TAO.__tao(identifier=identifier, data=data, signature=signature)
-        else:
-            # get fields from dictionary
-            identifier = ID(profile.get('ID'))
-            data = profile.get('data')
-            signature = base64_decode(profile.get("signature"))
+    def __init__(self, profile: dict):
         super().__init__(profile)
-        self.identifier = identifier
-        self.properties = {}
-        self.data = data
-        self.signature = signature
-        self.valid = False
+        # entity ID
+        identifier = profile['ID']
+        self.__identifier = ID(identifier)
+        # properties data
+        data = profile.get('data')
+        self.__data = data
+        # properties signature
+        signature = profile.get('signature')
+        if signature is None:
+            self.__signature = None
+        else:
+            self.__signature = base64_decode(signature)
+        # properties
+        self.__properties = {}
+        # valid flag
+        self.__valid = False
+        # public key
         self.__key = None
 
+    @property
+    def identifier(self) -> ID:
+        return self.__identifier
+
+    @property
+    def valid(self) -> bool:
+        return self.__valid
+
+    """
+        Public Key for encryption
+        ~~~~~~~~~~~~~~~~~~~~~~~~~
+        For safety considerations, the profile.key which used to encrypt message data should be different with meta.key
+    """
+
+    @property
+    def key(self) -> PublicKey:
+        if self.__valid:
+            return self.__key
+
+    @key.setter
+    def key(self, value: PublicKey):
+        self.__key = value
+        self.set_property('key', value)
+
+    """
+        Profile Properties
+        ~~~~~~~~~~~~~~~~~~
+        Inner dictionary
+    """
+
     def get_property(self, key):
-        if self.valid:
-            return self.properties.get(key)
+        if self.__valid:
+            return self.__properties.get(key)
 
     def set_property(self, key, value):
         if value is None:
-            self.properties.pop(key, None)
+            self.__properties.pop(key, None)
         else:
-            self.properties[key] = value
-        self.reset()
+            self.__properties[key] = value
+        self.__reset()
 
-    def reset(self):
+    def __reset(self):
         """ Reset data signature after properties changed """
         self.pop('data', None)
         self.pop('signature', None)
-        self.data = ''
-        self.signature = None
-        self.valid = False
+        self.__data = None
+        self.__signature = None
+        self.__valid = False
         self.__key = None
+
+    """
+        Sign/Verify profile data
+        ~~~~~~~~~~~~~~~~~~~~~~~~
+    """
 
     def verify(self, public_key: PublicKey) -> bool:
         """
@@ -118,22 +136,20 @@ class TAO(dict):
         :param public_key: public key in meta.key
         :return: True on signature matched
         """
-        if self.valid:
+        if self.__valid:
             # already verify
             return True
-        if self.data is None or self.signature is None:
+        if self.__data is None or self.__signature is None:
             # data error
             return False
-        if public_key.verify(self.data.encode('utf-8'), self.signature):
-            self.valid = True
+        if public_key.verify(self.__data.encode('utf-8'), self.__signature):
+            # signature matched
+            self.__valid = True
             # refresh properties
-            self.properties = json.loads(self.data)
+            self.__properties = json.loads(self.__data)
             # get public key
-            self.__key = PublicKey(self.properties.get('key'))
-        else:
-            self.data = None
-            self.signature = None
-        return self.valid
+            self.__key = PublicKey(self.__properties.get('key'))
+        return self.__valid
 
     def sign(self, private_key: PrivateKey) -> bytes:
         """
@@ -142,24 +158,17 @@ class TAO(dict):
         :param private_key: private key match meta.key
         :return: signature
         """
-        if self.valid:
+        if self.__valid:
             # already signed
-            return self.signature
-        self.data = json.dumps(self.properties)
-        self.signature = private_key.sign(self.data.encode('utf-8'))
-        self['data'] = self.data
-        self['signature'] = base64_encode(self.signature)
-        self.valid = True
-        return self.signature
-
-    @property
-    def key(self) -> PublicKey:
-        if self.valid:
-            return self.__key
-
-    @key.setter
-    def key(self, public_key: PublicKey):
-        self.set_property(key='key', value=public_key)
+            return self.__signature
+        data = json.dumps(self.__properties)
+        signature = private_key.sign(data.encode('utf-8'))
+        self['data'] = data
+        self['signature'] = base64_encode(signature)
+        self.__data = data
+        self.__signature = signature
+        self.__valid = True
+        return signature
 
 
 class Profile(TAO):
@@ -171,3 +180,11 @@ class Profile(TAO):
     @name.setter
     def name(self, value: str):
         self.set_property(key='name', value=value)
+
+    @classmethod
+    def new(cls, identifier: ID):
+        """ Create new empty profile object with entity ID """
+        profile = {
+            'ID': identifier,
+        }
+        return cls(profile)

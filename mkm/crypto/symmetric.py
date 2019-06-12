@@ -25,7 +25,7 @@
 
 from abc import ABCMeta, abstractmethod
 
-from .cryptography import CryptographyKey
+from .cryptography import CryptographyKey, algorithm
 
 
 class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
@@ -46,23 +46,16 @@ class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
             return None
         elif cls is not SymmetricKey:
             # subclass
-            if issubclass(cls, SymmetricKey):
-                return super().__new__(cls, key)
-            else:
-                raise TypeError('Not subclass of SymmetricKey')
+            return super().__new__(cls, key)
         elif isinstance(key, SymmetricKey):
             # return SymmetricKey object directly
             return key
-        elif isinstance(key, dict):
-            # get class by algorithm name
-            algorithm = key[cls.ALGORITHM]
-            clazz = symmetric_key_classes[algorithm]
-            if issubclass(clazz, SymmetricKey):
-                return clazz(key)
-            else:
-                raise ModuleNotFoundError('Invalid algorithm: ' + algorithm)
+        # get class by algorithm name
+        clazz = symmetric_key_classes[algorithm(key)]
+        if issubclass(clazz, SymmetricKey):
+            return clazz(key)
         else:
-            raise AssertionError('Invalid symmetric key')
+            raise ModuleNotFoundError('Invalid algorithm: %s' % key)
 
     def __init__(self, key: dict):
         super().__init__(key=key)

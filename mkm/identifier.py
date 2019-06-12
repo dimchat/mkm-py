@@ -93,18 +93,6 @@ class ID(str):
         self.__terminal = terminal
         return self
 
-    @property
-    def name(self) -> str:
-        return self.__name
-
-    @property
-    def address(self) -> Address:
-        return self.__address
-
-    @property
-    def terminal(self) -> str:
-        return self.__terminal
-
     def __eq__(self, other) -> bool:
         if other:
             other = ID(other)
@@ -124,11 +112,23 @@ class ID(str):
             return hash(self.address)
 
     @property
+    def name(self) -> str:
+        return self.__name
+
+    @property
+    def address(self) -> Address:
+        return self.__address
+
+    @property
+    def terminal(self) -> str:
+        return self.__terminal
+
+    @property
     def type(self) -> NetworkID:
         """ ID type """
-        return self.address.network
+        return self.__address.network
 
     @property
     def number(self) -> int:
         """ Search number of this ID """
-        return self.address.number
+        return self.__address.number

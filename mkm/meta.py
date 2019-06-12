@@ -46,7 +46,7 @@
         hash    = ripemd160(sha256(CT));
         code    = sha256(sha256(network + hash)).prefix(4);
         address = base58_encode(network + hash + code);
-        number  = uint(code);
+        number  = u_int(code);
 """
 
 from .crypto.utils import base64_encode, base64_decode
@@ -85,82 +85,98 @@ class Meta(dict):
     Version_ExETH = 0x05  # 0000 0101
     DefaultVersion = Version_MKM
 
-    @classmethod
-    def __meta(cls, seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=DefaultVersion) -> dict:
-        if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
-            return {
-                'version': version,
-                'seed': seed,
-                'key': key,
-                'fingerprint': base64_encode(fingerprint),
-            }
-        else:  # BTC, ETH, ...
-            return {
-                'version': version,
-                'key': key,
-            }
-
-    def __new__(cls, meta: dict=None,
-                seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=DefaultVersion):
-        """
-        Create meta object with meta info
-
-        :param meta:        A dictionary as meta info
-        :param seed:        A string as seed (name)
-        :param key:         A public key
-        :param fingerprint: A data signed by private keys with seed
-        :param version:     Meta version
-        :return: Meta object
-        """
+    def __new__(cls, meta: dict):
         if meta is None:
-            meta = Meta.__meta(seed=seed, key=key, fingerprint=fingerprint, version=version)
+            return None
         elif isinstance(meta, Meta):
             # return Meta object directly
             return meta
         # new Meta(dict)
-        return super().__new__(cls, meta)
+        return super().__new__(Meta, meta)
 
-    def __init__(self, meta: dict,
-                 seed: str='', key: PublicKey=None, fingerprint: bytes=None, version: chr=DefaultVersion):
-        if meta is not None:
-            # get fields from dictionary
-            version = int(meta.get('version'))
-            key = PublicKey(meta.get('key'))
-            seed = meta.get('seed')
-            fingerprint = meta.get('fingerprint')
-            if fingerprint is not None:
-                fingerprint = base64_decode(fingerprint)
-        # check meta version
-        if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
-            # verify seed and fingerprint
-            if not key.verify(seed.encode('utf-8'), fingerprint):
-                raise ValueError('Meta key not math: %s' % meta)
-        # new Meta(dict)
+    def __init__(self, meta: dict):
         super().__init__(meta)
+        # meta version
+        version = int(meta['version'])
         self.__version = version
-        self.__seed = seed
+        # public key
+        key = PublicKey(meta['key'])
         self.__key = key
-        self.__fingerprint = fingerprint
+        # seed & fingerprint
+        if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
+            seed = meta['seed']
+            fingerprint = base64_decode(meta['fingerprint'])
+            if key.verify(seed.encode('utf-8'), fingerprint):
+                self.__seed = seed
+                self.__fingerprint = fingerprint
+            else:
+                raise ValueError('Meta key not match: %s' % meta)
+        else:
+            self.__seed = None
+            self.__fingerprint = None
+
+    def __eq__(self, other) -> bool:
+        """ Check whether they can generate same IDs """
+        if other:
+            other = Meta(other)
+        else:
+            return False
+        id1 = self.generate_identifier(network=NetworkID.Main)
+        id2 = other.generate_identifier(network=NetworkID.Main)
+        return id1 == id2
 
     @property
     def version(self) -> chr:
         return self.__version
 
     @property
-    def seed(self) -> str:
-        return self.__seed
-
-    @property
     def key(self) -> PublicKey:
         return self.__key
+
+    @property
+    def seed(self) -> str:
+        return self.__seed
 
     @property
     def fingerprint(self) -> bytes:
         return self.__fingerprint
 
     @classmethod
+    def new(cls, key: PublicKey, seed: str=None, fingerprint: bytes=None, version: chr=DefaultVersion):
+        """
+        Create new meta info
+
+        :param version:     - meta version
+        :param key:         - public key
+        :param seed:        - user/group name
+        :param fingerprint: - signature
+        :return: Meta object
+        """
+        if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
+            meta = {
+                'version': version,
+                'seed': seed,
+                'key': key,
+                'fingerprint': base64_encode(fingerprint),
+            }
+        else:  # BTC, ETH, ...
+            meta = {
+                'version': version,
+                'key': key,
+            }
+        # new Meta(dict)
+        return Meta(meta)
+
+    @classmethod
     def generate(cls, private_key: PrivateKey, seed: str='', version: chr=DefaultVersion):
-        """ Generate meta info with seed and private key """
+        """
+        Generate meta info with seed and private key
+
+        :param private_key: - user/founder private key
+        :param seed:        - user/group name
+        :param version:     - meta version
+        :return:
+        """
         if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
             # generate fingerprint with private key
             fingerprint = private_key.sign(seed.encode('utf-8'))
@@ -170,15 +186,16 @@ class Meta(dict):
                 'key': private_key.public_key,
                 'fingerprint': base64_encode(fingerprint),
             }
-            return Meta(dictionary)
         else:  # BTC, ETH, ...
             dictionary = {
                 'version': version,
                 'key': private_key.public_key,
             }
-            return Meta(dictionary)
+        # new Meta(dict)
+        return Meta(dictionary)
 
     def match_public_key(self, public_key: PublicKey) -> bool:
+        """ Check whether match public key """
         if self.key == public_key:
             return True
         if self.version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
@@ -220,13 +237,3 @@ class Meta(dict):
             return Address(fingerprint=self.key.data, network=network, algorithm=Address.Algorithm_ETH)
         else:
             raise ArithmeticError('meta version error: %s' % self.version)
-
-    def __eq__(self, other) -> bool:
-        """ Check whether they can generate same IDs """
-        if other:
-            other = Meta(other)
-        else:
-            return False
-        id1 = self.generate_identifier(network=NetworkID.Main)
-        id2 = other.generate_identifier(network=NetworkID.Main)
-        return id1 == id2

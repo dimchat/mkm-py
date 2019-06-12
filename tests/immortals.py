@@ -60,7 +60,7 @@ hulk_meta = {
 }
 hulk_meta = Meta(hulk_meta)
 
-hulk_profile = Profile(identifier=hulk_id)
+hulk_profile = Profile.new(identifier=hulk_id)
 hulk_profile.name = hulk_name
 hulk_profile.sign(private_key=hulk_sk)
 
@@ -116,7 +116,7 @@ moki_meta = {
 }
 moki_meta = Meta(moki_meta)
 
-moki_profile = Profile(identifier=moki_id)
+moki_profile = Profile.new(identifier=moki_id)
 moki_profile.name = moki_name
 moki_profile.sign(private_key=moki_sk)
 

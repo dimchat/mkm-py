@@ -26,15 +26,26 @@
 from abc import ABCMeta
 
 
-class CryptographyKey(dict, metaclass=ABCMeta):
+def algorithm(key: dict) -> str:
+    """ get algorithm name from key dictionary """
+    return key['algorithm']
 
-    ALGORITHM = 'algorithm'
+
+"""
+    Cryptography key with designated algorithm
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""
+
+
+class CryptographyKey(dict, metaclass=ABCMeta):
 
     def __init__(self, key: dict):
         super().__init__(key)
-        # process by subclass
-        self.data = None
+        # algorithm name, the key for searching class
+        self.__algorithm: str = algorithm(key)
+        # process key data in subclass
+        self.data: bytes = None
 
     @property
     def algorithm(self) -> str:
-        return self.get(CryptographyKey.ALGORITHM)
+        return self.__algorithm
