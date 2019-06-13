@@ -52,7 +52,7 @@
 from .crypto.utils import base64_encode, base64_decode
 from .crypto import PublicKey, PrivateKey
 
-from .address import NetworkID, Address
+from .address import NetworkID, Address, BTCAddress
 from .identifier import ID
 
 
@@ -228,12 +228,12 @@ class Meta(dict):
         """ Generate address with meta info and network ID """
         if self.version == Meta.Version_MKM:   # MKM
             # generate MKM address
-            return Address(fingerprint=self.fingerprint, network=network)
+            return BTCAddress.new(fingerprint=self.fingerprint, network=network)
         elif self.version & Meta.Version_BTC:  # BTC, ExBTC
             # generate BTC address
-            return Address(fingerprint=self.key.data, network=network, algorithm=Address.Algorithm_BTC)
+            return BTCAddress.new(fingerprint=self.key.data, network=network)
         elif self.version & Meta.Version_ETH:  # ETH, ExETH
-            # generate ETH address
-            return Address(fingerprint=self.key.data, network=network, algorithm=Address.Algorithm_ETH)
+            # TODO: generate ETH address
+            raise AssertionError('ETH address not supported yet')
         else:
             raise ArithmeticError('meta version error: %s' % self.version)

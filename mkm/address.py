@@ -166,6 +166,58 @@ class NetworkID(IntEnum):
         return self.value == self.Robot
 
 
+class Address(str):
+    """
+        This class is used to build address for ID
+    """
+
+    def __new__(cls, address: str):
+        """
+        Create address object with string
+
+        :param address: address string
+        :return: Address object
+        """
+        if address is None:
+            return None
+        elif cls is not Address:
+            # subclass
+            return super().__new__(cls, address)
+        elif isinstance(address, Address):
+            # return Address object directly
+            return address
+        # try to create address object
+        for clazz in address_classes:
+            try:
+                return clazz(address=address)
+            except ValueError:
+                continue
+
+    @property
+    def network(self) -> NetworkID:
+        """
+        Get network type of address
+
+        :return: NetworkID
+        """
+        yield None
+
+    @property
+    def number(self) -> int:
+        """
+        Get search number of address
+
+        :return: search number [0, 2^32)
+        """
+        return 0
+
+
+"""
+    BTC Address
+    ~~~~~~~~~~~
+"""
+
+
 def check_code(data: bytes) -> bytes:
     # check code in BTC address
     return sha256(sha256(data))[:4]
@@ -176,56 +228,32 @@ def user_number(code: bytes) -> int:
     return int.from_bytes(code, byteorder='little')
 
 
-class Address(str):
-    """
-        This class is used to build address for ID
-    """
+class BTCAddress(Address):
 
-    Algorithm_BTC = 0x01
-    Algorithm_ETH = 0x02
-    DefaultAlgorithm = Algorithm_BTC
-
-    def __new__(cls, address: str='',
-                fingerprint: bytes=None, network: NetworkID=0, algorithm: chr=DefaultAlgorithm):
-        """
-        Create address object with string
-
-        :param address: address string
-        :return: Address object
-        """
-        if address:
-            # return Address object directly
-            if isinstance(address, Address):
-                return address
-            # get fields from string
-            data = base58_decode(address)
-            if len(data) == 25:
-                prefix = data[:1]
-                digest = data[1:-4]
-                code = data[-4:]
-                if check_code(prefix + digest) == code:
-                    network = ord(prefix)
-                    number = user_number(code)
-                    # algorithm = cls.Algorithm_BTC
-                else:
-                    raise ValueError('Address check code error')
-            else:
-                raise ValueError('Address length error')
-        elif algorithm == cls.Algorithm_BTC and fingerprint:
-            # calculate address string with fingerprint
-            prefix = chr(network).encode('latin1')
-            digest = ripemd160(sha256(fingerprint))
-            code = check_code(prefix + digest)
-            number = user_number(code)
-            address = base58_encode(prefix + digest + code)
-        else:
-            raise AssertionError('Parameter error')
-        # new Address(str)
+    def __new__(cls, address: str):
+        # get fields from string
+        data = base58_decode(address)
+        if len(data) != 25:
+            raise ValueError('BTC address length error')
+        prefix = data[:1]
+        digest = data[1:-4]
+        code = data[-4:]
+        if check_code(prefix + digest) != code:
+            raise ValueError('BTC address check code error')
+        network = ord(prefix)
         self = super().__new__(cls, address)
-        self.__network: NetworkID = NetworkID(network)
-        self.__number: int = number
-        # self.algorithm = algorithm
+        self.__network = NetworkID(network)
+        self.__number = user_number(code)
         return self
+
+    @classmethod
+    def new(cls, fingerprint: bytes, network: NetworkID=0) -> Address:
+        # calculate address string with fingerprint
+        prefix = chr(network).encode('latin1')
+        digest = ripemd160(sha256(fingerprint))
+        code = check_code(prefix + digest)
+        address = base58_encode(prefix + digest + code)
+        return BTCAddress(address)
 
     @property
     def network(self) -> NetworkID:
@@ -234,3 +262,8 @@ class Address(str):
     @property
     def number(self) -> int:
         return self.__number
+
+
+address_classes = [
+    BTCAddress
+]
