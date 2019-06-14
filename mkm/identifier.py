@@ -82,7 +82,8 @@ class ID(str):
             if terminal:
                 identifier = identifier + '/' + terminal
         else:
-            raise AssertionError('Parameters error')
+            # raise AssertionError('Parameters error')
+            return None
         # verify ID.address, which number must not be ZERO
         if address.number <= 0:
             raise ValueError('Invalid ID (address) string')
