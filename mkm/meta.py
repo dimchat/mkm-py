@@ -41,13 +41,9 @@
 
     algorithm:
         fingerprint = sign(seed, SK);
-
-        CT      = fingerprint; // or key.data for BTC address
-        hash    = ripemd160(sha256(CT));
-        code    = sha256(sha256(network + hash)).prefix(4);
-        address = base58_encode(network + hash + code);
-        number  = u_int(code);
 """
+
+from abc import ABCMeta, abstractmethod
 
 from .crypto.utils import base64_encode, base64_decode
 from .crypto import PublicKey, PrivateKey
@@ -56,7 +52,7 @@ from .address import NetworkID, Address, BTCAddress
 from .identifier import ID
 
 
-class Meta(dict):
+class Meta(dict, metaclass=ABCMeta):
     """
         Meta for Identifier
         ~~~~~~~~~~~~~~~~~~~
@@ -86,13 +82,27 @@ class Meta(dict):
     DefaultVersion = Version_MKM
 
     def __new__(cls, meta: dict):
+        """
+        Create meta for entity
+
+        :param meta: meta info
+        :return: Meta object
+        """
         if meta is None:
             return None
+        elif cls is not Meta:
+            # subclass
+            return super().__new__(cls, meta)
         elif isinstance(meta, Meta):
             # return Meta object directly
             return meta
-        # new Meta(dict)
-        return super().__new__(Meta, meta)
+        # get class by meta version
+        version = int(meta['version'])
+        clazz = meta_classes.get(version)
+        if issubclass(clazz, Meta):
+            return clazz(meta)
+        else:
+            raise ModuleNotFoundError('Invalid meta version')
 
     def __init__(self, meta: dict):
         super().__init__(meta)
@@ -224,16 +234,58 @@ class Meta(dict):
         address = self.generate_address(network=network)
         return ID(name=self.seed, address=address)
 
+    @abstractmethod
     def generate_address(self, network: NetworkID) -> Address:
         """ Generate address with meta info and network ID """
-        if self.version == Meta.Version_MKM:   # MKM
-            # generate MKM address
-            return BTCAddress.new(fingerprint=self.fingerprint, network=network)
-        elif self.version & Meta.Version_BTC:  # BTC, ExBTC
-            # generate BTC address
-            return BTCAddress.new(fingerprint=self.key.data, network=network)
-        elif self.version & Meta.Version_ETH:  # ETH, ExETH
-            # TODO: generate ETH address
-            raise AssertionError('ETH address not supported yet')
-        else:
-            raise ArithmeticError('meta version error: %s' % self.version)
+        pass
+
+
+"""
+    Meta for generate ID with address
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    algorithm:
+        CT      = fingerprint;
+        hash    = ripemd160(sha256(CT));
+        code    = sha256(sha256(network + hash)).prefix(4);
+        address = base58_encode(network + hash + code);
+        number  = u_int(code);
+"""
+
+
+class MKMMeta(Meta):
+
+    def generate_address(self, network: NetworkID):
+        assert self.version == Meta.Version_MKM
+        return BTCAddress.new(data=self.fingerprint, network=network)
+
+
+"""
+    Meta for generate ID with BTC address
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    algorithm:
+        CT      = key.data;
+        hash    = ripemd160(sha256(CT));
+        code    = sha256(sha256(network + hash)).prefix(4);
+        address = base58_encode(network + hash + code);
+        number  = u_int(code);
+"""
+
+
+class BTCMeta(Meta):
+
+    def generate_address(self, network: NetworkID):
+        assert self.version & Meta.Version_BTC
+        return BTCAddress.new(data=self.key.data, network=network)
+
+
+meta_classes = {
+    # MKM (default)
+    Meta.Version_MKM: MKMMeta,
+    # BTC
+    Meta.Version_BTC: BTCMeta,
+    Meta.Version_ExBTC: BTCMeta,
+    # ETH
+    # ...
+}

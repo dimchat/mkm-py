@@ -29,19 +29,12 @@
 # ==============================================================================
 
 """
-    Address like BitCoin
-    ~~~~~~~~~~~~~~~~~~~~
+    Address for MKM ID
+    ~~~~~~~~~~~~~~~~~~
 
-    data format: "network+digest+check_code"
-        network    --  1 byte
-        digest     -- 20 bytes
-        check_code --  4 bytes
-
-    algorithm:
-        fingerprint = sign(seed, SK);
-        digest      = ripemd160(sha256(fingerprint));
-        check_code  = sha256(sha256(network + digest)).prefix(4);
-        address     = base58_encode(network + digest + check_code);
+    properties:
+        network - address type
+        number  - search number
 """
 
 from enum import IntEnum
@@ -213,8 +206,19 @@ class Address(str):
 
 
 """
-    BTC Address
-    ~~~~~~~~~~~
+    Address like BitCoin
+    ~~~~~~~~~~~~~~~~~~~~
+
+    data format: "network+digest+check_code"
+        network    --  1 byte
+        digest     -- 20 bytes
+        check_code --  4 bytes
+
+    algorithm:
+        fingerprint = sign(seed, SK);
+        digest      = ripemd160(sha256(fingerprint));
+        check_code  = sha256(sha256(network + digest)).prefix(4);
+        address     = base58_encode(network + digest + check_code);
 """
 
 
@@ -232,12 +236,14 @@ class BTCAddress(Address):
 
     def __new__(cls, address: str):
         # get fields from string
-        data = base58_decode(address)
-        if len(data) != 25:
+        prefix_digest_code = base58_decode(address)
+        if len(prefix_digest_code) != 25:
             raise ValueError('BTC address length error')
-        prefix = data[:1]
-        digest = data[1:-4]
-        code = data[-4:]
+        # split them
+        prefix = prefix_digest_code[:1]
+        digest = prefix_digest_code[1:-4]
+        code = prefix_digest_code[-4:]
+        # check them
         if check_code(prefix + digest) != code:
             raise ValueError('BTC address check code error')
         network = ord(prefix)
@@ -247,10 +253,16 @@ class BTCAddress(Address):
         return self
 
     @classmethod
-    def new(cls, fingerprint: bytes, network: NetworkID=0) -> Address:
-        # calculate address string with fingerprint
+    def new(cls, data: bytes, network: NetworkID=0) -> Address:
+        """
+        Calculate address string with fingerprint
+
+        :param data:    fingerprint (signature/key.data)
+        :param network: address type
+        :return:        Address object
+        """
         prefix = chr(network).encode('latin1')
-        digest = ripemd160(sha256(fingerprint))
+        digest = ripemd160(sha256(data))
         code = check_code(prefix + digest)
         address = base58_encode(prefix + digest + code)
         return BTCAddress(address)
