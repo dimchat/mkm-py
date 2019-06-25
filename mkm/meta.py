@@ -218,15 +218,14 @@ class Meta(dict, metaclass=ABCMeta):
 
     def match_identifier(self, identifier: ID) -> bool:
         """ Check ID(name+address) with meta info """
-        if self.seed is None:
-            if identifier.name is not None:
-                return False
-        elif self.seed != identifier.name:
+        if identifier is None:
             return False
-        return self.match_address(address=identifier.address)
+        return self.generate_identifier(identifier.address.network) == identifier
 
     def match_address(self, address: Address) -> bool:
         """ Check address with meta info """
+        if address is None:
+            return False
         return self.generate_address(network=address.network) == address
 
     def generate_identifier(self, network: NetworkID) -> ID:

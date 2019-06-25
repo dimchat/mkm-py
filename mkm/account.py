@@ -78,7 +78,6 @@ class Account(Entity):
         meta = self.meta
         if meta is not None:
             return meta.key
-        raise AssertionError('failed to get meta.key for:' + self.identifier)
 
     def __profile_key(self) -> PublicKey:
         profile = self.profile
