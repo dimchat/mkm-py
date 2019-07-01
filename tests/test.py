@@ -15,6 +15,7 @@ import json
 
 from mkm import *
 from mkm.crypto.utils import *
+from mkm.identifier import ANYONE, EVERYONE
 
 from tests.immortals import moki_id, moki_meta, moki_sk
 from tests.immortals import hulk_id, hulk_meta, hulk_sk
@@ -92,6 +93,7 @@ def print_id(identity):
         'address': identity.address,
         'terminal': identity.terminal,
         'number': identity.number,
+        'type': identity.type,
     }
     print(identity, ':', info)
 
@@ -139,6 +141,25 @@ class BaseTestCase(unittest.TestCase):
         print_id(id1)
         print_id(id2)
         self.assertTrue(id1 == id2, 'ID error with terminal')
+
+        print_id(ANYONE)
+        id3 = ID('ANYONE@ANYWHERE')
+        print_id(id3)
+        self.assertIs(ANYONE, id3)
+
+        print_id(EVERYONE)
+        id4 = ID('EVERYONE@EVERYWHERE')
+        print_id(id4)
+        self.assertIs(EVERYONE, id4)
+
+        info = {
+            'func': 'test_id',
+            'anyone': ANYONE,
+            'everyone': EVERYONE,
+            'id3': id3,
+            'id4': id4,
+        }
+        print('info: ', info)
 
     def test_entity(self):
         print('\n---------------- %s' % self)

@@ -179,6 +179,11 @@ class Address(str):
         elif isinstance(address, Address):
             # return Address object directly
             return address
+        # Constant Address
+        if address == 'ANYWHERE':
+            return ANYWHERE
+        elif address == 'EVERYWHERE':
+            return EVERYWHERE
         # try to create address object
         for clazz in address_classes:
             try:
@@ -279,3 +284,27 @@ class BTCAddress(Address):
 address_classes = [
     BTCAddress
 ]
+
+
+#
+#  Address for broadcast
+#
+class ConstantAddress(Address):
+
+    def __new__(cls, address: str, network: NetworkID, number: int):
+        self = super().__new__(cls, address)
+        self.__network = network
+        self.__number = number
+        return self
+
+    @property
+    def network(self) -> NetworkID:
+        return self.__network
+
+    @property
+    def number(self) -> int:
+        return self.__number
+
+
+ANYWHERE = ConstantAddress(address="ANYWHERE", network=NetworkID.Main, number=9527)
+EVERYWHERE = ConstantAddress(address="EVERYWHERE", network=NetworkID.Group, number=9527)

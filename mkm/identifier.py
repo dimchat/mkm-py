@@ -28,7 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from .address import Address, NetworkID
+from .address import Address, NetworkID, ANYWHERE, EVERYWHERE
 
 
 class ID(str):
@@ -56,9 +56,14 @@ class ID(str):
         :return: ID object
         """
         if identifier:
-            # return ID object directly
             if isinstance(identifier, ID):
+                # return ID object directly
                 return identifier
+            # Constant ID
+            if identifier == 'ANYONE@ANYWHERE':
+                return ANYONE
+            elif identifier == 'EVERYONE@EVERYWHERE':
+                return EVERYONE
             # get terminal
             pair = identifier.split('/', 1)
             if len(pair) == 2:
@@ -95,7 +100,9 @@ class ID(str):
         return self
 
     def __eq__(self, other) -> bool:
-        if other:
+        if super().__eq__(other):
+            return True
+        elif other:
             other = ID(other)
         else:
             return False
@@ -133,3 +140,10 @@ class ID(str):
     def number(self) -> int:
         """ Search number of this ID """
         return self.__address.number
+
+
+#
+#  ID for broadcast
+#
+ANYONE = ID(name="ANYONE", address=ANYWHERE)
+EVERYONE = ID(name="EVERYONE", address=EVERYWHERE)
