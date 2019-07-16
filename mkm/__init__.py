@@ -31,7 +31,7 @@
 from .crypto import SymmetricKey, PrivateKey, PublicKey
 
 from .address import NetworkID, Address
-from .identifier import ID
+from .identifier import ID, ANYONE, EVERYONE
 from .meta import Meta
 from .profile import Profile
 from .entity import Entity, IEntityDataSource
@@ -51,4 +51,6 @@ __all__ = [
     'Entity', 'IEntityDataSource',
     'Account', 'User', 'IUserDataSource',
     'Group', 'IGroupDataSource',
+
+    'ANYONE', 'EVERYONE',
 ]

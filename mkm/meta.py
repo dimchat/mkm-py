@@ -262,7 +262,7 @@ class DefaultMeta(Meta):
 meta_classes = {
     # MKM (default)
     Meta.Version_MKM: DefaultMeta,
-    # BTC
-    # ETH
+    # BTC, ExBTC
+    # ETH, ExETH
     # ...
 }
