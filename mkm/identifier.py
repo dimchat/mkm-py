@@ -60,9 +60,10 @@ class ID(str):
                 # return ID object directly
                 return identifier
             # Constant ID
-            if identifier == 'ANYONE@ANYWHERE':
+            lowercase = identifier.lower();
+            if lowercase == 'anyone@anywhere':
                 return ANYONE
-            elif identifier == 'EVERYONE@EVERYWHERE':
+            elif lowercase == 'everyone@everywhere':
                 return EVERYONE
             # get terminal
             pair = identifier.split('/', 1)
@@ -145,5 +146,5 @@ class ID(str):
 #
 #  ID for broadcast
 #
-ANYONE = ID(name="ANYONE", address=ANYWHERE)
-EVERYONE = ID(name="EVERYONE", address=EVERYWHERE)
+ANYONE = ID(name="anyone", address=ANYWHERE)
+EVERYONE = ID(name="everyone", address=EVERYWHERE)

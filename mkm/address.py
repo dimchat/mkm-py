@@ -180,9 +180,10 @@ class Address(str):
             # return Address object directly
             return address
         # Constant Address
-        if address == 'ANYWHERE':
+        lowercase = address.lower();
+        if lowercase == 'anywhere':
             return ANYWHERE
-        elif address == 'EVERYWHERE':
+        elif lowercase == 'everywhere':
             return EVERYWHERE
         # try to create address object
         for clazz in address_classes:
@@ -306,5 +307,5 @@ class ConstantAddress(Address):
         return self.__number
 
 
-ANYWHERE = ConstantAddress(address="ANYWHERE", network=NetworkID.Main, number=9527)
-EVERYWHERE = ConstantAddress(address="EVERYWHERE", network=NetworkID.Group, number=9527)
+ANYWHERE = ConstantAddress(address="anywhere", network=NetworkID.Main, number=9527)
+EVERYWHERE = ConstantAddress(address="everywhere", network=NetworkID.Group, number=9527)

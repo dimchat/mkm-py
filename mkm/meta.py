@@ -240,8 +240,8 @@ class Meta(dict, metaclass=ABCMeta):
 
 
 """
-    Meta for generate ID with address
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Default Meta for generate ID with address
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     algorithm:
         CT      = fingerprint;
@@ -252,39 +252,17 @@ class Meta(dict, metaclass=ABCMeta):
 """
 
 
-class MKMMeta(Meta):
+class DefaultMeta(Meta):
 
     def generate_address(self, network: NetworkID):
         assert self.version == Meta.Version_MKM
         return BTCAddress.new(data=self.fingerprint, network=network)
 
 
-"""
-    Meta for generate ID with BTC address
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    algorithm:
-        CT      = key.data;
-        hash    = ripemd160(sha256(CT));
-        code    = sha256(sha256(network + hash)).prefix(4);
-        address = base58_encode(network + hash + code);
-        number  = u_int(code);
-"""
-
-
-class BTCMeta(Meta):
-
-    def generate_address(self, network: NetworkID):
-        assert self.version & Meta.Version_BTC
-        return BTCAddress.new(data=self.key.data, network=network)
-
-
 meta_classes = {
     # MKM (default)
-    Meta.Version_MKM: MKMMeta,
+    Meta.Version_MKM: DefaultMeta,
     # BTC
-    Meta.Version_BTC: BTCMeta,
-    Meta.Version_ExBTC: BTCMeta,
     # ETH
     # ...
 }
