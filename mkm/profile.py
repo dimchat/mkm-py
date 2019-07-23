@@ -35,19 +35,19 @@ from .crypto import PublicKey, PrivateKey
 from .identifier import ID
 
 
-class TAO(dict):
+class TAI(dict):
     """
-        The Additional Object
-        ~~~~~~~~~~~~~~~~~~~~~
+        The Additional Information
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         'Meta' is the information for entity which never changed, which contains the key for verify signature;
-        'TAO' is the variable part, which contains the key for asymmetric encryption.
+        'TAI' is the variable part, which contains the key for asymmetric encryption.
     """
 
     def __new__(cls, profile: dict):
         if profile is None:
             return None
-        elif isinstance(profile, TAO):
+        elif isinstance(profile, TAI):
             # return Meta object directly
             return profile
         # new Profile(dict)
@@ -171,7 +171,7 @@ class TAO(dict):
         return signature
 
 
-class Profile(TAO):
+class Profile(TAI):
 
     @property
     def name(self) -> str:
