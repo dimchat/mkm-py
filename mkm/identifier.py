@@ -142,6 +142,10 @@ class ID(str):
         """ Search number of this ID """
         return self.__address.number
 
+    @property
+    def valid(self) -> bool:
+        return self.__address is not None and self.__address.number > 0
+
 
 #
 #  ID for broadcast
