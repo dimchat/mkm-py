@@ -35,8 +35,16 @@ class AsymmetricKey(CryptographyKey, metaclass=ABCMeta):
 
 
 class PublicKey(AsymmetricKey, metaclass=ABCMeta):
-    """
-        This class is used to en/decrypt symmetric key or sign/verify signature with message data
+    """This class is used to en/decrypt symmetric key or sign/verify signature with message data
+
+        Asymmetric Cryptography Public Key
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        key data format: {
+            algorithm : "RSA", // "ECC", ...
+            data      : "{BASE64_ENCODE}",
+            ...
+        }
     """
 
     def __new__(cls, key: dict):
@@ -95,8 +103,16 @@ class PublicKey(AsymmetricKey, metaclass=ABCMeta):
 
 
 class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
-    """
-        This class is used to decrypt symmetric key or sign message data
+    """This class is used to decrypt symmetric key or sign message data
+
+        Asymmetric Cryptography Private Key
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        key data format: {
+            algorithm : "RSA", // "ECC", ...
+            data      : "{BASE64_ENCODE}",
+            ...
+        }
     """
 
     def __new__(cls, key: dict):

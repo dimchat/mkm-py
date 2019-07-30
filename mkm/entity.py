@@ -37,11 +37,18 @@ from .profile import Profile
 
 
 class Entity:
-    """
+    """Base class of Account and Group, ...
+
         Entity (Account/Group)
         ~~~~~~~~~~~~~~~~~~~~~~
 
-        Base class of Account and Group, ...
+            properties:
+                identifier - entity ID
+                type       - entity type
+                number     - search number
+                meta       - meta for entity ID
+                profile    - entity profile
+                name       - nickname
     """
 
     def __init__(self, identifier: ID):
@@ -51,12 +58,12 @@ class Entity:
         :param identifier: User/Group ID
         """
         super().__init__()
-        self.identifier = identifier
-        self.delegate = None  # IEntityDataSource
+        self.__identifier = identifier
+        self.__delegate = None  # IEntityDataSource
 
     def __str__(self):
         clazz = self.__class__.__name__
-        identifier = self.identifier
+        identifier = self.__identifier
         network = identifier.address.network
         number = identifier.address.number
         name = self.name
@@ -65,17 +72,21 @@ class Entity:
     def __eq__(self, other) -> bool:
         if not isinstance(other, Entity):
             return False
-        return self.identifier == other.identifier
+        return self.__identifier == other.identifier
+
+    @property
+    def identifier(self) -> ID:
+        return self.__identifier
 
     @property
     def type(self) -> NetworkID:
         """ Entity type """
-        return self.identifier.address.network
+        return self.__identifier.address.network
 
     @property
     def number(self) -> int:
         """ Search number of this entity """
-        return self.identifier.address.number
+        return self.__identifier.address.number
 
     @property
     def name(self) -> str:
@@ -86,16 +97,29 @@ class Entity:
             if name is not None:
                 return name
         # get from identifier
-        return self.identifier.name
+        return self.__identifier.name
 
     @property
     def meta(self) -> Meta:
-        return self.delegate.meta(identifier=self.identifier)
+        return self.__delegate.meta(identifier=self.__identifier)
 
     @property
     def profile(self) -> Profile:
-        # TODO: verify profile with meta.key
-        return self.delegate.profile(identifier=self.identifier)
+        tai: Profile = self.__delegate.profile(identifier=self.__identifier)
+        if tai is not None:
+            # verify it with meta.key
+            meta = self.meta
+            if meta is not None:
+                tai.verify(public_key=meta.key)
+            return tai
+
+    @property
+    def delegate(self):  # IEntityDataSource
+        return self.__delegate
+
+    @delegate.setter
+    def delegate(self, value):
+        self.__delegate = value
 
 
 #

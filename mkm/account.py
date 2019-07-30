@@ -36,11 +36,14 @@ from .entity import Entity, IEntityDataSource
 
 
 class Account(Entity):
-    """
+    """This class is for creating account
+
         Account for communication
         ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        Account with ID and Public Key
+            functions:
+                verify(data, signature) - verify (encrypted content) data and signature
+                encrypt(data)           - encrypt (symmetric key) data
     """
 
     def verify(self, data: bytes, signature: bytes) -> bool:
@@ -86,9 +89,14 @@ class Account(Entity):
 
 
 class User(Account):
-    """
-        User account
-        ~~~~~~~~~~~~
+    """This class is for creating user
+
+        User for communication
+        ~~~~~~~~~~~~~~~~~~~~~~
+
+            functions:
+                sign(data)    - calculate signature of (encrypted content) data
+                decrypt(data) - decrypt (symmetric key) data
     """
 
     @property

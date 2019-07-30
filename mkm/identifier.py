@@ -147,8 +147,11 @@ class ID(str):
         return self.__address is not None and self.__address.number > 0
 
 
-#
-#  ID for broadcast
-#
+"""
+    ID for broadcast
+    ~~~~~~~~~~~~~~~~
+"""
+
+
 ANYONE = ID(name="anyone", address=ANYWHERE)
 EVERYONE = ID(name="everyone", address=EVERYWHERE)

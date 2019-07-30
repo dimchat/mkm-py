@@ -31,13 +31,18 @@ def algorithm(key: dict) -> str:
     return key['algorithm']
 
 
-"""
-    Cryptography key with designated algorithm
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-"""
-
-
 class CryptographyKey(dict, metaclass=ABCMeta):
+    """Cryptography key with designated algorithm
+
+        Cryptography Key
+        ~~~~~~~~~~~~~~~~
+
+        key data format: {
+            algorithm : "RSA", // ECC, AES, ...
+            data      : "{BASE64_ENCODE}",
+            ...
+        }
+    """
 
     def __init__(self, key: dict):
         super().__init__(key)

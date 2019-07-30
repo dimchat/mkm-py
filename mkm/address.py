@@ -28,15 +28,6 @@
 # SOFTWARE.
 # ==============================================================================
 
-"""
-    Address for MKM ID
-    ~~~~~~~~~~~~~~~~~~
-
-    properties:
-        network - address type
-        number  - search number
-"""
-
 from enum import IntEnum
 
 from .crypto.utils import sha256, ripemd160, base58_encode, base58_decode
@@ -160,8 +151,14 @@ class NetworkID(IntEnum):
 
 
 class Address(str):
-    """
-        This class is used to build address for ID
+    """This class is used to build address for ID
+
+        Address for MKM ID
+        ~~~~~~~~~~~~~~~~~~
+
+        properties:
+            network - address type
+            number  - search number
     """
 
     def __new__(cls, address: str):
@@ -261,7 +258,7 @@ class BTCAddress(Address):
     @classmethod
     def new(cls, data: bytes, network: NetworkID=0) -> Address:
         """
-        Calculate address string with fingerprint
+        Generate address with fingerprint and network ID
 
         :param data:    fingerprint (signature/key.data)
         :param network: address type
@@ -287,9 +284,12 @@ address_classes = [
 ]
 
 
-#
-#  Address for broadcast
-#
+"""
+    Address for broadcast
+    ~~~~~~~~~~~~~~~~~~~~~
+"""
+
+
 class ConstantAddress(Address):
 
     def __new__(cls, address: str, network: NetworkID, number: int):

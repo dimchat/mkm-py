@@ -28,21 +28,6 @@
 # SOFTWARE.
 # ==============================================================================
 
-"""
-    Account/Group Meta data
-    ~~~~~~~~~~~~~~~~~~~~~~~
-
-    data format: {
-        version: 1,          // meta version
-        seed: "moKy",        // user/group name
-        key: "{public key}", // PK = secp256k1(SK);
-        fingerprint: "..."   // CT = sign(seed, SK);
-    }
-
-    algorithm:
-        fingerprint = sign(seed, SK);
-"""
-
 from abc import ABCMeta, abstractmethod
 
 from .crypto.utils import base64_encode, base64_decode
@@ -53,10 +38,23 @@ from .identifier import ID
 
 
 class Meta(dict, metaclass=ABCMeta):
-    """
-        Meta for Identifier
-        ~~~~~~~~~~~~~~~~~~~
+    """This class is used to generate entity ID
 
+        Account/Group Meta data
+        ~~~~~~~~~~~~~~~~~~~~~~~
+
+        data format: {
+            version: 1,          // meta version
+            seed: "moKy",        // user/group name
+            key: "{public key}", // PK = secp256k1(SK);
+            fingerprint: "..."   // CT = sign(seed, SK);
+        }
+
+        algorithm:
+            fingerprint = sign(seed, SK);
+    """
+
+    """
         @enum MKMMetaVersion
 
         @abstract Defined for meta data structure to generate identifier.
@@ -243,6 +241,9 @@ class Meta(dict, metaclass=ABCMeta):
     Default Meta for generate ID with address
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    version:
+        0x01 - MKM
+        
     algorithm:
         CT      = fingerprint;
         hash    = ripemd160(sha256(CT));

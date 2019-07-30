@@ -29,8 +29,16 @@ from .cryptography import CryptographyKey, algorithm
 
 
 class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
-    """
-        This class is used to encrypt or decrypt message data
+    """This class is used to encrypt or decrypt message data
+
+        Symmetric Cryptography Key
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        key data format: {
+            algorithm : "AES", // "DES", ...
+            data      : "{BASE64_ENCODE}",
+            ...
+        }
     """
 
     AES = 'AES'

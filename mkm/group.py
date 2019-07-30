@@ -62,8 +62,8 @@ class Group(Entity):
 
 class IGroupDataSource(IEntityDataSource, ABC):
     """
-        User Data Source
-        ~~~~~~~~~~~~~~~~
+        Group Data Source
+        ~~~~~~~~~~~~~~~~~
     """
 
     @abstractmethod
