@@ -155,3 +155,15 @@ class ID(str):
 
 ANYONE = ID(name="anyone", address=ANYWHERE)
 EVERYONE = ID(name="everyone", address=EVERYWHERE)
+
+
+def is_anyone(identifier: str) -> bool:
+    return ANYONE == identifier
+
+
+def is_everyone(identifier: str) -> bool:
+    return EVERYONE == identifier
+
+
+def is_broadcast(identifier: str) -> bool:
+    return is_everyone(identifier) or is_anyone(identifier)

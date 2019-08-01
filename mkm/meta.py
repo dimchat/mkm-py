@@ -256,7 +256,7 @@ class Meta(dict, metaclass=ABCMeta):
 class DefaultMeta(Meta):
 
     def generate_address(self, network: NetworkID):
-        assert self.version == Meta.Version_MKM
+        assert self.version == Meta.Version_MKM, 'meta version error: %d' % self.version
         return BTCAddress.new(data=self.fingerprint, network=network)
 
 

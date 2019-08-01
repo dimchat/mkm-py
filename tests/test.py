@@ -141,16 +141,19 @@ class BaseTestCase(unittest.TestCase):
         print_id(id1)
         print_id(id2)
         self.assertTrue(id1 == id2, 'ID error with terminal')
+        # self.assertTrue(is_broadcast(id2))
 
         print_id(ANYONE)
         id3 = ID('ANYONE@ANYWHERE')
         print_id(id3)
         self.assertIs(ANYONE, id3)
+        self.assertTrue(is_broadcast(id3))
 
         print_id(EVERYONE)
         id4 = ID('EVERYONE@EVERYWHERE')
         print_id(id4)
         self.assertIs(EVERYONE, id4)
+        self.assertTrue(is_broadcast(id4))
 
         info = {
             'func': 'test_id',
