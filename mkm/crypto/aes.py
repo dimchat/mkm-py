@@ -64,17 +64,29 @@ class AESKey(SymmetricKey):
         else:
             return int(size)
 
+    @staticmethod
+    def __pad(data: bytes) -> bytes:
+        block_size = AES.block_size
+        amount = block_size - len(data) % block_size
+        if amount == 0:
+            amount = block_size
+        pad = chr(amount).encode('utf-8')
+        return data + pad * amount
+
+    @staticmethod
+    def __unpad(data: bytes) -> bytes:
+        amount = data[-1]
+        return data[:-amount]
+
     def encrypt(self, data: bytes) -> bytes:
+        data = self.__pad(data)
         key = AES.new(self.data, AES.MODE_CBC, self.iv)
-        size = key.block_size
-        pad = (size - len(data) % size) * chr(0).encode('utf-8')
-        return key.encrypt(data + pad)
+        return key.encrypt(data)
 
     def decrypt(self, data: bytes) -> bytes:
         key = AES.new(self.data, AES.MODE_CBC, self.iv)
         plaintext = key.decrypt(data)
-        pad = plaintext[-1:]  # chr(0).encode('utf-8')
-        return plaintext.rstrip(pad)
+        return self.__unpad(plaintext)
 
 
 """
@@ -83,4 +95,4 @@ class AESKey(SymmetricKey):
 
 # AES Key
 symmetric_key_classes[SymmetricKey.AES] = AESKey        # default
-symmetric_key_classes['AES/CBC/PKCS5Padding'] = AESKey
+symmetric_key_classes['AES/CBC/PKCS7Padding'] = AESKey
