@@ -61,12 +61,19 @@ class RSAPrivateKey(PrivateKey):
     def __init__(self, key: dict):
         super().__init__(key=key)
         # data in 'PEM' format
-        data = key.get('data')
+        data: str = key.get('data')
         if data is None:
             # generate private key data
             private_key = RSA.generate(self.size)
-            data = private_key.exportKey()
+            data: bytes = private_key.exportKey()
             self['data'] = data.decode('utf-8')
+        else:
+            tag1 = '-----BEGIN RSA PRIVATE KEY-----'
+            tag2 = '-----END RSA PRIVATE KEY-----'
+            pos2 = data.find(tag2)
+            if pos2 > 0:
+                pos1 = data.find(tag1)
+                data = data[pos1: pos2 + len(tag2)]
         # create key
         self.key = RSA.importKey(data)
 
