@@ -35,11 +35,11 @@ from .identifier import ID
 from .entity import Entity, IEntityDataSource
 
 
-class Account(Entity):
-    """This class is for creating account
+class User(Entity):
+    """This class is for creating user
 
-        Account for communication
-        ~~~~~~~~~~~~~~~~~~~~~~~~~
+        User for communication
+        ~~~~~~~~~~~~~~~~~~~~~~
 
             functions:
                 verify(data, signature) - verify (encrypted content) data and signature
@@ -88,7 +88,7 @@ class Account(Entity):
             return profile.key
 
 
-class User(Account):
+class LocalUser(User):
     """This class is for creating user
 
         User for communication

@@ -258,7 +258,7 @@ class AccountTestCase(unittest.TestCase):
         print('private key: ', sk1)
         self.assertTrue(meta1.key.match(sk1), 'meta key not match private key')
 
-        account1 = Account(id1)
+        account1 = User(id1)
         account1.delegate = facebook
 
         print('account1: ', account1)
@@ -266,7 +266,7 @@ class AccountTestCase(unittest.TestCase):
         id2 = ID(hulk_id)
         sk2 = PrivateKey(hulk_sk)
 
-        user2 = User(id2)
+        user2 = LocalUser(id2)
         user2.delegate = facebook
 
         print('user2: ', user2)

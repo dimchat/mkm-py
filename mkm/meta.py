@@ -40,8 +40,8 @@ from .identifier import ID
 class Meta(dict, metaclass=ABCMeta):
     """This class is used to generate entity ID
 
-        Account/Group Meta data
-        ~~~~~~~~~~~~~~~~~~~~~~~
+        User/Group Meta data
+        ~~~~~~~~~~~~~~~~~~~~
 
         data format: {
             version: 1,          // meta version

@@ -56,7 +56,7 @@ fingerprint = private_key.sign(seed.encode('utf-8'))
 ````
 
 ## <span id="id">1. ID</span>
-The **ID** is used to identify an **entity**(account/group). It consists of 3 fields and 2 extended properties:
+The **ID** is used to identify an **entity**(user/group). It consists of 3 fields and 2 extended properties:
 
 | Field       | Description                   |
 | ----------- | ----------------------------- |

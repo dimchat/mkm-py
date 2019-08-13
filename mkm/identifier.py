@@ -33,8 +33,8 @@ from .address import Address, NetworkID, ANYWHERE, EVERYWHERE
 
 class ID(str):
     """
-        ID for entity (Account/Group)
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        ID for entity (User/Group)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         data format: "name@address[/terminal]"
 

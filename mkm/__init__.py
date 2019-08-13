@@ -35,7 +35,7 @@ from .identifier import ID, ANYONE, EVERYONE, is_broadcast
 from .meta import Meta
 from .profile import Profile
 from .entity import Entity, IEntityDataSource
-from .account import Account, User, IUserDataSource
+from .user import User, LocalUser, IUserDataSource
 from .group import Group, IGroupDataSource
 
 name = "MingKeMing"
@@ -49,7 +49,7 @@ __all__ = [
     # MingKeMing
     'NetworkID', 'Address', 'ID', 'Meta', 'Profile',
     'Entity', 'IEntityDataSource',
-    'Account', 'User', 'IUserDataSource',
+    'User', 'LocalUser', 'IUserDataSource',
     'Group', 'IGroupDataSource',
 
     'ANYONE', 'EVERYONE', 'is_broadcast',

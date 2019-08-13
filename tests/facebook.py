@@ -12,7 +12,6 @@ class Facebook(IUserDataSource):
         self.private_keys = {}
         self.metas = {}
         self.profiles = {}
-        self.accounts = {}
         self.users = {}
 
     def cache_private_key(self, private_key: PrivateKey, identifier: ID):
@@ -24,25 +23,10 @@ class Facebook(IUserDataSource):
     def cache_profile(self, profile: Profile, identifier: ID):
         self.profiles[identifier.address] = profile
 
-    def cache_account(self, account: Account):
-        if isinstance(account, User):
-            self.cache_user(account)
-            return
-        if account.delegate is None:
-            account.delegate = self
-        self.accounts[account.identifier.address] = account
-
     def cache_user(self, user: User):
         if user.delegate is None:
             user.delegate = self
         self.users[user.identifier.address] = user
-
-    def account(self, identifier: ID) -> Account:
-        account = self.accounts.get(identifier.address)
-        if account is None:
-            account = self.users.get(identifier.address)
-        # TODO: if account not found, create one?
-        return account
 
     def user(self, identifier: ID) -> User:
         user = self.users.get(identifier.address)
@@ -86,5 +70,5 @@ facebook.cache_meta(meta=hulk_meta, identifier=hulk_id)
 facebook.cache_profile(profile=moki_profile, identifier=moki_id)
 facebook.cache_profile(profile=hulk_profile, identifier=hulk_id)
 
-facebook.cache_user(User(moki_id))
-facebook.cache_user(User(hulk_id))
+facebook.cache_user(LocalUser(moki_id))
+facebook.cache_user(LocalUser(hulk_id))

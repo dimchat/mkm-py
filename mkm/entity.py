@@ -37,10 +37,10 @@ from .profile import Profile
 
 
 class Entity:
-    """Base class of Account and Group, ...
+    """Base class of User and Group, ...
 
-        Entity (Account/Group)
-        ~~~~~~~~~~~~~~~~~~~~~~
+        Entity (User/Group)
+        ~~~~~~~~~~~~~~~~~~~
 
             properties:
                 identifier - entity ID
