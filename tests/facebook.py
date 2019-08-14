@@ -49,9 +49,6 @@ class Facebook(IUserDataSource):
         # TODO: get contacts with user ID
         pass
 
-    def save_meta(self, meta: Meta, identifier: ID) -> bool:
-        return True
-
     def meta(self, identifier: ID) -> Meta:
         return self.metas.get(identifier.address)
 

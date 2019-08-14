@@ -133,17 +133,6 @@ class IEntityDataSource(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def save_meta(self, meta: Meta, identifier: ID) -> bool:
-        """
-        Save meta for entity ID
-
-        :param meta:       meta info
-        :param identifier: entity ID
-        :return:           False on meta not match with the entity ID
-        """
-        pass
-
-    @abstractmethod
     def meta(self, identifier: ID) -> Meta:
         """
         Get meta for this entity ID

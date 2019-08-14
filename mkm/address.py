@@ -128,7 +128,7 @@ class NetworkID(IntEnum):
     Thing = 0x80           # 1000 0000 (IoT)
     Robot = 0xC8           # 1100 1000
 
-    def is_communicator(self) -> bool:
+    def is_user(self) -> bool:
         return (self.value & self.Main) or (self.value == self.BTCMain)
 
     def is_person(self) -> bool:
@@ -177,7 +177,7 @@ class Address(str):
             # return Address object directly
             return address
         # Constant Address
-        lowercase = address.lower();
+        lowercase = address.lower()
         if lowercase == 'anywhere':
             return ANYWHERE
         elif lowercase == 'everywhere':
