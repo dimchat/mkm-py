@@ -33,6 +33,7 @@ from abc import abstractmethod, ABC
 from .crypto import PublicKey, PrivateKey
 from .identifier import ID
 from .entity import Entity, IEntityDataSource
+from .profile import Profile
 
 
 class User(Entity):
@@ -46,37 +47,6 @@ class User(Entity):
                 encrypt(data)           - encrypt (symmetric key) data
     """
 
-    def verify(self, data: bytes, signature: bytes) -> bool:
-        """
-        Verify data with signature, use meta.key
-
-        :param data:
-        :param signature:
-        :return:
-        """
-        # 1. get key for signature from meta
-        key = self.__meta_key()
-        if key is not None:
-            # 2. verify with meta.key
-            return key.verify(data=data, signature=signature)
-
-    def encrypt(self, data: bytes) -> bytes:
-        """
-        Encrypt data, try profile.key first, if not found, use meta.key
-
-        :param data: message data
-        :return: encrypted data
-        """
-        # 1. get key for encryption from profile
-        key = self.__profile_key()
-        if key is None:
-            # 2. get key for encryption from meta instead
-            # NOTICE: meta.key will never changed, so use profile.key to encrypt is the better way
-            key = self.__meta_key()
-        if key is not None:
-            # 3. encrypt with profile.key
-            return key.encrypt(data=data)
-
     def __meta_key(self) -> PublicKey:
         meta = self.meta
         if meta is not None:
@@ -87,67 +57,62 @@ class User(Entity):
         if profile is not None:
             return profile.key
 
-
-class LocalUser(User):
-    """This class is for creating user
-
-        User for communication
-        ~~~~~~~~~~~~~~~~~~~~~~
-
-            functions:
-                sign(data)    - calculate signature of (encrypted content) data
-                decrypt(data) - decrypt (symmetric key) data
-    """
-
     @property
-    def contacts(self) -> list:
+    def profile(self) -> Profile:
+        tai = super().profile
+        if tai is not None:
+            if tai.valid:
+                # no need to verify
+                return tai
+            # try to verify with meta.key
+            key = self.__meta_key()
+            if tai.verify(public_key=key):
+                # signature correct
+                return tai
+            # profile error? continue to process by subclass
+            return tai
+
+    def verify(self, data: bytes, signature: bytes) -> bool:
+        """Verify data with signature, use meta.key
+
+        :param data:
+        :param signature:
+        :return:
         """
-        Get all contacts of the user
+        # # 1. get public key from profile
+        # key = self.__profile_key()
+        # if key is not None and key.verify(data=data, signature=signature):
+        #     return True
+        # 2. get public key from meta
+        key = self.__meta_key()
+        # 3. verify it
+        return key.verify(data=data, signature=signature)
 
-        :return: contacts list
+    def encrypt(self, data: bytes) -> bytes:
+        """Encrypt data, try profile.key first, if not found, use meta.key
+
+        :param data: plaintext
+        :return: ciphertext
         """
-        return self.delegate.contacts(identifier=self.identifier)
+        # 1. get key for encryption from profile
+        key = self.__profile_key()
+        if key is None:
+            # 2. get key for encryption from meta instead
+            # NOTICE: meta.key will never changed, so use profile.key to encrypt is the better way
+            key = self.__meta_key()
+        # 3. encrypt it
+        return key.encrypt(data=data)
 
-    def sign(self, data: bytes) -> bytes:
-        """
-        Sign data with user's private key
-
-        :param data: message data
-        :return: signature
-        """
-        key = self.delegate.private_key_for_signature(identifier=self.identifier)
-        if key is not None:
-            return key.sign(data=data)
-
-    def decrypt(self, data: bytes) -> bytes:
-        """
-        Decrypt data with user's private key(s)
-
-        :param data: encrypted data
-        :return: plaintext
-        """
-        keys = self.delegate.private_keys_for_decryption(identifier=self.identifier)
-        plaintext = None
-        for key in keys:
-            try:
-                plaintext = key.decrypt(data=data)
-            except ValueError:
-                # If the dat length is incorrect
-                continue
-            if plaintext is not None:
-                # decryption success
-                break
-        return plaintext
-
-
-#
-#  Delegate
-#
 
 class IUserDataSource(IEntityDataSource, ABC):
-    """
-        User Data Source
-        ~~~~~~~~~~~~~~~~
+    """This interface is for getting private information for local user
+
+        Local User Data Source
+        ~~~~~~~~~~~~~~~~~~~~~~
+
+        1. private key for signature, is the key matching with meta.key;
+        2. private key for decryption, is the key matching with profile.key,
+           if profile.key not exists, means it is the same key pair with meta.key
     """
 
     @abstractmethod
@@ -173,9 +138,68 @@ class IUserDataSource(IEntityDataSource, ABC):
     @abstractmethod
     def contacts(self, identifier: ID) -> list:
         """
-        Get contacts list
+        Get user's contacts list
 
         :param identifier: user ID
         :return: contacts list (ID)
         """
         pass
+
+
+class LocalUser(User):
+    """This class is for creating local user
+
+        User for communication
+        ~~~~~~~~~~~~~~~~~~~~~~
+
+            functions:
+                sign(data)    - calculate signature of (encrypted content) data
+                decrypt(data) - decrypt (symmetric key) data
+    """
+
+    def __sign_key(self) -> PrivateKey:
+        delegate: IUserDataSource = self.delegate
+        return delegate.private_key_for_signature(identifier=self.identifier)
+
+    def __decrypt_keys(self) -> list:
+        delegate: IUserDataSource = self.delegate
+        return delegate.private_keys_for_decryption(identifier=self.identifier)
+
+    @property
+    def contacts(self) -> list:
+        """
+        Get all contacts of the user
+
+        :return: contacts list
+        """
+        delegate: IUserDataSource = self.delegate
+        return delegate.contacts(identifier=self.identifier)
+
+    def sign(self, data: bytes) -> bytes:
+        """
+        Sign data with user's private key
+
+        :param data: message data
+        :return: signature
+        """
+        key = self.__sign_key()
+        return key.sign(data=data)
+
+    def decrypt(self, data: bytes) -> bytes:
+        """
+        Decrypt data with user's private key(s)
+
+        :param data: ciphertext
+        :return: plaintext
+        """
+        keys = self.__decrypt_keys()
+        # try decrypting it with each private key
+        for key in keys:
+            try:
+                plaintext = key.decrypt(data=data)
+                if plaintext is not None:
+                    # OK!
+                    return plaintext
+            except ValueError:
+                # this key not match, try next one
+                continue

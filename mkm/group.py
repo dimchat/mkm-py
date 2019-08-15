@@ -39,31 +39,17 @@ from abc import abstractmethod, ABC
 
 from .identifier import ID
 from .entity import Entity, IEntityDataSource
+from .profile import Profile
 
-
-class Group(Entity):
-
-    @property
-    def founder(self) -> ID:
-        return self.delegate.founder(identifier=self.identifier)
-
-    @property
-    def owner(self) -> ID:
-        return self.delegate.owner(identifier=self.identifier)
-
-    @property
-    def members(self) -> list:
-        return self.delegate.members(identifier=self.identifier)
-
-
-#
-#  Delegates
-#
 
 class IGroupDataSource(IEntityDataSource, ABC):
-    """
+    """This interface is for getting information for group
+
         Group Data Source
         ~~~~~~~~~~~~~~~~~
+
+        1. founder has the same public key with the group's meta.key
+        2. owner and members should be set complying with the consensus algorithm
     """
 
     @abstractmethod
@@ -80,3 +66,55 @@ class IGroupDataSource(IEntityDataSource, ABC):
     def members(self, identifier: ID) -> list:
         """ Get all members in the group """
         pass
+
+
+class Group(Entity):
+    """This class is for creating group
+
+        Group for organizing users
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            roles:
+                founder
+                owner
+                members
+                administrators - Optional
+                assistants     - Optional
+    """
+
+    def __init__(self, identifier: ID):
+        super().__init__(identifier=identifier)
+        self.__founder: ID = None
+
+    @property
+    def profile(self) -> Profile:
+        profile = super().profile
+        if profile is not None:
+            if profile.valid:
+                # no need to verify
+                return profile
+            # try to verify with owner's meta.key
+            owner = self.owner
+            meta = self.delegate.meta(identifier=owner)
+            if meta is not None and profile.verify(public_key=meta.key):
+                # signature correct
+                return profile
+            # profile error? continue to process by subclass
+            return profile
+
+    @property
+    def founder(self) -> ID:
+        if self.__founder is None:
+            delegate: IGroupDataSource = self.delegate
+            self.__founder = delegate.founder(identifier=self.identifier)
+        return self.__founder
+
+    @property
+    def owner(self) -> ID:
+        delegate: IGroupDataSource = self.delegate
+        return delegate.owner(identifier=self.identifier)
+
+    @property
+    def members(self) -> list:
+        delegate: IGroupDataSource = self.delegate
+        return delegate.members(identifier=self.identifier)

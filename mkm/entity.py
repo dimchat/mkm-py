@@ -36,6 +36,33 @@ from .meta import Meta
 from .profile import Profile
 
 
+class IEntityDataSource(metaclass=ABCMeta):
+    """
+        Entity Data Source
+        ~~~~~~~~~~~~~~~~~~
+    """
+
+    @abstractmethod
+    def meta(self, identifier: ID) -> Meta:
+        """
+        Get meta for entity ID
+
+        :param identifier: entity ID
+        :return:           meta info
+        """
+        pass
+
+    @abstractmethod
+    def profile(self, identifier: ID) -> Profile:
+        """
+        Get profile for entity ID
+
+        :param identifier: entity ID
+        :return:           profile info
+        """
+        pass
+
+
 class Entity:
     """Base class of User and Group, ...
 
@@ -58,8 +85,8 @@ class Entity:
         :param identifier: User/Group ID
         """
         super().__init__()
-        self.__identifier = identifier
-        self.__delegate = None  # IEntityDataSource
+        self.__identifier: ID = identifier
+        self.__delegate: IEntityDataSource = None
 
     def __str__(self):
         clazz = self.__class__.__name__
@@ -101,53 +128,16 @@ class Entity:
 
     @property
     def meta(self) -> Meta:
-        return self.__delegate.meta(identifier=self.__identifier)
+        return self.delegate.meta(identifier=self.__identifier)
 
     @property
     def profile(self) -> Profile:
-        tai: Profile = self.__delegate.profile(identifier=self.__identifier)
-        if tai is not None:
-            # verify it with meta.key
-            meta = self.meta
-            if meta is not None:
-                tai.verify(public_key=meta.key)
-            return tai
+        return self.delegate.profile(identifier=self.__identifier)
 
     @property
-    def delegate(self):  # IEntityDataSource
+    def delegate(self) -> IEntityDataSource:
         return self.__delegate
 
     @delegate.setter
     def delegate(self, value):
         self.__delegate = value
-
-
-#
-#  Delegate
-#
-
-class IEntityDataSource(metaclass=ABCMeta):
-    """
-        Entity Data Source
-        ~~~~~~~~~~~~~~~~~~
-    """
-
-    @abstractmethod
-    def meta(self, identifier: ID) -> Meta:
-        """
-        Get meta for this entity ID
-
-        :param identifier: entity ID
-        :return:           meta info
-        """
-        pass
-
-    @abstractmethod
-    def profile(self, identifier: ID) -> Profile:
-        """
-        Get name in this entity's profile
-
-        :param identifier: entity ID
-        :return:           profile info
-        """
-        pass
