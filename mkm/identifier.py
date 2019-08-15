@@ -60,7 +60,7 @@ class ID(str):
                 # return ID object directly
                 return identifier
             # Constant ID
-            lowercase = identifier.lower();
+            lowercase = identifier.lower()
             if lowercase == 'anyone@anywhere':
                 return ANYONE
             elif lowercase == 'everyone@everywhere':
