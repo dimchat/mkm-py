@@ -67,6 +67,9 @@ class RSAPrivateKey(PrivateKey):
             private_key = RSA.generate(self.size)
             data: bytes = private_key.exportKey()
             self['data'] = data.decode('utf-8')
+            self['mode'] = 'ECB'
+            self['padding'] = 'PKCS1'
+            self['digest'] = 'SHA256'
         else:
             tag1 = '-----BEGIN RSA PRIVATE KEY-----'
             tag2 = '-----END RSA PRIVATE KEY-----'
@@ -92,6 +95,9 @@ class RSAPrivateKey(PrivateKey):
         info = {
             'algorithm': PublicKey.RSA,
             'data': data.decode('utf-8'),
+            'mode': 'ECB',
+            'padding': 'PKCS1',
+            'digest': 'SHA256'
         }
         return RSAPublicKey(info)
 

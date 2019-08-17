@@ -43,6 +43,8 @@ class AESKey(SymmetricKey):
             self['data'] = base64_encode(data)
             iv = bytes(numpy.random.bytes(AES.block_size))
             self['iv'] = base64_encode(iv)
+            # self['mode'] = 'CBC'
+            # self['padding'] = 'PKCS7'
         else:
             data = base64_decode(data)
         # initialization vector
