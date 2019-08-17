@@ -46,11 +46,5 @@ class CryptographyKey(dict, metaclass=ABCMeta):
 
     def __init__(self, key: dict):
         super().__init__(key)
-        # algorithm name, the key for searching class
-        self.__algorithm: str = algorithm(key)
         # process key data in subclass
         self.data: bytes = None
-
-    @property
-    def algorithm(self) -> str:
-        return self.__algorithm
