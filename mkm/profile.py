@@ -56,13 +56,16 @@ class TAI(dict):
     def __init__(self, profile: dict):
         super().__init__(profile)
         # entity ID
-        identifier = profile['ID']
+        identifier: str = profile['ID']
         self.__identifier = ID(identifier)
         # properties data
-        data = profile.get('data')
-        self.__data = data
+        data: str = profile.get('data')
+        if data is None:
+            self.__data = None
+        else:
+            self.__data = data.encode('utf-8')
         # properties signature
-        signature = profile.get('signature')
+        signature: str = profile.get('signature')
         if signature is None:
             self.__signature = None
         else:
@@ -142,7 +145,7 @@ class TAI(dict):
         if self.__data is None or self.__signature is None:
             # data error
             return False
-        if public_key.verify(self.__data.encode('utf-8'), self.__signature):
+        if public_key.verify(self.__data, self.__signature):
             # signature matched
             self.__valid = True
             # refresh properties
@@ -161,11 +164,11 @@ class TAI(dict):
         if self.__valid:
             # already signed
             return self.__signature
-        data = json.dumps(self.__properties)
-        signature = private_key.sign(data.encode('utf-8'))
+        data: str = json.dumps(self.__properties)
+        signature: bytes = private_key.sign(data.encode('utf-8'))
         self['data'] = data
         self['signature'] = base64_encode(signature)
-        self.__data = data
+        self.__data = data.encode('utf-8')
         self.__signature = signature
         self.__valid = True
         return signature
