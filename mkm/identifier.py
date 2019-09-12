@@ -61,9 +61,9 @@ class ID(str):
                 return identifier
             # Constant ID
             lowercase = identifier.lower()
-            if lowercase == 'anyone@anywhere':
+            if lowercase == 'anyone':
                 return ANYONE
-            elif lowercase == 'everyone@everywhere':
+            elif lowercase == 'everyone':
                 return EVERYONE
             # get terminal
             pair = identifier.split('/', 1)
@@ -101,13 +101,13 @@ class ID(str):
         return self
 
     def __eq__(self, other) -> bool:
+        if other is None:
+            return False
         if super().__eq__(other):
             return True
-        elif other:
-            other = ID(other)
-        else:
-            return False
-        return self.name == other.name and self.address == other.address
+        identifier = ID(other)
+        assert identifier.valid, 'other ID not valid: %s' % other
+        return self.name == identifier.name and self.address == identifier.address
 
     def __hash__(self) -> int:
         if len(self.name) > 0:

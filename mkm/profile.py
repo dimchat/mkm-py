@@ -107,11 +107,11 @@ class TAI(dict):
         Inner dictionary
     """
 
-    def get_property(self, key):
+    def get_property(self, key: str):
         if self.__valid:
             return self.__properties.get(key)
 
-    def set_property(self, key, value):
+    def set_property(self, key: str, value):
         if value is None:
             self.__properties.pop(key, None)
         else:
