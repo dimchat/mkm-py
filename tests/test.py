@@ -183,15 +183,17 @@ class BaseTestCase(unittest.TestCase):
         # self.assertTrue(is_broadcast(id2))
 
         print_id(ANYONE)
-        id3 = ID('ANYONE@ANYWHERE')
+        id3 = ID('anyone@anywhere')
         print_id(id3)
-        self.assertIs(ANYONE, id3)
+        self.assertEqual(ANYONE, id3)
+        self.assertIsNot(ANYONE, id3);
         self.assertTrue(is_broadcast(id3))
 
         print_id(EVERYONE)
-        id4 = ID('EVERYONE@EVERYWHERE')
+        id4 = ID('everyone@everywhere')
         print_id(id4)
-        self.assertIs(EVERYONE, id4)
+        self.assertEqual(EVERYONE, id4)
+        self.assertIsNot(EVERYONE, id4);
         self.assertTrue(is_broadcast(id4))
 
         info = {

@@ -176,11 +176,13 @@ class Address(str):
         elif isinstance(address, Address):
             # return Address object directly
             return address
-        # Constant Address
-        lowercase = address.lower()
-        if lowercase == 'anywhere':
+        # Address for broadcast
+        length = len(address)
+        # anywhere
+        if length == len(ANYWHERE) and address.lower() == ANYWHERE:
             return ANYWHERE
-        elif lowercase == 'everywhere':
+        # everywhere
+        if length == len(EVERYWHERE) and address.lower() == EVERYWHERE:
             return EVERYWHERE
         # try to create address object
         for clazz in address_classes:
@@ -309,3 +311,13 @@ class ConstantAddress(Address):
 
 ANYWHERE = ConstantAddress(address="anywhere", network=NetworkID.Main, number=9527)
 EVERYWHERE = ConstantAddress(address="everywhere", network=NetworkID.Group, number=9527)
+
+
+def is_broadcast(address: Address) -> bool:
+    value = address.network.value
+    if value == NetworkID.Group.value:
+        # group address
+        return address == EVERYWHERE
+    elif value == NetworkID.Main.value:
+        # user address
+        return address == ANYWHERE

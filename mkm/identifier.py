@@ -29,6 +29,7 @@
 # ==============================================================================
 
 from .address import Address, NetworkID, ANYWHERE, EVERYWHERE
+from .address import is_broadcast as is_broadcast_address
 
 
 class ID(str):
@@ -59,12 +60,6 @@ class ID(str):
             if isinstance(identifier, ID):
                 # return ID object directly
                 return identifier
-            # Constant ID
-            lowercase = identifier.lower()
-            if lowercase == 'anyone' or lowercase == 'anyone@anywhere':
-                return ANYONE
-            elif lowercase == 'everyone' or lowercase == 'everyone@everywhere':
-                return EVERYONE
             # get terminal
             pair = identifier.split('/', 1)
             if len(pair) == 2:
@@ -158,8 +153,4 @@ EVERYONE = ID(name="everyone", address=EVERYWHERE)
 
 
 def is_broadcast(identifier: ID) -> bool:
-    network = identifier.type
-    if network.value == EVERYWHERE.network.value:
-        return identifier.address == EVERYWHERE
-    elif network.value == ANYWHERE.network.value:
-        return identifier.address == ANYWHERE
+    return is_broadcast_address(identifier.address)
