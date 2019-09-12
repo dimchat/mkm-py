@@ -129,25 +129,25 @@ class NetworkID(IntEnum):
     Robot = 0xC8           # 1100 1000
 
     def is_user(self) -> bool:
-        return (self.value & self.Main) or (self.value == self.BTCMain)
+        return (self.value & self.Main.value) or (self.value == self.BTCMain.value)
 
     def is_person(self) -> bool:
-        return (self.value == self.Main) or (self.value == self.BTCMain)
+        return (self.value == self.Main.value) or (self.value == self.BTCMain.value)
 
     def is_group(self) -> bool:
-        return self.value & self.Group
+        return self.value & self.Group.value
 
     def is_station(self) -> bool:
-        return self.value == self.Station
+        return self.value == self.Station.value
 
     def is_provider(self) -> bool:
-        return self.value == self.Provider
+        return self.value == self.Provider.value
 
     def is_thing(self) -> bool:
-        return self.value & self.Thing
+        return self.value & self.Thing.value
 
     def is_robot(self) -> bool:
-        return self.value == self.Robot
+        return self.value == self.Robot.value
 
 
 class Address(str):

@@ -61,9 +61,9 @@ class ID(str):
                 return identifier
             # Constant ID
             lowercase = identifier.lower()
-            if lowercase == 'anyone':
+            if lowercase == 'anyone' or lowercase == 'anyone@anywhere':
                 return ANYONE
-            elif lowercase == 'everyone':
+            elif lowercase == 'everyone' or lowercase == 'everyone@everywhere':
                 return EVERYONE
             # get terminal
             pair = identifier.split('/', 1)
@@ -159,7 +159,7 @@ EVERYONE = ID(name="everyone", address=EVERYWHERE)
 
 def is_broadcast(identifier: ID) -> bool:
     network = identifier.type
-    if network.is_group():
+    if network.value == EVERYWHERE.network.value:
         return identifier.address == EVERYWHERE
-    elif network.is_person():
+    elif network.value == ANYWHERE.network.value:
         return identifier.address == ANYWHERE
