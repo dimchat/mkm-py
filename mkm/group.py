@@ -95,10 +95,11 @@ class Group(Entity):
                 return profile
             # try to verify with owner's meta.key
             owner = self.owner
-            meta = self.delegate.meta(identifier=owner)
-            if meta is not None and profile.verify(public_key=meta.key):
-                # signature correct
-                return profile
+            if owner is not None:
+                meta = self.delegate.meta(identifier=owner)
+                if meta is not None and profile.verify(public_key=meta.key):
+                    # signature correct
+                    return profile
             # profile error? continue to process by subclass
             return profile
 
