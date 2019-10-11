@@ -33,7 +33,7 @@ from abc import ABCMeta, abstractmethod
 from .crypto.utils import base64_encode, base64_decode
 from .crypto import PublicKey, PrivateKey
 
-from .address import NetworkID, Address, BTCAddress
+from .address import NetworkID, Address, DefaultAddress
 from .identifier import ID
 
 
@@ -257,7 +257,7 @@ class DefaultMeta(Meta):
 
     def generate_address(self, network: NetworkID):
         assert self.version == Meta.Version_MKM, 'meta version error: %d' % self.version
-        return BTCAddress.new(data=self.fingerprint, network=network)
+        return DefaultAddress.new(data=self.fingerprint, network=network)
 
 
 meta_classes = {

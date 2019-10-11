@@ -237,7 +237,7 @@ def user_number(code: bytes) -> int:
     return int.from_bytes(code, byteorder='little')
 
 
-class BTCAddress(Address):
+class DefaultAddress(Address):
 
     def __new__(cls, address: str):
         # get fields from string
@@ -270,7 +270,7 @@ class BTCAddress(Address):
         digest = ripemd160(sha256(data))
         code = check_code(prefix + digest)
         address = base58_encode(prefix + digest + code)
-        return BTCAddress(address)
+        return DefaultAddress(address)
 
     @property
     def network(self) -> NetworkID:
@@ -282,7 +282,7 @@ class BTCAddress(Address):
 
 
 address_classes = [
-    BTCAddress
+    DefaultAddress
 ]
 
 
