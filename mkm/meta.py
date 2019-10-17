@@ -96,7 +96,8 @@ class Meta(dict, metaclass=ABCMeta):
             return meta
         # get class by meta version
         clazz = meta_classes.get(int(meta['version']))
-        if issubclass(clazz, Meta):
+        if clazz is not None:
+            assert issubclass(clazz, Meta), '%s must be sub-class of Meta' % clazz
             return clazz(meta)
         else:
             raise ModuleNotFoundError('Invalid meta version: %s' % meta)

@@ -60,7 +60,8 @@ class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
             return key
         # get class by algorithm name
         clazz = symmetric_key_classes.get(algorithm(key))
-        if issubclass(clazz, SymmetricKey):
+        if clazz is not None:
+            assert issubclass(clazz, SymmetricKey), '%s must be sub-class of SymmetricKey' % clazz
             return clazz(key)
         else:
             raise ModuleNotFoundError('Invalid key algorithm: %s' % key)

@@ -63,7 +63,8 @@ class PublicKey(AsymmetricKey, metaclass=ABCMeta):
             return key
         # get class by algorithm name
         clazz = public_key_classes.get(algorithm(key))
-        if issubclass(clazz, PublicKey):
+        if clazz is not None:
+            assert issubclass(clazz, PublicKey), '%s must be sub-class of PublicKey' % clazz
             return clazz(key)
         else:
             raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
@@ -131,7 +132,8 @@ class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
             return key
         # get class by algorithm name
         clazz = private_key_classes.get(algorithm(key))
-        if issubclass(clazz, PrivateKey):
+        if clazz is not None:
+            assert issubclass(clazz, PrivateKey), '%s must be sub-class of PrivateKey' % clazz
             return clazz(key)
         else:
             raise ModuleNotFoundError('Invalid key algorithm: %s' % key)

@@ -10,7 +10,7 @@
 
 from setuptools import setup, find_packages
 
-__version__ = '0.6.7'
+__version__ = '0.6.10'
 __author__ = 'Albert Moky'
 __contact__ = 'albert.moky@gmail.com'
 
