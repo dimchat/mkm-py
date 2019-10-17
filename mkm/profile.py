@@ -55,9 +55,8 @@ class TAI(dict):
 
     def __init__(self, profile: dict):
         super().__init__(profile)
-        # entity ID
-        identifier: str = profile['ID']
-        self.__identifier = ID(identifier)
+        # entity ID (cannot changed)
+        self.__identifier = profile['ID']
         # properties data
         data: str = profile.get('data')
         if data is None:
@@ -78,7 +77,7 @@ class TAI(dict):
         self.__key = None
 
     @property
-    def identifier(self) -> ID:
+    def identifier(self) -> str:
         return self.__identifier
 
     @property

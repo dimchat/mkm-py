@@ -59,11 +59,11 @@ class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
             # return SymmetricKey object directly
             return key
         # get class by algorithm name
-        clazz = symmetric_key_classes[algorithm(key)]
+        clazz = symmetric_key_classes.get(algorithm(key))
         if issubclass(clazz, SymmetricKey):
             return clazz(key)
         else:
-            raise ModuleNotFoundError('Invalid algorithm: %s' % key)
+            raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
 
     def __init__(self, key: dict):
         super().__init__(key=key)

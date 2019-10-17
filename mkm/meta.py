@@ -95,12 +95,11 @@ class Meta(dict, metaclass=ABCMeta):
             # return Meta object directly
             return meta
         # get class by meta version
-        version = int(meta['version'])
-        clazz = meta_classes.get(version)
+        clazz = meta_classes.get(int(meta['version']))
         if issubclass(clazz, Meta):
             return clazz(meta)
         else:
-            raise ModuleNotFoundError('Invalid meta version')
+            raise ModuleNotFoundError('Invalid meta version: %s' % meta)
 
     def __init__(self, meta: dict):
         super().__init__(meta)

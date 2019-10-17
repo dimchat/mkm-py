@@ -3,3 +3,4 @@
 /build
 /dist
 /mkm.egg-info
+*.pyc
