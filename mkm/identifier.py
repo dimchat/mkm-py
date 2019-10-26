@@ -45,8 +45,8 @@ class ID(str):
             terminal - entity login resource(device), OPTIONAL
     """
 
-    def __new__(cls, identifier: str='',
-                name: str='', address: Address=None, terminal: str=None):
+    def __new__(cls, identifier: str=None,
+                name: str=None, address: Address=None, terminal: str=None):
         """
         Create ID object with ID string or name + address
 
@@ -56,38 +56,36 @@ class ID(str):
         :param terminal:   A string for login point
         :return: ID object
         """
-        if identifier:
-            if isinstance(identifier, ID):
+        if identifier is None and address is None:
+            return None
+        elif cls is ID:
+            if identifier is None:
+                # concatenate ID string
+                assert address is not None, 'would not happen'
+                identifier = str(address)
+                if name is not None:
+                    identifier = name + '@' + identifier
+                if terminal is not None:
+                    identifier = identifier + '/' + terminal
+            elif isinstance(identifier, ID):
                 # return ID object directly
                 return identifier
-            # get terminal
-            pair = identifier.split('/', 1)
-            if len(pair) == 2:
-                terminal = pair[1]
             else:
-                terminal = None
-            # get name & address
-            pair = pair[0].split('@', 1)
-            if len(pair) == 2:
-                name = pair[0]
-                address = Address(pair[1])
-            else:
-                name = ''
-                address = Address(pair[0])
-        elif address:
-            # concatenate ID string
-            if name:
-                identifier = name + '@' + address
-            else:
-                identifier = address
-            if terminal:
-                identifier = identifier + '/' + terminal
-        else:
-            # raise AssertionError('Parameters error')
-            return None
+                # split ID string
+                pair = identifier.split('/', 1)
+                if len(pair) == 2:
+                    # got terminal
+                    terminal = pair[1]
+                pair = pair[0].split('@', 1)
+                if len(pair) == 2:
+                    # got name & address
+                    name = pair[0]
+                    address = Address(pair[1])
+                else:
+                    # got address
+                    address = Address(pair[0])
         # verify ID.address, which number must not be ZERO
-        if address.number <= 0:
-            raise ValueError('Invalid ID (address) string')
+        assert address.number > 0, 'Invalid ID (address) string: %s' % address
         # new ID(str)
         self = super().__new__(cls, identifier)
         self.__name = name
@@ -105,15 +103,12 @@ class ID(str):
         return self.name == identifier.name and self.address == identifier.address
 
     def __hash__(self) -> int:
-        if len(self.name) > 0:
-            if self.terminal is not None:
-                return hash('%s@%s/%s' % (self.name, self.address, self.terminal))
-            else:
-                return hash('%s@%s' % (self.name, self.address))
-        elif self.terminal is not None:
-            return hash('%s/%s' % (self.address, self.terminal))
-        else:
-            return hash(self.address)
+        string = str(self.__address)
+        if self.__name is not None and len(self.__name) > 0:
+            string = self.__name + '@' + string
+        if self.__terminal is not None and len(self.__terminal) > 0:
+            string = string + '/' + self.__terminal
+        return hash(string)
 
     @property
     def name(self) -> str:
@@ -141,6 +136,16 @@ class ID(str):
     def valid(self) -> bool:
         return self.__address is not None and self.__address.number > 0
 
+    #
+    #   Factory
+    #
+    @classmethod
+    def new(cls, address: Address, name: str=None, terminal: str=None):
+        # SUGGEST:
+        #     Do NOT call 'ID(name=name, address=address)' directly,
+        #     call 'ID.new(name=name, address=address)' instead
+        return ID(name=name, address=address, terminal=terminal)
+
 
 """
     ID for broadcast
@@ -148,8 +153,8 @@ class ID(str):
 """
 
 
-ANYONE = ID(name="anyone", address=ANYWHERE)
-EVERYONE = ID(name="everyone", address=EVERYWHERE)
+ANYONE = ID.new(name="anyone", address=ANYWHERE)
+EVERYONE = ID.new(name="everyone", address=EVERYWHERE)
 
 
 def is_broadcast(identifier: ID) -> bool:

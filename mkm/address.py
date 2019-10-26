@@ -170,26 +170,27 @@ class Address(str):
         """
         if address is None:
             return None
-        elif cls is not Address:
-            # subclass
-            return super().__new__(cls, address)
-        elif isinstance(address, Address):
-            # return Address object directly
-            return address
-        # Address for broadcast
-        length = len(address)
-        # anywhere
-        if length == len(ANYWHERE) and address.lower() == ANYWHERE:
-            return ANYWHERE
-        # everywhere
-        if length == len(EVERYWHERE) and address.lower() == EVERYWHERE:
-            return EVERYWHERE
-        # try to create address object
-        for clazz in address_classes:
-            try:
-                return clazz(address=address)
-            except ValueError:
-                continue
+        elif cls is Address:
+            if isinstance(address, Address):
+                # return Address object directly
+                return address
+            # Address for broadcast
+            length = len(address)
+            # anywhere
+            if length == len(ANYWHERE) and address.lower() == ANYWHERE:
+                return ANYWHERE
+            # everywhere
+            if length == len(EVERYWHERE) and address.lower() == EVERYWHERE:
+                return EVERYWHERE
+            # try to create address object
+            for clazz in address_classes:
+                try:
+                    return clazz(address=address)
+                except ValueError:
+                    continue
+            raise ValueError('unrecognized address: %s' % address)
+        # subclass
+        return super().__new__(cls, address)
 
     @property
     def network(self) -> NetworkID:

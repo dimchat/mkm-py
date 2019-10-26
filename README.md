@@ -1,7 +1,7 @@
 # Ming Ke Ming (名可名) -- Account Module (Python)
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/dimchat/mkm-py/blob/master/LICENSE)
-[![Version](https://img.shields.io/badge/alpha-0.6.2-red.svg)](https://github.com/dimchat/mkm-py/wiki)
+[![Version](https://img.shields.io/badge/alpha-0.6.13-red.svg)](https://github.com/dimchat/mkm-py/wiki)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/dimchat/mkm-py/pulls)
 [![Platform](https://img.shields.io/badge/Platform-Python%203-brightgreen.svg)](https://github.com/dimchat/mkm-py/wiki)
 
@@ -159,7 +159,7 @@ you must verify it with the consensus algorithm before accept its **public key**
     def generate_identifier(self, network: NetworkID) -> ID:
         """ Generate ID with meta info and network ID """
         address = self.generate_address(network=network)
-        return ID(name=self.seed, address=address)
+        return ID.new(name=self.seed, address=address)
 
     @abstractmethod
     def generate_address(self, network: NetworkID) -> Address:

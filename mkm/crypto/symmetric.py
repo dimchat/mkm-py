@@ -44,27 +44,29 @@ class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
     AES = 'AES'
     DES = 'DES'
 
+    # noinspection PyTypeChecker
     def __new__(cls, key: dict):
         """
+        Create symmetric key
 
-        :param key: key info with algorithm='AES'
+        :param key: key info (with algorithm='AES')
         :return: symmetric key
         """
         if key is None:
             return None
-        elif cls is not SymmetricKey:
-            # subclass
-            return super().__new__(cls, key)
-        elif isinstance(key, SymmetricKey):
-            # return SymmetricKey object directly
-            return key
-        # get class by algorithm name
-        clazz = symmetric_key_classes.get(algorithm(key))
-        if clazz is not None:
-            assert issubclass(clazz, SymmetricKey), '%s must be sub-class of SymmetricKey' % clazz
-            return clazz(key)
-        else:
-            raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
+        elif cls is SymmetricKey:
+            if isinstance(key, SymmetricKey):
+                # return SymmetricKey object directly
+                return key
+            # get class by algorithm name
+            clazz = symmetric_key_classes.get(algorithm(key))
+            if clazz is not None:
+                assert issubclass(clazz, SymmetricKey), '%s must be sub-class of SymmetricKey' % clazz
+                return clazz(key)
+            else:
+                raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
+        # subclass
+        return super().__new__(cls, key)
 
     def __init__(self, key: dict):
         super().__init__(key=key)

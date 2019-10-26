@@ -44,15 +44,6 @@ class TAI(dict):
         'TAI' is the variable part, which contains the key for asymmetric encryption.
     """
 
-    def __new__(cls, profile: dict):
-        if profile is None:
-            return None
-        elif isinstance(profile, TAI):
-            # return Meta object directly
-            return profile
-        # new Profile(dict)
-        return super().__new__(cls, profile)
-
     def __init__(self, profile: dict):
         super().__init__(profile)
         # entity ID (cannot changed)
@@ -164,16 +155,26 @@ class TAI(dict):
             # already signed
             return self.__signature
         data: str = json.dumps(self.__properties)
-        signature: bytes = private_key.sign(data.encode('utf-8'))
-        self['data'] = data
-        self['signature'] = base64_encode(signature)
         self.__data = data.encode('utf-8')
-        self.__signature = signature
+        self.__signature = private_key.sign(self.__data)
         self.__valid = True
-        return signature
+        self['data'] = data  # JsON string
+        self['signature'] = base64_encode(self.__signature)
+        return self.__signature
 
 
 class Profile(TAI):
+
+    # noinspection PyTypeChecker
+    def __new__(cls, profile: dict):
+        if profile is None:
+            return None
+        elif cls is Profile:
+            if isinstance(profile, Profile):
+                # return Profile object directly
+                return profile
+        # new Profile(dict)
+        return super().__new__(cls, profile)
 
     @property
     def name(self) -> str:

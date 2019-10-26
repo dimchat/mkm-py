@@ -34,6 +34,22 @@ from .asymmetric import PublicKey, PrivateKey, public_key_classes, private_key_c
 class RSAPublicKey(PublicKey):
     """ RSA Public Key """
 
+    def __new__(cls, key: dict):
+        """
+        Create RSA public key
+
+        :param key: key info
+        :return: RSAPublicKey object
+        """
+        if key is None:
+            return None
+        elif cls is RSAPublicKey:
+            if isinstance(key, RSAPublicKey):
+                # return RSAPublicKey object directly
+                return key
+        # new RSAPublicKey(dict)
+        return super().__new__(cls, key)
+
     def __init__(self, key: dict):
         super().__init__(key=key)
         # data in 'PEM' format
@@ -57,6 +73,22 @@ class RSAPublicKey(PublicKey):
 
 class RSAPrivateKey(PrivateKey):
     """ RSA Private Key """
+
+    def __new__(cls, key: dict):
+        """
+        Create RSA private key
+
+        :param key: key info
+        :return: RSAPrivateKey object
+        """
+        if key is None:
+            return None
+        elif cls is RSAPrivateKey:
+            if isinstance(key, RSAPrivateKey):
+                # return RSAPrivateKey object directly
+                return key
+        # new RSAPrivateKey(dict)
+        return super().__new__(cls, key)
 
     def __init__(self, key: dict):
         super().__init__(key=key)

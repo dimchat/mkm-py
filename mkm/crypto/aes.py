@@ -33,6 +33,22 @@ from .utils import base64_encode, base64_decode
 class AESKey(SymmetricKey):
     """ AES Key """
 
+    def __new__(cls, key: dict):
+        """
+        Create AES key
+
+        :param key: key info
+        :return: AESKey object
+        """
+        if key is None:
+            return None
+        elif cls is AESKey:
+            if isinstance(key, AESKey):
+                # return AESKey object directly
+                return key
+        # new AESKey(dict)
+        return super().__new__(cls, key)
+
     def __init__(self, key: dict):
         super().__init__(key=key)
         # key data

@@ -79,6 +79,7 @@ class Meta(dict, metaclass=ABCMeta):
     Version_ExETH = 0x05  # 0000 0101
     DefaultVersion = Version_MKM
 
+    # noinspection PyTypeChecker
     def __new__(cls, meta: dict):
         """
         Create meta for entity
@@ -88,19 +89,19 @@ class Meta(dict, metaclass=ABCMeta):
         """
         if meta is None:
             return None
-        elif cls is not Meta:
-            # subclass
-            return super().__new__(cls, meta)
-        elif isinstance(meta, Meta):
-            # return Meta object directly
-            return meta
-        # get class by meta version
-        clazz = meta_classes.get(int(meta['version']))
-        if clazz is not None:
-            assert issubclass(clazz, Meta), '%s must be sub-class of Meta' % clazz
-            return clazz(meta)
-        else:
-            raise ModuleNotFoundError('Invalid meta version: %s' % meta)
+        elif cls is Meta:
+            if isinstance(meta, Meta):
+                # return Meta object directly
+                return meta
+            # get class by meta version
+            clazz = meta_classes.get(int(meta['version']))
+            if clazz is not None:
+                assert issubclass(clazz, Meta), '%s must be sub-class of Meta' % clazz
+                return clazz(meta)
+            else:
+                raise ModuleNotFoundError('Invalid meta version: %s' % meta)
+        # subclass
+        return super().__new__(cls, meta)
 
     def __init__(self, meta: dict):
         super().__init__(meta)
@@ -229,7 +230,7 @@ class Meta(dict, metaclass=ABCMeta):
     def generate_identifier(self, network: NetworkID) -> ID:
         """ Generate ID with meta info and network ID """
         address = self.generate_address(network=network)
-        return ID(name=self.seed, address=address)
+        return ID.new(name=self.seed, address=address)
 
     @abstractmethod
     def generate_address(self, network: NetworkID) -> Address:

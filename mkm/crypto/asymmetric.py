@@ -47,27 +47,32 @@ class PublicKey(AsymmetricKey, metaclass=ABCMeta):
         }
     """
 
+    # noinspection PyTypeChecker
     def __new__(cls, key: dict):
         """
+        Create public key
 
         :param key: key info with algorithm='RSA'
         :return: public key
         """
         if key is None:
             return None
-        elif cls is not PublicKey:
-            # subclass
-            return super().__new__(cls, key)
-        elif isinstance(key, PublicKey):
-            # return PublicKey object directly
-            return key
-        # get class by algorithm name
-        clazz = public_key_classes.get(algorithm(key))
-        if clazz is not None:
-            assert issubclass(clazz, PublicKey), '%s must be sub-class of PublicKey' % clazz
-            return clazz(key)
-        else:
-            raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
+        elif cls is PublicKey:
+            if isinstance(key, PublicKey):
+                # return PublicKey object directly
+                return key
+            # get class by algorithm name
+            clazz = public_key_classes.get(algorithm(key))
+            if clazz is not None:
+                assert issubclass(clazz, PublicKey), '%s must be sub-class of PublicKey' % clazz
+                return clazz(key)
+            else:
+                raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
+        # subclass
+        return super().__new__(cls, key)
+
+    def __init__(self, key: dict):
+        super().__init__(key)
 
     def match(self, private_key) -> bool:
         if not isinstance(private_key, PrivateKey):
@@ -116,27 +121,32 @@ class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
         }
     """
 
+    # noinspection PyTypeChecker
     def __new__(cls, key: dict):
         """
+        Create private key
 
         :param key: key info with algorithm='RSA'
         :return: private key
         """
         if key is None:
             return None
-        elif cls is not PrivateKey:
-            # subclass
-            return super().__new__(cls, key)
-        elif isinstance(key, PrivateKey):
-            # return PrivateKey object directly
-            return key
-        # get class by algorithm name
-        clazz = private_key_classes.get(algorithm(key))
-        if clazz is not None:
-            assert issubclass(clazz, PrivateKey), '%s must be sub-class of PrivateKey' % clazz
-            return clazz(key)
-        else:
-            raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
+        elif cls is PrivateKey:
+            if isinstance(key, PrivateKey):
+                # return PrivateKey object directly
+                return key
+            # get class by algorithm name
+            clazz = private_key_classes.get(algorithm(key))
+            if clazz is not None:
+                assert issubclass(clazz, PrivateKey), '%s must be sub-class of PrivateKey' % clazz
+                return clazz(key)
+            else:
+                raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
+        # subclass
+        return super().__new__(cls, key)
+
+    def __init__(self, key: dict):
+        super().__init__(key)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, PrivateKey):
