@@ -185,7 +185,8 @@ class Address(str):
             # try to create address object
             for clazz in address_classes:
                 try:
-                    return clazz(address=address)
+                    # noinspection PyTypeChecker
+                    return clazz.__new__(clazz, address)
                 except ValueError:
                     continue
             raise ValueError('unrecognized address: %s' % address)
@@ -241,6 +242,20 @@ def user_number(code: bytes) -> int:
 class DefaultAddress(Address):
 
     def __new__(cls, address: str):
+        if address is None:
+            return None
+        elif cls is DefaultAddress:
+            if isinstance(address, DefaultAddress):
+                # return DefaultAddress directly
+                return address
+        # new DefaultAddress(str)
+        return super().__new__(cls, address)
+
+    def __init__(self, address: str):
+        if self is address:
+            # no need to init again
+            return
+        super().__init__()
         # get fields from string
         prefix_digest_code = base58_decode(address)
         if len(prefix_digest_code) != 25:
@@ -253,10 +268,16 @@ class DefaultAddress(Address):
         if check_code(prefix + digest) != code:
             raise ValueError('BTC address check code error')
         network = ord(prefix)
-        self = super().__new__(cls, address)
         self.__network = NetworkID(network)
         self.__number = user_number(code)
-        return self
+
+    @property
+    def network(self) -> NetworkID:
+        return self.__network
+
+    @property
+    def number(self) -> int:
+        return self.__number
 
     @classmethod
     def new(cls, data: bytes, network: NetworkID=0) -> Address:
@@ -271,15 +292,7 @@ class DefaultAddress(Address):
         digest = ripemd160(sha256(data))
         code = check_code(prefix + digest)
         address = base58_encode(prefix + digest + code)
-        return DefaultAddress(address)
-
-    @property
-    def network(self) -> NetworkID:
-        return self.__network
-
-    @property
-    def number(self) -> int:
-        return self.__number
+        return cls(address)
 
 
 address_classes = [

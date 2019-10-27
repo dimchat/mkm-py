@@ -251,6 +251,10 @@ class AccountTestCase(unittest.TestCase):
     def test_account(self):
         print('\n---------------- %s' % self)
 
+        address = Address('4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk')
+        address = Address(address)
+        print('address: %s' % address)
+
         id1 = ID(moki_id)
         meta1 = Meta(moki_meta)
         print('ID: ', id1, ', meta: ', meta1)

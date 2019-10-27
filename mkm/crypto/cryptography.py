@@ -45,6 +45,9 @@ class CryptographyKey(dict, metaclass=ABCMeta):
     """
 
     def __init__(self, key: dict):
+        if self is key:
+            # no need to init again
+            return
         super().__init__(key)
         # process key data in subclass
         self.data: bytes = None

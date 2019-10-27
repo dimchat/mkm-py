@@ -97,13 +97,16 @@ class Meta(dict, metaclass=ABCMeta):
             clazz = meta_classes.get(int(meta['version']))
             if clazz is not None:
                 assert issubclass(clazz, Meta), '%s must be sub-class of Meta' % clazz
-                return clazz(meta)
+                return clazz.__new__(clazz, meta)
             else:
                 raise ModuleNotFoundError('Invalid meta version: %s' % meta)
         # subclass
         return super().__new__(cls, meta)
 
     def __init__(self, meta: dict):
+        if self is meta:
+            # no need to init again
+            return
         super().__init__(meta)
         # meta version
         version = int(meta['version'])
@@ -150,59 +153,6 @@ class Meta(dict, metaclass=ABCMeta):
     def fingerprint(self) -> bytes:
         return self.__fingerprint
 
-    @classmethod
-    def new(cls, key: PublicKey, seed: str=None, fingerprint: bytes=None, version: chr=DefaultVersion):
-        """
-        Create new meta info
-
-        :param version:     - meta version
-        :param key:         - public key
-        :param seed:        - user/group name
-        :param fingerprint: - signature
-        :return: Meta object
-        """
-        if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
-            meta = {
-                'version': version,
-                'seed': seed,
-                'key': key,
-                'fingerprint': base64_encode(fingerprint),
-            }
-        else:  # BTC, ETH, ...
-            meta = {
-                'version': version,
-                'key': key,
-            }
-        # new Meta(dict)
-        return Meta(meta)
-
-    @classmethod
-    def generate(cls, private_key: PrivateKey, seed: str='', version: chr=DefaultVersion):
-        """
-        Generate meta info with seed and private key
-
-        :param private_key: - user/founder private key
-        :param seed:        - user/group name
-        :param version:     - meta version
-        :return:
-        """
-        if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
-            # generate fingerprint with private key
-            fingerprint = private_key.sign(seed.encode('utf-8'))
-            dictionary = {
-                'version': version,
-                'seed': seed,
-                'key': private_key.public_key,
-                'fingerprint': base64_encode(fingerprint),
-            }
-        else:  # BTC, ETH, ...
-            dictionary = {
-                'version': version,
-                'key': private_key.public_key,
-            }
-        # new Meta(dict)
-        return Meta(dictionary)
-
     def match_public_key(self, public_key: PublicKey) -> bool:
         """ Check whether match public key """
         if self.key == public_key:
@@ -236,6 +186,62 @@ class Meta(dict, metaclass=ABCMeta):
     def generate_address(self, network: NetworkID) -> Address:
         """ Generate address with meta info and network ID """
         pass
+
+    #
+    #  Factories
+    #
+    @classmethod
+    def new(cls, key: PublicKey, seed: str=None, fingerprint: bytes=None, version: chr=DefaultVersion):
+        """
+        Create new meta info
+
+        :param version:     - meta version
+        :param key:         - public key
+        :param seed:        - user/group name
+        :param fingerprint: - signature
+        :return: Meta object
+        """
+        if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
+            meta = {
+                'version': version,
+                'seed': seed,
+                'key': key,
+                'fingerprint': base64_encode(fingerprint),
+            }
+        else:  # BTC, ETH, ...
+            meta = {
+                'version': version,
+                'key': key,
+            }
+        # new Meta(dict)
+        return cls(meta)
+
+    @classmethod
+    def generate(cls, private_key: PrivateKey, seed: str='', version: chr=DefaultVersion):
+        """
+        Generate meta info with seed and private key
+
+        :param private_key: - user/founder private key
+        :param seed:        - user/group name
+        :param version:     - meta version
+        :return:
+        """
+        if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
+            # generate fingerprint with private key
+            fingerprint = private_key.sign(seed.encode('utf-8'))
+            dictionary = {
+                'version': version,
+                'seed': seed,
+                'key': private_key.public_key,
+                'fingerprint': base64_encode(fingerprint),
+            }
+        else:  # BTC, ETH, ...
+            dictionary = {
+                'version': version,
+                'key': private_key.public_key,
+            }
+        # new Meta(dict)
+        return cls(dictionary)
 
 
 """

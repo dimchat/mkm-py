@@ -50,7 +50,10 @@ class AESKey(SymmetricKey):
         return super().__new__(cls, key)
 
     def __init__(self, key: dict):
-        super().__init__(key=key)
+        if self is key:
+            # no need to init again
+            return
+        super().__init__(key)
         # key data
         data = self.get('data')
         if data is None:

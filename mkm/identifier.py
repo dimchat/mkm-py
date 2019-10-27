@@ -45,53 +45,31 @@ class ID(str):
             terminal - entity login resource(device), OPTIONAL
     """
 
-    def __new__(cls, identifier: str=None,
-                name: str=None, address: Address=None, terminal: str=None):
+    def __new__(cls, identifier: str):
         """
-        Create ID object with ID string or name + address
+        Create ID object with string
 
         :param identifier: ID string with format 'name@address/terminal'
-        :param name:       A string for ID.name
-        :param address:    An Address object for ID.address
-        :param terminal:   A string for login point
         :return: ID object
         """
-        if identifier is None and address is None:
+        if identifier is None:
             return None
         elif cls is ID:
-            if identifier is None:
-                # concatenate ID string
-                assert address is not None, 'would not happen'
-                identifier = str(address)
-                if name is not None:
-                    identifier = name + '@' + identifier
-                if terminal is not None:
-                    identifier = identifier + '/' + terminal
-            elif isinstance(identifier, ID):
+            if isinstance(identifier, ID):
                 # return ID object directly
                 return identifier
-            else:
-                # split ID string
-                pair = identifier.split('/', 1)
-                if len(pair) == 2:
-                    # got terminal
-                    terminal = pair[1]
-                pair = pair[0].split('@', 1)
-                if len(pair) == 2:
-                    # got name & address
-                    name = pair[0]
-                    address = Address(pair[1])
-                else:
-                    # got address
-                    address = Address(pair[0])
-        # verify ID.address, which number must not be ZERO
-        assert address.number > 0, 'Invalid ID (address) string: %s' % address
         # new ID(str)
-        self = super().__new__(cls, identifier)
-        self.__name = name
-        self.__address = address
-        self.__terminal = terminal
-        return self
+        return super().__new__(cls, identifier)
+
+    def __init__(self, identifier: str):
+        if self is identifier:
+            # no need to init again
+            return
+        super().__init__()
+        # lazy
+        self.__name: str = None
+        self.__address: Address = None
+        self.__terminal: str = None
 
     def __eq__(self, other) -> bool:
         if other is None:
@@ -112,39 +90,72 @@ class ID(str):
 
     @property
     def name(self) -> str:
-        return self.__name
+        if self.valid:
+            return self.__name
 
     @property
     def address(self) -> Address:
+        if self.__address is None:
+            # split ID string
+            pair = self.split('/', 1)
+            if len(pair) == 2:
+                # got terminal
+                self.__terminal = pair[1]
+            else:
+                self.__terminal = ''
+            pair = pair[0].split('@', 1)
+            if len(pair) == 2:
+                # got name & address
+                self.__name = pair[0]
+                self.__address = Address(pair[1])
+            else:
+                # got address
+                self.__name = ''
+                self.__address = Address(pair[0])
         return self.__address
 
     @property
     def terminal(self) -> str:
-        return self.__terminal
+        if self.valid:
+            return self.__terminal
 
     @property
     def type(self) -> NetworkID:
         """ ID type """
-        return self.__address.network
+        address = self.address
+        if address is not None:
+            return address.network
 
     @property
     def number(self) -> int:
         """ Search number of this ID """
-        return self.__address.number
+        address = self.address
+        if address is not None:
+            return address.number
 
     @property
     def valid(self) -> bool:
-        return self.__address is not None and self.__address.number > 0
+        address = self.address
+        if address is not None:
+            return address.number > 0
 
     #
     #   Factory
     #
     @classmethod
     def new(cls, address: Address, name: str=None, terminal: str=None):
-        # SUGGEST:
-        #     Do NOT call 'ID(name=name, address=address)' directly,
-        #     call 'ID.new(name=name, address=address)' instead
-        return ID(name=name, address=address, terminal=terminal)
+        # concatenate ID string
+        string = str(address)
+        if name is not None:
+            string = name + '@' + string
+        if terminal is not None:
+            string = string + '/' + terminal
+        # new ID(str)
+        identifier = cls(string)
+        identifier.__name = name
+        identifier.__address = address
+        identifier.__terminal = terminal
+        return identifier
 
 
 """

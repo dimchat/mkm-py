@@ -51,7 +51,10 @@ class RSAPublicKey(PublicKey):
         return super().__new__(cls, key)
 
     def __init__(self, key: dict):
-        super().__init__(key=key)
+        if self is key:
+            # no need to init again
+            return
+        super().__init__(key)
         # data in 'PEM' format
         data = key['data']
         self.key = RSA.importKey(data)
@@ -91,7 +94,10 @@ class RSAPrivateKey(PrivateKey):
         return super().__new__(cls, key)
 
     def __init__(self, key: dict):
-        super().__init__(key=key)
+        if self is key:
+            # no need to init again
+            return
+        super().__init__(key)
         # data in 'PEM' format
         data: str = key.get('data')
         if data is None:

@@ -62,14 +62,11 @@ class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
             clazz = symmetric_key_classes.get(algorithm(key))
             if clazz is not None:
                 assert issubclass(clazz, SymmetricKey), '%s must be sub-class of SymmetricKey' % clazz
-                return clazz(key)
+                return clazz.__new__(clazz, key)
             else:
                 raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
         # subclass
         return super().__new__(cls, key)
-
-    def __init__(self, key: dict):
-        super().__init__(key=key)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, SymmetricKey):

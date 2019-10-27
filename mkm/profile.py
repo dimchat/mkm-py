@@ -45,6 +45,9 @@ class TAI(dict):
     """
 
     def __init__(self, profile: dict):
+        if self is profile:
+            # no need to init again
+            return
         super().__init__(profile)
         # entity ID (cannot changed)
         self.__identifier = profile['ID']

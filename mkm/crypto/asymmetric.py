@@ -65,14 +65,11 @@ class PublicKey(AsymmetricKey, metaclass=ABCMeta):
             clazz = public_key_classes.get(algorithm(key))
             if clazz is not None:
                 assert issubclass(clazz, PublicKey), '%s must be sub-class of PublicKey' % clazz
-                return clazz(key)
+                return clazz.__new__(clazz, key)
             else:
                 raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
         # subclass
         return super().__new__(cls, key)
-
-    def __init__(self, key: dict):
-        super().__init__(key)
 
     def match(self, private_key) -> bool:
         if not isinstance(private_key, PrivateKey):
@@ -139,14 +136,11 @@ class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
             clazz = private_key_classes.get(algorithm(key))
             if clazz is not None:
                 assert issubclass(clazz, PrivateKey), '%s must be sub-class of PrivateKey' % clazz
-                return clazz(key)
+                return clazz.__new__(clazz, key)
             else:
                 raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
         # subclass
         return super().__new__(cls, key)
-
-    def __init__(self, key: dict):
-        super().__init__(key)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, PrivateKey):
