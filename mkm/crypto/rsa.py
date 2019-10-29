@@ -28,7 +28,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from Crypto.Signature import PKCS1_v1_5 as Signature_PKCS1_v1_5
 
-from .asymmetric import PublicKey, PrivateKey, public_key_classes, private_key_classes
+from .asymmetric import PublicKey, PrivateKey
 
 
 class RSAPublicKey(PublicKey):
@@ -60,6 +60,7 @@ class RSAPublicKey(PublicKey):
         self.key = RSA.importKey(data)
         self.data = self.key.exportKey(format='DER')
 
+    # noinspection PyTypeChecker
     def encrypt(self, data: bytes) -> bytes:
         cipher = Cipher_PKCS1_v1_5.new(self.key)
         return cipher.encrypt(data)
@@ -139,6 +140,7 @@ class RSAPrivateKey(PrivateKey):
         }
         return RSAPublicKey(info)
 
+    # noinspection PyTypeChecker
     def decrypt(self, data: bytes) -> bytes:
         cipher = Cipher_PKCS1_v1_5.new(self.key)
         sentinel = ''
@@ -153,16 +155,12 @@ class RSAPrivateKey(PrivateKey):
         return signer.sign(hash_obj)
 
 
-"""
-    Key Classes Maps
-"""
+# register public key class with algorithm
+PublicKey.register(algorithm=PublicKey.RSA, key_class=RSAPublicKey)             # default
+PublicKey.register(algorithm='SHA256withRSA', key_class=RSAPublicKey)
+PublicKey.register(algorithm='RSA/ECB/PKCS1Padding', key_class=RSAPublicKey)
 
-# RSA Public Key
-public_key_classes[PublicKey.RSA] = RSAPublicKey             # default
-public_key_classes['SHA256withRSA'] = RSAPublicKey
-public_key_classes['RSA/ECB/PKCS1Padding'] = RSAPublicKey
-
-# RSA Private Key
-private_key_classes[PrivateKey.RSA] = RSAPrivateKey          # default
-private_key_classes['SHA256withRSA'] = RSAPrivateKey
-private_key_classes['RSA/ECB/PKCS1Padding'] = RSAPrivateKey
+# register private key class with algorithm
+PrivateKey.register(algorithm=PrivateKey.RSA, key_class=RSAPrivateKey)          # default
+PrivateKey.register(algorithm='SHA256withRSA', key_class=RSAPrivateKey)
+PrivateKey.register(algorithm='RSA/ECB/PKCS1Padding', key_class=RSAPrivateKey)

@@ -94,7 +94,7 @@ class Meta(dict, metaclass=ABCMeta):
                 # return Meta object directly
                 return meta
             # get class by meta version
-            clazz = meta_classes.get(int(meta['version']))
+            clazz = cls.meta_class(version=int(meta['version']))
             if clazz is not None:
                 assert issubclass(clazz, Meta), '%s must be sub-class of Meta' % clazz
                 return clazz.__new__(clazz, meta)
@@ -138,7 +138,7 @@ class Meta(dict, metaclass=ABCMeta):
         return id1 == id2
 
     @property
-    def version(self) -> chr:
+    def version(self) -> int:
         return self.__version
 
     @property
@@ -191,7 +191,7 @@ class Meta(dict, metaclass=ABCMeta):
     #  Factories
     #
     @classmethod
-    def new(cls, key: PublicKey, seed: str=None, fingerprint: bytes=None, version: chr=DefaultVersion):
+    def new(cls, key: PublicKey, seed: str=None, fingerprint: bytes=None, version: int=DefaultVersion):
         """
         Create new meta info
 
@@ -217,7 +217,7 @@ class Meta(dict, metaclass=ABCMeta):
         return cls(meta)
 
     @classmethod
-    def generate(cls, private_key: PrivateKey, seed: str='', version: chr=DefaultVersion):
+    def generate(cls, private_key: PrivateKey, seed: str='', version: int=DefaultVersion):
         """
         Generate meta info with seed and private key
 
@@ -243,6 +243,37 @@ class Meta(dict, metaclass=ABCMeta):
         # new Meta(dict)
         return cls(dictionary)
 
+    #
+    #   Runtime
+    #
+    __meta_classes = {}  # class map
+
+    @classmethod
+    def register(cls, version: int, meta_class=None) -> bool:
+        """
+        Register meta class with version
+
+        :param version:  meta version for different meta algorithms
+        :param meta_class: if content class is None, then remove with type
+        :return: False on error
+        """
+        if meta_class is None:
+            cls.__meta_classes.pop(version, None)
+        else:
+            cls.__meta_classes[version] = meta_class
+        # TODO: check issubclass(meta_class, Meta)
+        return True
+
+    @classmethod
+    def meta_class(cls, version: int):
+        """
+        Get meta class with version
+
+        :param version: meta version for different meta algorithm
+        :return: meta class
+        """
+        return cls.__meta_classes.get(version)
+
 
 """
     Default Meta for generate ID with address
@@ -267,10 +298,5 @@ class DefaultMeta(Meta):
         return DefaultAddress.new(data=self.fingerprint, network=network)
 
 
-meta_classes = {
-    # MKM (default)
-    Meta.Version_MKM: DefaultMeta,
-    # BTC, ExBTC
-    # ETH, ExETH
-    # ...
-}
+# register meta class with version
+Meta.register(version=Meta.Version_MKM, meta_class=DefaultMeta)

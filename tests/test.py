@@ -187,14 +187,14 @@ class BaseTestCase(unittest.TestCase):
         print_id(id3)
         self.assertEqual(ANYONE, id3)
         self.assertIsNot(ANYONE, id3);
-        self.assertTrue(is_broadcast(id3))
+        self.assertTrue(id3.is_broadcast)
 
         print_id(EVERYONE)
         id4 = ID('everyone@everywhere')
         print_id(id4)
         self.assertEqual(EVERYONE, id4)
         self.assertIsNot(EVERYONE, id4);
-        self.assertTrue(is_broadcast(id4))
+        self.assertTrue(id4.is_broadcast)
 
         info = {
             'func': 'test_id',

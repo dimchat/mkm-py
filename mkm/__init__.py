@@ -31,7 +31,7 @@
 from .crypto import SymmetricKey, PrivateKey, PublicKey
 
 from .address import NetworkID, Address
-from .identifier import ID, ANYONE, EVERYONE, is_broadcast
+from .identifier import ID, ANYONE, EVERYONE
 from .meta import Meta
 from .profile import Profile
 from .entity import Entity, IEntityDataSource
@@ -43,14 +43,15 @@ name = "MingKeMing"
 __author__ = 'Albert Moky'
 
 __all__ = [
-    # Crypto
+
+    # crypto
     'SymmetricKey', 'PrivateKey', 'PublicKey',
 
-    # MingKeMing
+    # entity
     'NetworkID', 'Address', 'ID', 'Meta', 'Profile',
     'Entity', 'IEntityDataSource',
     'User', 'LocalUser', 'IUserDataSource',
     'Group', 'IGroupDataSource',
 
-    'ANYONE', 'EVERYONE', 'is_broadcast',
+    'ANYONE', 'EVERYONE',
 ]

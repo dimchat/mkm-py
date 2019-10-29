@@ -183,7 +183,7 @@ class Address(str):
             if length == len(EVERYWHERE) and address.lower() == EVERYWHERE:
                 return EVERYWHERE
             # try to create address object
-            for clazz in address_classes:
+            for clazz in cls.address_classes():
                 try:
                     # noinspection PyTypeChecker
                     return clazz.__new__(clazz, address)
@@ -210,6 +210,43 @@ class Address(str):
         :return: search number [0, 2^32)
         """
         return 0
+
+    @property
+    def is_broadcast(self) -> bool:
+        assert self.network is not None, 'address error: %s' % self
+        value = self.network.value
+        if value == NetworkID.Group.value:
+            # group address
+            return self == EVERYWHERE
+        elif value == NetworkID.Main.value:
+            # user address
+            return self == ANYWHERE
+
+    #
+    #   Runtime
+    #
+    __address_classes = []  # class list
+
+    @classmethod
+    def register(cls, address_class) -> bool:
+        """
+        Register address class
+
+        :param address_class: class for parsing ID.address
+        :return: False on error
+        """
+        cls.__address_classes.append(address_class)
+        # TODO: check issubclass(address_class, Address)
+        return True
+
+    @classmethod
+    def address_classes(cls) -> list:
+        """
+        Get content class with type
+
+        :return: all address classes
+        """
+        return cls.__address_classes
 
 
 """
@@ -279,6 +316,9 @@ class DefaultAddress(Address):
     def number(self) -> int:
         return self.__number
 
+    #
+    #   Factory
+    #
     @classmethod
     def new(cls, data: bytes, network: NetworkID=0) -> Address:
         """
@@ -295,9 +335,8 @@ class DefaultAddress(Address):
         return cls(address)
 
 
-address_classes = [
-    DefaultAddress
-]
+# register default address class
+Address.register(DefaultAddress)  # default
 
 
 """
@@ -325,13 +364,3 @@ class ConstantAddress(Address):
 
 ANYWHERE = ConstantAddress(address="anywhere", network=NetworkID.Main, number=9527)
 EVERYWHERE = ConstantAddress(address="everywhere", network=NetworkID.Group, number=9527)
-
-
-def is_broadcast(address: Address) -> bool:
-    value = address.network.value
-    if value == NetworkID.Group.value:
-        # group address
-        return address == EVERYWHERE
-    elif value == NetworkID.Main.value:
-        # user address
-        return address == ANYWHERE

@@ -26,11 +26,6 @@
 from abc import ABCMeta
 
 
-def algorithm(key: dict) -> str:
-    """ get algorithm name from key dictionary """
-    return key['algorithm']
-
-
 class CryptographyKey(dict, metaclass=ABCMeta):
     """Cryptography key with designated algorithm
 

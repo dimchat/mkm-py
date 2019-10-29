@@ -25,7 +25,7 @@
 
 from abc import ABCMeta, abstractmethod
 
-from .cryptography import CryptographyKey, algorithm
+from .cryptography import CryptographyKey
 
 
 class AsymmetricKey(CryptographyKey, metaclass=ABCMeta):
@@ -62,7 +62,7 @@ class PublicKey(AsymmetricKey, metaclass=ABCMeta):
                 # return PublicKey object directly
                 return key
             # get class by algorithm name
-            clazz = public_key_classes.get(algorithm(key))
+            clazz = cls.key_class(algorithm=key['algorithm'])
             if clazz is not None:
                 assert issubclass(clazz, PublicKey), '%s must be sub-class of PublicKey' % clazz
                 return clazz.__new__(clazz, key)
@@ -104,6 +104,37 @@ class PublicKey(AsymmetricKey, metaclass=ABCMeta):
         """
         pass
 
+    #
+    #   Runtime
+    #
+    __key_classes = {}  # class map
+
+    @classmethod
+    def register(cls, algorithm: str, key_class=None) -> bool:
+        """
+        Register public key class with algorithm
+
+        :param algorithm: key algorithm
+        :param key_class: if key class is None, then remove with algorithm
+        :return: False on error
+        """
+        if key_class is None:
+            cls.__key_classes.pop(algorithm, None)
+        else:
+            cls.__key_classes[algorithm] = key_class
+        # TODO: check issubclass(key_class, PublicKey)
+        return True
+
+    @classmethod
+    def key_class(cls, algorithm: str):
+        """
+        Get public key class with algorithm
+
+        :param algorithm: key algorithm
+        :return: public key class
+        """
+        return cls.__key_classes.get(algorithm)
+
 
 class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
     """This class is used to decrypt symmetric key or sign message data
@@ -133,7 +164,7 @@ class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
                 # return PrivateKey object directly
                 return key
             # get class by algorithm name
-            clazz = private_key_classes.get(algorithm(key))
+            clazz = cls.key_class(algorithm=key['algorithm'])
             if clazz is not None:
                 assert issubclass(clazz, PrivateKey), '%s must be sub-class of PrivateKey' % clazz
                 return clazz.__new__(clazz, key)
@@ -180,9 +211,33 @@ class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
         """
         pass
 
+    #
+    #   Runtime
+    #
+    __key_classes = {}  # class map
 
-public_key_classes = {
-}
+    @classmethod
+    def register(cls, algorithm: str, key_class=None) -> bool:
+        """
+        Register private key class with algorithm
 
-private_key_classes = {
-}
+        :param algorithm: key algorithm
+        :param key_class: if key class is None, then remove with algorithm
+        :return: False on error
+        """
+        if key_class is None:
+            cls.__key_classes.pop(algorithm, None)
+        else:
+            cls.__key_classes[algorithm] = key_class
+        # TODO: check issubclass(key_class, PrivateKey)
+        return True
+
+    @classmethod
+    def key_class(cls, algorithm: str):
+        """
+        Get private key class with algorithm
+
+        :param algorithm: key algorithm
+        :return: private key class
+        """
+        return cls.__key_classes.get(algorithm)

@@ -26,7 +26,7 @@
 import numpy
 from Crypto.Cipher import AES
 
-from .symmetric import SymmetricKey, symmetric_key_classes
+from .symmetric import SymmetricKey
 from .utils import base64_encode, base64_decode
 
 
@@ -110,10 +110,6 @@ class AESKey(SymmetricKey):
         return self.__unpad(plaintext)
 
 
-"""
-    Key Classes Maps
-"""
-
-# AES Key
-symmetric_key_classes[SymmetricKey.AES] = AESKey        # default
-symmetric_key_classes['AES/CBC/PKCS7Padding'] = AESKey
+# register symmetric key class with algorithm
+SymmetricKey.register(algorithm=SymmetricKey.AES, key_class=AESKey)        # default
+SymmetricKey.register(algorithm='AES/CBC/PKCS7Padding', key_class=AESKey)

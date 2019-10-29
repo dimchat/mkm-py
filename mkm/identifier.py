@@ -29,7 +29,6 @@
 # ==============================================================================
 
 from .address import Address, NetworkID, ANYWHERE, EVERYWHERE
-from .address import is_broadcast as is_broadcast_address
 
 
 class ID(str):
@@ -139,6 +138,11 @@ class ID(str):
         if address is not None:
             return address.number > 0
 
+    @property
+    def is_broadcast(self) -> bool:
+        assert self.address is not None, 'ID error: %s' % self
+        return self.address.is_broadcast
+
     #
     #   Factory
     #
@@ -166,7 +170,3 @@ class ID(str):
 
 ANYONE = ID.new(name="anyone", address=ANYWHERE)
 EVERYONE = ID.new(name="everyone", address=EVERYWHERE)
-
-
-def is_broadcast(identifier: ID) -> bool:
-    return is_broadcast_address(identifier.address)
