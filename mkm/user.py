@@ -32,7 +32,7 @@ from abc import abstractmethod, ABC
 
 from .crypto import PublicKey, PrivateKey
 from .identifier import ID
-from .entity import Entity, IEntityDataSource
+from .entity import Entity, EntityDataSource
 from .profile import Profile
 
 
@@ -104,7 +104,7 @@ class User(Entity):
         return key.encrypt(data=data)
 
 
-class IUserDataSource(IEntityDataSource, ABC):
+class UserDataSource(EntityDataSource, ABC):
     """This interface is for getting private information for local user
 
         Local User Data Source
@@ -158,11 +158,11 @@ class LocalUser(User):
     """
 
     def __sign_key(self) -> PrivateKey:
-        delegate: IUserDataSource = self.delegate
+        delegate: UserDataSource = self.delegate
         return delegate.private_key_for_signature(identifier=self.identifier)
 
     def __decrypt_keys(self) -> list:
-        delegate: IUserDataSource = self.delegate
+        delegate: UserDataSource = self.delegate
         return delegate.private_keys_for_decryption(identifier=self.identifier)
 
     @property
@@ -172,7 +172,7 @@ class LocalUser(User):
 
         :return: contacts list
         """
-        delegate: IUserDataSource = self.delegate
+        delegate: UserDataSource = self.delegate
         return delegate.contacts(identifier=self.identifier)
 
     def sign(self, data: bytes) -> bytes:

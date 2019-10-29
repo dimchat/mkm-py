@@ -34,9 +34,9 @@ from .address import NetworkID, Address
 from .identifier import ID, ANYONE, EVERYONE
 from .meta import Meta
 from .profile import Profile
-from .entity import Entity, IEntityDataSource
-from .user import User, LocalUser, IUserDataSource
-from .group import Group, IGroupDataSource
+from .entity import Entity, EntityDataSource
+from .user import User, LocalUser, UserDataSource
+from .group import Group, GroupDataSource
 
 name = "MingKeMing"
 
@@ -49,9 +49,10 @@ __all__ = [
 
     # entity
     'NetworkID', 'Address', 'ID', 'Meta', 'Profile',
-    'Entity', 'IEntityDataSource',
-    'User', 'LocalUser', 'IUserDataSource',
-    'Group', 'IGroupDataSource',
+    'Entity', 'User', 'LocalUser', 'Group',
+
+    # delegate
+    'EntityDataSource', 'UserDataSource', 'GroupDataSource',
 
     'ANYONE', 'EVERYONE',
 ]

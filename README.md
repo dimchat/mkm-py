@@ -1,7 +1,7 @@
 # Ming Ke Ming (名可名) -- Account Module (Python)
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/dimchat/mkm-py/blob/master/LICENSE)
-[![Version](https://img.shields.io/badge/alpha-0.6.13-red.svg)](https://github.com/dimchat/mkm-py/wiki)
+[![Version](https://img.shields.io/badge/alpha-0.7.1-red.svg)](https://github.com/dimchat/mkm-py/wiki)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/dimchat/mkm-py/pulls)
 [![Platform](https://img.shields.io/badge/Platform-Python%203-brightgreen.svg)](https://github.com/dimchat/mkm-py/wiki)
 
@@ -190,17 +190,17 @@ ID2 = "moki@4WDfe3zZ4T7opFSi3iDAKiuTnUHjxmXekk"  # Monkey King
 ```javascript
 /* Meta(JsON) for hulk@4YeVEN3aUnvC1DNUufCq1bs9zoBSJTzVEj */
 {
-    version     : 0x01,
-    seed        : "hulk",
-    key         : {
-        algorithm  : "RSA",
-        data       : "-----BEGIN PUBLIC KEY-----\nMIGJAoGBALB+vbUK48UU9rjlgnohQowME+3JtTb2hLPqtatVOW364/EKFq0/PSdnZVE9V2Zq+pbX7dj3nCS4pWnYf40ELH8wuDm0Tc4jQ70v4LgAcdy3JGTnWUGiCsY+0Z8kNzRkm3FJid592FL7ryzfvIzB9bjg8U2JqlyCVAyUYEnKv4lDAgMBAAE=\n-----END PUBLIC KEY-----",
+    "version"     : 0x01,
+    "key"         : {
+        "algorithm" : "RSA",
+        "data"      : "-----BEGIN PUBLIC KEY-----\nMIGJAoGBALB+vbUK48UU9rjlgnohQowME+3JtTb2hLPqtatVOW364/EKFq0/PSdnZVE9V2Zq+pbX7dj3nCS4pWnYf40ELH8wuDm0Tc4jQ70v4LgAcdy3JGTnWUGiCsY+0Z8kNzRkm3FJid592FL7ryzfvIzB9bjg8U2JqlyCVAyUYEnKv4lDAgMBAAE=\n-----END PUBLIC KEY-----",
         // other parameters
-        keySize    : 1024,
-        encryption : "PKCS1",
-        signature  : "PKCS1v15SHA256"
+        "mode"      : "ECB",
+        "padding"   : "PKCS1",
+        "digest"    : "SHA256"
     },
-    fingerprint : "jIPGWpWSbR/DQH6ol3t9DSFkYroVHQDvtbJErmFztMUP2DgRrRSNWuoKY5Y26qL38wfXJQXjYiWqNWKQmQe/gK8M8NkU7lRwm+2nh9wSBYV6Q4WXsCboKbnM0+HVn9Vdfp21hMMGrxTX1pBPRbi0567ZjNQC8ffdW2WvQSoec2I="
+    "seed"        : "hulk",
+    "fingerprint" : "jIPGWpWSbR/DQH6ol3t9DSFkYroVHQDvtbJErmFztMUP2DgRrRSNWuoKY5Y26qL38wfXJQXjYiWqNWKQmQe/gK8M8NkU7lRwm+2nh9wSBYV6Q4WXsCboKbnM0+HVn9Vdfp21hMMGrxTX1pBPRbi0567ZjNQC8ffdW2WvQSoec2I="
 }
 ```
 

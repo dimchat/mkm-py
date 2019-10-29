@@ -36,7 +36,7 @@ from .meta import Meta
 from .profile import Profile
 
 
-class IEntityDataSource(metaclass=ABCMeta):
+class EntityDataSource(metaclass=ABCMeta):
     """
         Entity Data Source
         ~~~~~~~~~~~~~~~~~~
@@ -135,7 +135,7 @@ class Entity:
         return self.delegate.profile(identifier=self.__identifier)
 
     @property
-    def delegate(self) -> IEntityDataSource:
+    def delegate(self) -> EntityDataSource:
         return self.__delegate
 
     @delegate.setter

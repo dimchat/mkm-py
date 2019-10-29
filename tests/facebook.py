@@ -5,7 +5,7 @@ from mkm import *
 from .immortals import *
 
 
-class Facebook(IUserDataSource):
+class Facebook(UserDataSource):
 
     def __init__(self):
         super().__init__()

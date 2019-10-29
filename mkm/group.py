@@ -38,11 +38,11 @@
 from abc import abstractmethod, ABC
 
 from .identifier import ID
-from .entity import Entity, IEntityDataSource
+from .entity import Entity, EntityDataSource
 from .profile import Profile
 
 
-class IGroupDataSource(IEntityDataSource, ABC):
+class GroupDataSource(EntityDataSource, ABC):
     """This interface is for getting information for group
 
         Group Data Source
@@ -106,16 +106,16 @@ class Group(Entity):
     @property
     def founder(self) -> ID:
         if self.__founder is None:
-            delegate: IGroupDataSource = self.delegate
+            delegate: GroupDataSource = self.delegate
             self.__founder = delegate.founder(identifier=self.identifier)
         return self.__founder
 
     @property
     def owner(self) -> ID:
-        delegate: IGroupDataSource = self.delegate
+        delegate: GroupDataSource = self.delegate
         return delegate.owner(identifier=self.identifier)
 
     @property
     def members(self) -> list:
-        delegate: IGroupDataSource = self.delegate
+        delegate: GroupDataSource = self.delegate
         return delegate.members(identifier=self.identifier)
