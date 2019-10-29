@@ -24,6 +24,7 @@
 # ==============================================================================
 
 from abc import ABCMeta, abstractmethod
+from typing import Optional
 
 from .cryptography import CryptographyKey
 
@@ -192,7 +193,7 @@ class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
         yield None
 
     @abstractmethod
-    def decrypt(self, data: bytes) -> bytes:
+    def decrypt(self, data: bytes) -> Optional[bytes]:
         """
         plaintext = decrypt(ciphertext, SK);
 

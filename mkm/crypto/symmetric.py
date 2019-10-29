@@ -24,6 +24,7 @@
 # ==============================================================================
 
 from abc import ABCMeta, abstractmethod
+from typing import Optional
 
 from .cryptography import CryptographyKey
 
@@ -87,7 +88,7 @@ class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def decrypt(self, data: bytes) -> bytes:
+    def decrypt(self, data: bytes) -> Optional[bytes]:
         """
         plaintext = decrypt(ciphertext, PW);
 

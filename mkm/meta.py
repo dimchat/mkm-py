@@ -29,6 +29,7 @@
 # ==============================================================================
 
 from abc import ABCMeta, abstractmethod
+from typing import Optional
 
 from .crypto.utils import base64_encode, base64_decode
 from .crypto import PublicKey, PrivateKey
@@ -146,11 +147,11 @@ class Meta(dict, metaclass=ABCMeta):
         return self.__key
 
     @property
-    def seed(self) -> str:
+    def seed(self) -> Optional[str]:
         return self.__seed
 
     @property
-    def fingerprint(self) -> bytes:
+    def fingerprint(self) -> Optional[bytes]:
         return self.__fingerprint
 
     def match_public_key(self, public_key: PublicKey) -> bool:
@@ -293,7 +294,7 @@ class Meta(dict, metaclass=ABCMeta):
 
 class DefaultMeta(Meta):
 
-    def generate_address(self, network: NetworkID):
+    def generate_address(self, network: NetworkID) -> Address:
         assert self.version == Meta.Version_MKM, 'meta version error: %d' % self.version
         return DefaultAddress.new(data=self.fingerprint, network=network)
 

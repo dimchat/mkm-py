@@ -31,6 +31,8 @@
 """
 
 import hashlib
+from typing import Optional
+
 import base58
 import base64
 
@@ -53,7 +55,7 @@ def base58_encode(data: bytes) -> str:
     return base58.b58encode(data).decode('utf-8')
 
 
-def base58_decode(string: str) -> bytes:
+def base58_decode(string: str) -> Optional[bytes]:
     """ BASE-58 Decode """
     return base58.b58decode(string)
 
@@ -63,6 +65,6 @@ def base64_encode(data: bytes) -> str:
     return base64.b64encode(data).decode('utf-8')
 
 
-def base64_decode(string: str) -> bytes:
+def base64_decode(string: str) -> Optional[bytes]:
     """ BASE-64 Decode """
     return base64.b64decode(string)

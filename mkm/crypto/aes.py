@@ -23,6 +23,8 @@
 # SOFTWARE.
 # ==============================================================================
 
+from typing import Optional
+
 import numpy
 from Crypto.Cipher import AES
 
@@ -104,7 +106,7 @@ class AESKey(SymmetricKey):
         key = AES.new(self.data, AES.MODE_CBC, self.iv)
         return key.encrypt(data)
 
-    def decrypt(self, data: bytes) -> bytes:
+    def decrypt(self, data: bytes) -> Optional[bytes]:
         key = AES.new(self.data, AES.MODE_CBC, self.iv)
         plaintext = key.decrypt(data)
         return self.__unpad(plaintext)

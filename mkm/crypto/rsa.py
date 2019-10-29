@@ -23,6 +23,8 @@
 # SOFTWARE.
 # ==============================================================================
 
+from typing import Optional
+
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
@@ -141,7 +143,7 @@ class RSAPrivateKey(PrivateKey):
         return RSAPublicKey(info)
 
     # noinspection PyTypeChecker
-    def decrypt(self, data: bytes) -> bytes:
+    def decrypt(self, data: bytes) -> Optional[bytes]:
         cipher = Cipher_PKCS1_v1_5.new(self.key)
         sentinel = ''
         plaintext = cipher.decrypt(data, sentinel)

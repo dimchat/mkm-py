@@ -29,6 +29,7 @@
 # ==============================================================================
 
 from abc import abstractmethod, ABC
+from typing import Optional
 
 from .crypto import PublicKey, PrivateKey
 from .identifier import ID
@@ -52,13 +53,13 @@ class User(Entity):
         if meta is not None:
             return meta.key
 
-    def __profile_key(self) -> PublicKey:
+    def __profile_key(self) -> Optional[PublicKey]:
         profile = self.profile
         if profile is not None:
             return profile.key
 
     @property
-    def profile(self) -> Profile:
+    def profile(self) -> Optional[Profile]:
         tai = super().profile
         if tai is not None:
             if tai.valid:
@@ -136,7 +137,7 @@ class UserDataSource(EntityDataSource, ABC):
         pass
 
     @abstractmethod
-    def contacts(self, identifier: ID) -> list:
+    def contacts(self, identifier: ID) -> Optional[list]:
         """
         Get user's contacts list
 
@@ -166,7 +167,7 @@ class LocalUser(User):
         return delegate.private_keys_for_decryption(identifier=self.identifier)
 
     @property
-    def contacts(self) -> list:
+    def contacts(self) -> Optional[list]:
         """
         Get all contacts of the user
 
@@ -185,7 +186,7 @@ class LocalUser(User):
         key = self.__sign_key()
         return key.sign(data=data)
 
-    def decrypt(self, data: bytes) -> bytes:
+    def decrypt(self, data: bytes) -> Optional[bytes]:
         """
         Decrypt data with user's private key(s)
 

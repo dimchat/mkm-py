@@ -29,6 +29,7 @@
 # ==============================================================================
 
 from abc import abstractmethod, ABCMeta
+from typing import Optional
 
 from .address import NetworkID
 from .identifier import ID
@@ -43,7 +44,7 @@ class EntityDataSource(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def meta(self, identifier: ID) -> Meta:
+    def meta(self, identifier: ID) -> Optional[Meta]:
         """
         Get meta for entity ID
 
@@ -53,7 +54,7 @@ class EntityDataSource(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def profile(self, identifier: ID) -> Profile:
+    def profile(self, identifier: ID) -> Optional[Profile]:
         """
         Get profile for entity ID
 
@@ -86,7 +87,7 @@ class Entity:
         """
         super().__init__()
         self.__identifier: ID = identifier
-        self.__delegate: IEntityDataSource = None
+        self.__delegate: EntityDataSource = None
 
     def __str__(self):
         clazz = self.__class__.__name__
@@ -131,7 +132,7 @@ class Entity:
         return self.delegate.meta(identifier=self.__identifier)
 
     @property
-    def profile(self) -> Profile:
+    def profile(self) -> Optional[Profile]:
         return self.delegate.profile(identifier=self.__identifier)
 
     @property

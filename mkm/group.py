@@ -36,6 +36,7 @@
 """
 
 from abc import abstractmethod, ABC
+from typing import Optional
 
 from .identifier import ID
 from .entity import Entity, EntityDataSource
@@ -53,17 +54,17 @@ class GroupDataSource(EntityDataSource, ABC):
     """
 
     @abstractmethod
-    def founder(self, identifier: ID) -> ID:
+    def founder(self, identifier: ID) -> Optional[ID]:
         """ Get founder of the group """
         pass
 
     @abstractmethod
-    def owner(self, identifier: ID) -> ID:
+    def owner(self, identifier: ID) -> Optional[ID]:
         """ Get current owner of the group """
         pass
 
     @abstractmethod
-    def members(self, identifier: ID) -> list:
+    def members(self, identifier: ID) -> Optional[list]:
         """ Get all members in the group """
         pass
 
@@ -87,7 +88,7 @@ class Group(Entity):
         self.__founder: ID = None
 
     @property
-    def profile(self) -> Profile:
+    def profile(self) -> Optional[Profile]:
         profile = super().profile
         if profile is not None:
             if profile.valid:
@@ -104,18 +105,18 @@ class Group(Entity):
             return profile
 
     @property
-    def founder(self) -> ID:
+    def founder(self) -> Optional[ID]:
         if self.__founder is None:
             delegate: GroupDataSource = self.delegate
             self.__founder = delegate.founder(identifier=self.identifier)
         return self.__founder
 
     @property
-    def owner(self) -> ID:
+    def owner(self) -> Optional[ID]:
         delegate: GroupDataSource = self.delegate
         return delegate.owner(identifier=self.identifier)
 
     @property
-    def members(self) -> list:
+    def members(self) -> Optional[list]:
         delegate: GroupDataSource = self.delegate
         return delegate.members(identifier=self.identifier)

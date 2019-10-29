@@ -28,6 +28,8 @@
 # SOFTWARE.
 # ==============================================================================
 
+from typing import Optional
+
 from .address import Address, NetworkID, ANYWHERE, EVERYWHERE
 
 
@@ -88,7 +90,7 @@ class ID(str):
         return hash(string)
 
     @property
-    def name(self) -> str:
+    def name(self) -> Optional[str]:
         if self.valid:
             return self.__name
 
@@ -114,7 +116,7 @@ class ID(str):
         return self.__address
 
     @property
-    def terminal(self) -> str:
+    def terminal(self) -> Optional[str]:
         if self.valid:
             return self.__terminal
 

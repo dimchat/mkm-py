@@ -29,6 +29,7 @@
 # ==============================================================================
 
 import json
+from typing import Optional
 
 from .crypto.utils import base64_decode, base64_encode
 from .crypto import PublicKey, PrivateKey
@@ -85,7 +86,7 @@ class TAI(dict):
     """
 
     @property
-    def key(self) -> PublicKey:
+    def key(self) -> Optional[PublicKey]:
         if self.__valid:
             return self.__key
 
@@ -100,7 +101,7 @@ class TAI(dict):
         Inner dictionary
     """
 
-    def get_property(self, key: str):
+    def get_property(self, key: str) -> Optional[object]:
         if self.__valid:
             return self.__properties.get(key)
 
@@ -180,7 +181,7 @@ class Profile(TAI):
         return super().__new__(cls, profile)
 
     @property
-    def name(self) -> str:
+    def name(self) -> Optional[str]:
         return self.get_property(key='name')
 
     @name.setter
