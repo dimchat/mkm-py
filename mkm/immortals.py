@@ -95,17 +95,20 @@ class Immortals(UserDataSource):
         if private_key is None:
             return False
         # copy 'name'
-        names = profile.get('names')
-        if names is None:
-            name = profile.get('name')
-            if name is not None:
-                profile.set_property('name', name)
-        elif len(names) > 0:
-            name = names[0]
+        name = profile.get('name')
+        if name is None:
+            names = profile.get('names')
+            if names is not None and len(names) > 0:
+                profile.set_property('name', names[0])
+        else:
             profile.set_property('name', name)
         # copy 'avatar'
         avatar = profile.get('avatar')
-        if avatar is not None:
+        if avatar is None:
+            photos = profile.get('photos')
+            if photos is not None and len(photos) > 0:
+                profile.set_property('avatar', photos[0])
+        else:
             profile.set_property('avatar', avatar)
         # sign and cache
         self.sign_profile(profile=profile)
