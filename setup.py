@@ -10,7 +10,7 @@
 
 from setuptools import setup, find_packages
 
-__version__ = '0.7.3'
+__version__ = '0.7.5'
 __author__ = 'Albert Moky'
 __contact__ = 'albert.moky@gmail.com'
 
@@ -28,6 +28,9 @@ setup(
     long_description=readme,
     long_description_content_type='text/markdown',
     packages=find_packages(),
+    package_data={
+        '': ['res/*.js']
+    },
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',

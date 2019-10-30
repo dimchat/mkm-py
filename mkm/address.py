@@ -28,6 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
+from abc import ABCMeta
 from enum import IntEnum
 
 from .crypto.utils import sha256, ripemd160, base58_encode, base58_decode
@@ -150,7 +151,7 @@ class NetworkID(IntEnum):
         return self.value == self.Robot.value
 
 
-class Address(str):
+class Address(str, metaclass=ABCMeta):
     """This class is used to build address for ID
 
         Address for MKM ID

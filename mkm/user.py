@@ -117,7 +117,7 @@ class UserDataSource(EntityDataSource, ABC):
     """
 
     @abstractmethod
-    def private_key_for_signature(self, identifier: ID) -> PrivateKey:
+    def private_key_for_signature(self, identifier: ID) -> Optional[PrivateKey]:
         """
         Get user's private key for signature
 
@@ -127,7 +127,7 @@ class UserDataSource(EntityDataSource, ABC):
         pass
 
     @abstractmethod
-    def private_keys_for_decryption(self, identifier: ID) -> list:
+    def private_keys_for_decryption(self, identifier: ID) -> Optional[list]:
         """
         Get user's private keys for decryption
 

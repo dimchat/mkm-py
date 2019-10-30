@@ -64,7 +64,7 @@ class EntityDataSource(metaclass=ABCMeta):
         pass
 
 
-class Entity:
+class Entity(metaclass=ABCMeta):
     """Base class of User and Group, ...
 
         Entity (User/Group)
