@@ -82,11 +82,16 @@ class ID(str):
         return self.name == identifier.name and self.address == identifier.address
 
     def __hash__(self) -> int:
-        string = str(self.__address)
-        if self.__name is not None and len(self.__name) > 0:
-            string = self.__name + '@' + string
-        if self.__terminal is not None and len(self.__terminal) > 0:
-            string = string + '/' + self.__terminal
+        # get address string
+        string = str(self.address)
+        # append name
+        name = self.name
+        if name is not None and len(name) > 0:
+            string = name + '@' + string
+        # append terminal
+        terminal = self.terminal
+        if terminal is not None and len(terminal) > 0:
+            string = string + '/' + terminal
         return hash(string)
 
     @property

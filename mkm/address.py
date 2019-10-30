@@ -297,14 +297,14 @@ class DefaultAddress(Address):
         # get fields from string
         prefix_digest_code = base58_decode(address)
         if len(prefix_digest_code) != 25:
-            raise ValueError('BTC address length error')
+            raise ValueError('BTC address length error: %s' % address)
         # split them
         prefix = prefix_digest_code[:1]
         digest = prefix_digest_code[1:-4]
         code = prefix_digest_code[-4:]
         # check them
         if check_code(prefix + digest) != code:
-            raise ValueError('BTC address check code error')
+            raise ValueError('BTC address check code error: %s' % address)
         network = ord(prefix)
         self.__network = NetworkID(network)
         self.__number = user_number(code)
