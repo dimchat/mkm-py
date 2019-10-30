@@ -168,6 +168,7 @@ class Immortals(UserDataSource):
             else:
                 user = LocalUser(identifier=identifier)
             # cache it in barrack
+            user.delegate = self
             self.__users[identifier] = user
             return user
 
