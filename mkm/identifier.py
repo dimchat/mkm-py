@@ -30,7 +30,8 @@
 
 from typing import Optional
 
-from .address import Address, NetworkID, ANYWHERE, EVERYWHERE
+from .types import NetworkID
+from .address import Address, ANYWHERE, EVERYWHERE
 
 
 class ID(str):

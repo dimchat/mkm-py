@@ -38,13 +38,14 @@
 import os
 from typing import Optional
 
+from .dos import JSONFile
 from .crypto import PrivateKey
-from .address import NetworkID
+from .types import NetworkID
 from .identifier import ID
 from .meta import Meta
 from .profile import Profile
-from .user import User, LocalUser, UserDataSource
-from .dos import JSONFile
+from .user import User, LocalUser
+from .delegate import UserDataSource
 
 
 def load_resource_file(filename: str) -> dict:

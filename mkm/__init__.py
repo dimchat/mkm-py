@@ -30,13 +30,15 @@
 
 from .crypto import SymmetricKey, PrivateKey, PublicKey
 
-from .address import NetworkID, Address
+from .types import NetworkID
+from .address import Address, ANYWHERE, EVERYWHERE
 from .identifier import ID, ANYONE, EVERYONE
 from .meta import Meta
 from .profile import Profile
-from .entity import Entity, EntityDataSource
-from .user import User, LocalUser, UserDataSource
-from .group import Group, GroupDataSource
+from .entity import Entity
+from .user import User, LocalUser
+from .group import Group
+from .delegate import EntityDataSource, UserDataSource, GroupDataSource
 
 name = "MingKeMing"
 
@@ -54,5 +56,5 @@ __all__ = [
     # delegate
     'EntityDataSource', 'UserDataSource', 'GroupDataSource',
 
-    'ANYONE', 'EVERYONE',
+    'ANYONE', 'EVERYONE', 'ANYWHERE', 'EVERYWHERE',
 ]

@@ -35,12 +35,12 @@
     Group with members
 """
 
-from abc import abstractmethod
 from typing import Optional
 
 from .identifier import ID
-from .entity import Entity, EntityDataSource
+from .entity import Entity
 from .profile import Profile
+from .delegate import GroupDataSource
 
 
 class Group(Entity):
@@ -95,29 +95,3 @@ class Group(Entity):
     def members(self) -> Optional[list]:
         assert isinstance(self.delegate, GroupDataSource), 'group delegate error: %s' % self.delegate
         return self.delegate.members(identifier=self.identifier)
-
-
-class GroupDataSource(EntityDataSource):
-    """This interface is for getting information for group
-
-        Group Data Source
-        ~~~~~~~~~~~~~~~~~
-
-        1. founder has the same public key with the group's meta.key
-        2. owner and members should be set complying with the consensus algorithm
-    """
-
-    @abstractmethod
-    def founder(self, identifier: ID) -> Optional[ID]:
-        """ Get founder of the group """
-        pass
-
-    @abstractmethod
-    def owner(self, identifier: ID) -> Optional[ID]:
-        """ Get current owner of the group """
-        pass
-
-    @abstractmethod
-    def members(self, identifier: ID) -> Optional[list]:
-        """ Get all members in the group """
-        pass

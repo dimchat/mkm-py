@@ -28,13 +28,12 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import abstractmethod
 from typing import Optional
 
 from .crypto import PublicKey, PrivateKey
-from .identifier import ID
-from .entity import Entity, EntityDataSource
+from .entity import Entity
 from .profile import Profile
+from .delegate import UserDataSource
 
 
 class User(Entity):
@@ -162,45 +161,3 @@ class LocalUser(User):
             except ValueError:
                 # this key not match, try next one
                 continue
-
-
-class UserDataSource(EntityDataSource):
-    """This interface is for getting private information for local user
-
-        Local User Data Source
-        ~~~~~~~~~~~~~~~~~~~~~~
-
-        1. private key for signature, is the key matching with meta.key;
-        2. private key for decryption, is the key matching with profile.key,
-           if profile.key not exists, means it is the same key pair with meta.key
-    """
-
-    @abstractmethod
-    def private_key_for_signature(self, identifier: ID) -> Optional[PrivateKey]:
-        """
-        Get user's private key for signature
-
-        :param identifier: user ID
-        :return: private key
-        """
-        pass
-
-    @abstractmethod
-    def private_keys_for_decryption(self, identifier: ID) -> Optional[list]:
-        """
-        Get user's private keys for decryption
-
-        :param identifier: user ID
-        :return: private keys
-        """
-        pass
-
-    @abstractmethod
-    def contacts(self, identifier: ID) -> Optional[list]:
-        """
-        Get user's contacts list
-
-        :param identifier: user ID
-        :return: contacts list (ID)
-        """
-        pass

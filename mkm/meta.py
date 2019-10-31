@@ -34,7 +34,8 @@ from typing import Optional
 from .crypto.utils import base64_encode, base64_decode
 from .crypto import PublicKey, PrivateKey
 
-from .address import NetworkID, Address, DefaultAddress
+from .types import NetworkID
+from .address import Address, DefaultAddress
 from .identifier import ID
 
 
