@@ -59,12 +59,12 @@ class Entity(metaclass=ABCMeta):
         :param identifier: User/Group ID
         """
         super().__init__()
-        self._identifier: ID = identifier
-        self._delegate: EntityDataSource = None
+        self.__identifier: ID = identifier
+        self.delegate: EntityDataSource = None
 
     def __str__(self):
         clazz = self.__class__.__name__
-        identifier = self._identifier
+        identifier = self.__identifier
         network = identifier.address.network
         number = identifier.address.number
         name = self.name
@@ -75,22 +75,22 @@ class Entity(metaclass=ABCMeta):
             return False
         if super().__eq__(other):
             return True
-        return self._identifier == other.identifier
+        return self.__identifier == other.identifier
 
     @property
     def identifier(self) -> ID:
-        return self._identifier
+        return self.__identifier
 
     @property
     def type(self) -> NetworkID:
         """ Entity type """
-        assert self._identifier is not None, 'entity ID should not be empty'
-        return self._identifier.address.network
+        assert self.__identifier is not None, 'entity ID should not be empty'
+        return self.__identifier.address.network
 
     @property
     def number(self) -> int:
         """ Search number of this entity """
-        return self._identifier.address.number
+        return self.__identifier.address.number
 
     @property
     def name(self) -> str:
@@ -101,25 +101,17 @@ class Entity(metaclass=ABCMeta):
             if name is not None:
                 return name
         # get from identifier
-        return self._identifier.name
+        return self.__identifier.name
 
     @property
     def meta(self) -> Meta:
-        assert isinstance(self._delegate, EntityDataSource), 'entity delegate error: %s' % self._delegate
-        return self._delegate.meta(identifier=self._identifier)
+        assert isinstance(self.delegate, EntityDataSource), 'entity delegate error: %s' % self.delegate
+        return self.delegate.meta(identifier=self.__identifier)
 
     @property
     def profile(self) -> Optional[Profile]:
-        assert isinstance(self._delegate, EntityDataSource), 'entity delegate error: %s' % self._delegate
-        return self._delegate.profile(identifier=self._identifier)
-
-    @property
-    def delegate(self):
-        return self._delegate
-
-    @delegate.setter
-    def delegate(self, value):
-        self._delegate = value
+        assert isinstance(self.delegate, EntityDataSource), 'entity delegate error: %s' % self.delegate
+        return self.delegate.profile(identifier=self.__identifier)
 
 
 class EntityDataSource(metaclass=ABCMeta):

@@ -117,12 +117,12 @@ class LocalUser(User):
     """
 
     def __sign_key(self) -> PrivateKey:
-        assert isinstance(self._delegate, UserDataSource), 'user delegate error: %s' % self._delegate
-        return self._delegate.private_key_for_signature(identifier=self._identifier)
+        assert isinstance(self.delegate, UserDataSource), 'user delegate error: %s' % self.delegate
+        return self.delegate.private_key_for_signature(identifier=self.identifier)
 
     def __decrypt_keys(self) -> list:
-        assert isinstance(self._delegate, UserDataSource), 'user delegate error: %s' % self._delegate
-        return self._delegate.private_keys_for_decryption(identifier=self._identifier)
+        assert isinstance(self.delegate, UserDataSource), 'user delegate error: %s' % self.delegate
+        return self.delegate.private_keys_for_decryption(identifier=self.identifier)
 
     @property
     def contacts(self) -> Optional[list]:
@@ -131,8 +131,8 @@ class LocalUser(User):
 
         :return: contacts list
         """
-        assert isinstance(self._delegate, UserDataSource), 'user delegate error: %s' % self._delegate
-        return self._delegate.contacts(identifier=self._identifier)
+        assert isinstance(self.delegate, UserDataSource), 'user delegate error: %s' % self.delegate
+        return self.delegate.contacts(identifier=self.identifier)
 
     def sign(self, data: bytes) -> bytes:
         """

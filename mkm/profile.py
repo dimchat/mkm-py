@@ -50,50 +50,42 @@ class TAI(dict):
             # no need to init again
             return
         super().__init__(profile)
-        # entity ID (cannot changed)
-        self.__identifier = profile['ID']
-        # properties data
-        data: str = profile.get('data')
-        if data is None:
-            self.__data = None
-        else:
-            self.__data = data.encode('utf-8')
-        # properties signature
-        signature: str = profile.get('signature')
-        if signature is None:
-            self.__signature = None
-        else:
-            self.__signature = base64_decode(signature)
-        # properties
-        self.__properties = {}
-        # valid flag
-        self.__valid = False
-        # public key
-        self.__key = None
+        # lazy
+        self.__identifier: str = None
+        self.__data: bytes = None
+        self.__signature: bytes = None
+        # protected
+        self._properties: dict = {}
+        self._valid: bool = False
 
     @property
     def identifier(self) -> str:
+        """ Profile ID """
+        if self.__identifier is None:
+            self.__identifier = self['ID']
         return self.__identifier
 
     @property
-    def valid(self) -> bool:
-        return self.__valid
-
-    """
-        Public Key for encryption
-        ~~~~~~~~~~~~~~~~~~~~~~~~~
-        For safety considerations, the profile.key which used to encrypt message data should be different with meta.key
-    """
+    def data(self) -> bytes:
+        """ Profile properties data """
+        if self.__data is None:
+            string: str = self.get('data')
+            if string is not None:
+                self.__data = string.encode('utf-8')
+        return self.__data
 
     @property
-    def key(self) -> Optional[PublicKey]:
-        if self.__valid:
-            return self.__key
+    def signature(self) -> bytes:
+        """ Profile properties signature """
+        if self.__signature is None:
+            base64: str = self.get('signature')
+            if base64 is not None:
+                self.__signature = base64_decode(base64)
+        return self.__signature
 
-    @key.setter
-    def key(self, value: PublicKey):
-        self.__key = value
-        self.set_property('key', value)
+    @property
+    def valid(self) -> bool:
+        return self._valid
 
     """
         Profile Properties
@@ -102,24 +94,23 @@ class TAI(dict):
     """
 
     def get_property(self, key: str) -> Optional[object]:
-        if self.__valid:
-            return self.__properties.get(key)
+        if self._valid:
+            return self._properties.get(key)
 
-    def set_property(self, key: str, value):
+    def set_property(self, key: str, value: object=None):
         if value is None:
-            self.__properties.pop(key, None)
+            self._properties.pop(key, None)
         else:
-            self.__properties[key] = value
-        self.__reset()
+            self._properties[key] = value
+        self._reset()
 
-    def __reset(self):
+    def _reset(self):
         """ Reset data signature after properties changed """
         self.pop('data', None)
         self.pop('signature', None)
         self.__data = None
         self.__signature = None
-        self.__valid = False
-        self.__key = None
+        self._valid = False
 
     """
         Sign/Verify profile data
@@ -133,20 +124,24 @@ class TAI(dict):
         :param public_key: public key in meta.key
         :return: True on signature matched
         """
-        if self.__valid:
+        if self._valid:
             # already verify
             return True
-        if self.__data is None or self.__signature is None:
+        data = self.data
+        signature = self.signature
+        if data is None or signature is None:
             # data error
             return False
-        if public_key.verify(self.__data, self.__signature):
+        if public_key.verify(data, signature):
             # signature matched
-            self.__valid = True
+            self._valid = True
             # refresh properties
-            self.__properties = json.loads(self.__data)
-            # get public key
-            self.__key = PublicKey(self.__properties.get('key'))
-        return self.__valid
+            dictionary = json.loads(data)
+            if isinstance(dictionary, dict):
+                self._properties = dictionary
+            else:
+                self._properties = {}
+        return self._valid
 
     def sign(self, private_key: PrivateKey) -> bytes:
         """
@@ -155,13 +150,13 @@ class TAI(dict):
         :param private_key: private key match meta.key
         :return: signature
         """
-        if self.__valid:
+        if self._valid:
             # already signed
             return self.__signature
-        data: str = json.dumps(self.__properties)
+        self._valid = True
+        data: str = json.dumps(self._properties)
         self.__data = data.encode('utf-8')
         self.__signature = private_key.sign(self.__data)
-        self.__valid = True
         self['data'] = data  # JsON string
         self['signature'] = base64_encode(self.__signature)
         return self.__signature
@@ -179,6 +174,49 @@ class Profile(TAI):
                 return profile
         # new Profile(dict)
         return super().__new__(cls, profile)
+
+    def __init__(self, profile: dict):
+        if self is profile:
+            # no need to init again
+            return
+        super().__init__(profile)
+        # lazy
+        self.__key: PublicKey = None
+
+    def _reset(self):
+        super()._reset()
+        self.__key = None
+
+    """
+        Public Key for encryption
+        ~~~~~~~~~~~~~~~~~~~~~~~~~
+        For safety considerations, the profile.key which used to encrypt message data should be different with meta.key
+    """
+
+    def verify(self, public_key: PublicKey) -> bool:
+        if self._valid:
+            # already verify
+            return True
+        if super().verify(public_key=public_key):
+            # get public key
+            self.__key = PublicKey(self._properties.get('key'))
+            return True
+
+    @property
+    def key(self) -> Optional[PublicKey]:
+        return self.__key
+
+    @key.setter
+    def key(self, value: PublicKey):
+        self.__key = value
+        self.set_property('key', value)
+
+    """
+        Name
+        ~~~~
+        Nickname for user
+        Group name for group
+    """
 
     @property
     def name(self) -> Optional[str]:

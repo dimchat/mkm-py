@@ -162,15 +162,17 @@ class Meta(dict, metaclass=ABCMeta):
                 # meta.key should not be empty
                 self.__status = -1
             elif self.version & Meta.Version_MKM:
-                seed = self.seed
-                fingerprint = self.fingerprint
-                if key.verify(data=seed.encode('utf-8'), signature=fingerprint):
+                # MKM, ExBTC, ExETH, ...
+                un = self.seed
+                ct = self.fingerprint
+                if un is not None and ct is not None and key.verify(data=un.encode('utf-8'), signature=ct):
                     # fingerprint matched
                     self.__status = 1
                 else:
                     # fingerprint not matched
                     self.__status = -1
             else:
+                # BTC, ETH, ...
                 self.__status = 1
         return self.__status == 1
 
@@ -198,13 +200,14 @@ class Meta(dict, metaclass=ABCMeta):
             return False
         return self.generate_address(network=address.network) == address
 
-    def generate_identifier(self, network: NetworkID) -> ID:
+    def generate_identifier(self, network: NetworkID) -> Optional[ID]:
         """ Generate ID with meta info and network ID """
         address = self.generate_address(network=network)
-        return ID.new(name=self.seed, address=address)
+        if address is not None:
+            return ID.new(name=self.seed, address=address)
 
     @abstractmethod
-    def generate_address(self, network: NetworkID) -> Address:
+    def generate_address(self, network: NetworkID) -> Optional[Address]:
         """ Generate address with meta info and network ID """
         pass
 
@@ -315,9 +318,10 @@ class Meta(dict, metaclass=ABCMeta):
 
 class DefaultMeta(Meta):
 
-    def generate_address(self, network: NetworkID) -> Address:
+    def generate_address(self, network: NetworkID) -> Optional[Address]:
         assert self.version == Meta.Version_MKM, 'meta version error: %d' % self.version
-        return DefaultAddress.new(data=self.fingerprint, network=network)
+        if self.valid:
+            return DefaultAddress.new(data=self.fingerprint, network=network)
 
 
 # register meta class with version

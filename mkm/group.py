@@ -72,7 +72,7 @@ class Group(Entity):
             # try to verify with owner's meta.key
             owner = self.owner
             if owner is not None:
-                meta = self._delegate.meta(identifier=owner)
+                meta = self.delegate.meta(identifier=owner)
                 if meta is not None and profile.verify(public_key=meta.key):
                     # signature correct
                     return profile
@@ -82,19 +82,19 @@ class Group(Entity):
     @property
     def founder(self) -> Optional[ID]:
         if self.__founder is None:
-            assert isinstance(self._delegate, GroupDataSource), 'group delegate error: %s' % self._delegate
-            self.__founder = self._delegate.founder(identifier=self._identifier)
+            assert isinstance(self.delegate, GroupDataSource), 'group delegate error: %s' % self.delegate
+            self.__founder = self.delegate.founder(identifier=self.identifier)
         return self.__founder
 
     @property
     def owner(self) -> Optional[ID]:
-        assert isinstance(self._delegate, GroupDataSource), 'group delegate error: %s' % self._delegate
-        return self._delegate.owner(identifier=self._identifier)
+        assert isinstance(self.delegate, GroupDataSource), 'group delegate error: %s' % self.delegate
+        return self.delegate.owner(identifier=self.identifier)
 
     @property
     def members(self) -> Optional[list]:
-        assert isinstance(self._delegate, GroupDataSource), 'group delegate error: %s' % self._delegate
-        return self._delegate.members(identifier=self._identifier)
+        assert isinstance(self.delegate, GroupDataSource), 'group delegate error: %s' % self.delegate
+        return self.delegate.members(identifier=self.identifier)
 
 
 class GroupDataSource(EntityDataSource):
