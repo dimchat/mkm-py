@@ -62,8 +62,8 @@ class RSAPublicKey(PublicKey):
         self.key = RSA.importKey(data)
         self.data = self.key.exportKey(format='DER')
 
-    # noinspection PyTypeChecker
     def encrypt(self, data: bytes) -> bytes:
+        # noinspection PyTypeChecker
         cipher = Cipher_PKCS1_v1_5.new(self.key)
         return cipher.encrypt(data)
 
@@ -71,6 +71,7 @@ class RSAPublicKey(PublicKey):
         hash_obj = SHA256.new(data)
         verifier = Signature_PKCS1_v1_5.new(self.key)
         try:
+            # noinspection PyTypeChecker
             return verifier.verify(hash_obj, signature)
         except ValueError:
             # raise ValueError("Invalid signature")
@@ -146,6 +147,7 @@ class RSAPrivateKey(PrivateKey):
     def decrypt(self, data: bytes) -> Optional[bytes]:
         cipher = Cipher_PKCS1_v1_5.new(self.key)
         sentinel = ''
+        # noinspection PyArgumentList
         plaintext = cipher.decrypt(data, sentinel)
         if sentinel:
             print('error: ' + sentinel)

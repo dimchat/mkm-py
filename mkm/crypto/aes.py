@@ -32,6 +32,20 @@ from .symmetric import SymmetricKey
 from .utils import base64_encode, base64_decode
 
 
+def pkcs7_pad(data: bytes, block_size: int) -> bytes:
+    amount = block_size - len(data) % block_size
+    if amount == 0:
+        amount = block_size
+    pad = chr(amount).encode('utf-8')
+    return data + pad * amount
+
+
+def pkcs7_unpad(data: bytes) -> bytes:
+    amount = data[-1]
+    # assert len(data) >= amount
+    return data[:-amount]
+
+
 class AESKey(SymmetricKey):
     """ AES Key """
 
@@ -87,29 +101,15 @@ class AESKey(SymmetricKey):
         else:
             return int(size)
 
-    @staticmethod
-    def __pad(data: bytes) -> bytes:
-        block_size = AES.block_size
-        amount = block_size - len(data) % block_size
-        if amount == 0:
-            amount = block_size
-        pad = chr(amount).encode('utf-8')
-        return data + pad * amount
-
-    @staticmethod
-    def __unpad(data: bytes) -> bytes:
-        amount = data[-1]
-        return data[:-amount]
-
     def encrypt(self, data: bytes) -> bytes:
-        data = self.__pad(data)
+        data = pkcs7_pad(data=data, block_size=AES.block_size)
         key = AES.new(self.data, AES.MODE_CBC, self.iv)
         return key.encrypt(data)
 
     def decrypt(self, data: bytes) -> Optional[bytes]:
         key = AES.new(self.data, AES.MODE_CBC, self.iv)
         plaintext = key.decrypt(data)
-        return self.__unpad(plaintext)
+        return pkcs7_unpad(data=plaintext)
 
 
 # register symmetric key class with algorithm

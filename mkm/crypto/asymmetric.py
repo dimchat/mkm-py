@@ -121,9 +121,10 @@ class PublicKey(AsymmetricKey, metaclass=ABCMeta):
         """
         if key_class is None:
             cls.__key_classes.pop(algorithm, None)
-        else:
+        elif issubclass(key_class, PublicKey):
             cls.__key_classes[algorithm] = key_class
-        # TODO: check issubclass(key_class, PublicKey)
+        else:
+            raise TypeError('%s must be subclass of PublicKey' % key_class)
         return True
 
     @classmethod
@@ -175,13 +176,14 @@ class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
         return super().__new__(cls, key)
 
     def __eq__(self, other) -> bool:
-        if not isinstance(other, PrivateKey):
+        if not isinstance(other, dict):
             return False
         if super().__eq__(other):
             return True
         pk = self.public_key
         if pk is not None:
-            return pk.match(other)
+            sk = PrivateKey(other)
+            return pk.match(private_key=sk)
 
     @property
     def public_key(self) -> PublicKey:
@@ -228,9 +230,10 @@ class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
         """
         if key_class is None:
             cls.__key_classes.pop(algorithm, None)
-        else:
+        elif issubclass(key_class, PrivateKey):
             cls.__key_classes[algorithm] = key_class
-        # TODO: check issubclass(key_class, PrivateKey)
+        else:
+            raise TypeError('%s must be subclass of PrivateKey' % key_class)
         return True
 
     @classmethod

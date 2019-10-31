@@ -28,7 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import abstractmethod, ABC
+from abc import abstractmethod
 from typing import Optional
 
 from .crypto import PublicKey, PrivateKey
@@ -105,7 +105,66 @@ class User(Entity):
         return key.encrypt(data=data)
 
 
-class UserDataSource(EntityDataSource, ABC):
+class LocalUser(User):
+    """This class is for creating local user
+
+        User for communication
+        ~~~~~~~~~~~~~~~~~~~~~~
+
+            functions:
+                sign(data)    - calculate signature of (encrypted content) data
+                decrypt(data) - decrypt (symmetric key) data
+    """
+
+    def __sign_key(self) -> PrivateKey:
+        assert isinstance(self._delegate, UserDataSource), 'user delegate error: %s' % self._delegate
+        return self._delegate.private_key_for_signature(identifier=self._identifier)
+
+    def __decrypt_keys(self) -> list:
+        assert isinstance(self._delegate, UserDataSource), 'user delegate error: %s' % self._delegate
+        return self._delegate.private_keys_for_decryption(identifier=self._identifier)
+
+    @property
+    def contacts(self) -> Optional[list]:
+        """
+        Get all contacts of the user
+
+        :return: contacts list
+        """
+        assert isinstance(self._delegate, UserDataSource), 'user delegate error: %s' % self._delegate
+        return self._delegate.contacts(identifier=self._identifier)
+
+    def sign(self, data: bytes) -> bytes:
+        """
+        Sign data with user's private key
+
+        :param data: message data
+        :return: signature
+        """
+        key = self.__sign_key()
+        return key.sign(data=data)
+
+    def decrypt(self, data: bytes) -> Optional[bytes]:
+        """
+        Decrypt data with user's private key(s)
+
+        :param data: ciphertext
+        :return: plaintext
+        """
+        keys = self.__decrypt_keys()
+        # try decrypting it with each private key
+        for key in keys:
+            try:
+                plaintext = key.decrypt(data=data)
+                if plaintext is not None:
+                    # OK!
+                    return plaintext
+            except ValueError:
+                # this key not match, try next one
+                continue
+
+
+class UserDataSource(EntityDataSource):
     """This interface is for getting private information for local user
 
         Local User Data Source
@@ -145,62 +204,3 @@ class UserDataSource(EntityDataSource, ABC):
         :return: contacts list (ID)
         """
         pass
-
-
-class LocalUser(User):
-    """This class is for creating local user
-
-        User for communication
-        ~~~~~~~~~~~~~~~~~~~~~~
-
-            functions:
-                sign(data)    - calculate signature of (encrypted content) data
-                decrypt(data) - decrypt (symmetric key) data
-    """
-
-    def __sign_key(self) -> PrivateKey:
-        delegate: UserDataSource = self.delegate
-        return delegate.private_key_for_signature(identifier=self.identifier)
-
-    def __decrypt_keys(self) -> list:
-        delegate: UserDataSource = self.delegate
-        return delegate.private_keys_for_decryption(identifier=self.identifier)
-
-    @property
-    def contacts(self) -> Optional[list]:
-        """
-        Get all contacts of the user
-
-        :return: contacts list
-        """
-        delegate: UserDataSource = self.delegate
-        return delegate.contacts(identifier=self.identifier)
-
-    def sign(self, data: bytes) -> bytes:
-        """
-        Sign data with user's private key
-
-        :param data: message data
-        :return: signature
-        """
-        key = self.__sign_key()
-        return key.sign(data=data)
-
-    def decrypt(self, data: bytes) -> Optional[bytes]:
-        """
-        Decrypt data with user's private key(s)
-
-        :param data: ciphertext
-        :return: plaintext
-        """
-        keys = self.__decrypt_keys()
-        # try decrypting it with each private key
-        for key in keys:
-            try:
-                plaintext = key.decrypt(data=data)
-                if plaintext is not None:
-                    # OK!
-                    return plaintext
-            except ValueError:
-                # this key not match, try next one
-                continue

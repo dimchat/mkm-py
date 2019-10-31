@@ -70,7 +70,7 @@ class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
         return super().__new__(cls, key)
 
     def __eq__(self, other) -> bool:
-        if not isinstance(other, SymmetricKey):
+        if not isinstance(other, dict):
             return False
         if super().__eq__(other):
             return True
@@ -113,9 +113,10 @@ class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
         """
         if key_class is None:
             cls.__key_classes.pop(algorithm, None)
-        else:
+        elif issubclass(key_class, SymmetricKey):
             cls.__key_classes[algorithm] = key_class
-        # TODO: check issubclass(key_class, SymmetricKey)
+        else:
+            raise TypeError('%s must be subclass of SymmetricKey' % key_class)
         return True
 
     @classmethod

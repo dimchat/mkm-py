@@ -185,11 +185,9 @@ class Address(str, metaclass=ABCMeta):
                 return EVERYWHERE
             # try to create address object
             for clazz in cls.address_classes():
-                try:
-                    # noinspection PyTypeChecker
-                    return clazz.__new__(clazz, address)
-                except ValueError:
-                    continue
+                inst = clazz.__new__(clazz, address)
+                if inst is not None:
+                    return inst
             raise ValueError('unrecognized address: %s' % address)
         # subclass
         return super().__new__(cls, address)
@@ -236,8 +234,10 @@ class Address(str, metaclass=ABCMeta):
         :param address_class: class for parsing ID.address
         :return: False on error
         """
-        cls.__address_classes.append(address_class)
-        # TODO: check issubclass(address_class, Address)
+        if issubclass(address_class, Address):
+            cls.__address_classes.append(address_class)
+        else:
+            raise TypeError('%s must be subclass of Address' % address_class)
         return True
 
     @classmethod

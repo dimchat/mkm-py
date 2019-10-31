@@ -35,7 +35,7 @@
     Group with members
 """
 
-from abc import abstractmethod, ABC
+from abc import abstractmethod
 from typing import Optional
 
 from .identifier import ID
@@ -43,7 +43,61 @@ from .entity import Entity, EntityDataSource
 from .profile import Profile
 
 
-class GroupDataSource(EntityDataSource, ABC):
+class Group(Entity):
+    """This class is for creating group
+
+        Group for organizing users
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            roles:
+                founder
+                owner
+                members
+                administrators - Optional
+                assistants     - Optional
+    """
+
+    def __init__(self, identifier: ID):
+        super().__init__(identifier=identifier)
+        # once the group founder is set, it will never change
+        self.__founder: ID = None
+
+    @property
+    def profile(self) -> Optional[Profile]:
+        profile = super().profile
+        if profile is not None:
+            if profile.valid:
+                # no need to verify
+                return profile
+            # try to verify with owner's meta.key
+            owner = self.owner
+            if owner is not None:
+                meta = self._delegate.meta(identifier=owner)
+                if meta is not None and profile.verify(public_key=meta.key):
+                    # signature correct
+                    return profile
+            # profile error? continue to process by subclass
+            return profile
+
+    @property
+    def founder(self) -> Optional[ID]:
+        if self.__founder is None:
+            assert isinstance(self._delegate, GroupDataSource), 'group delegate error: %s' % self._delegate
+            self.__founder = self._delegate.founder(identifier=self._identifier)
+        return self.__founder
+
+    @property
+    def owner(self) -> Optional[ID]:
+        assert isinstance(self._delegate, GroupDataSource), 'group delegate error: %s' % self._delegate
+        return self._delegate.owner(identifier=self._identifier)
+
+    @property
+    def members(self) -> Optional[list]:
+        assert isinstance(self._delegate, GroupDataSource), 'group delegate error: %s' % self._delegate
+        return self._delegate.members(identifier=self._identifier)
+
+
+class GroupDataSource(EntityDataSource):
     """This interface is for getting information for group
 
         Group Data Source
@@ -67,56 +121,3 @@ class GroupDataSource(EntityDataSource, ABC):
     def members(self, identifier: ID) -> Optional[list]:
         """ Get all members in the group """
         pass
-
-
-class Group(Entity):
-    """This class is for creating group
-
-        Group for organizing users
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            roles:
-                founder
-                owner
-                members
-                administrators - Optional
-                assistants     - Optional
-    """
-
-    def __init__(self, identifier: ID):
-        super().__init__(identifier=identifier)
-        self.__founder: ID = None
-
-    @property
-    def profile(self) -> Optional[Profile]:
-        profile = super().profile
-        if profile is not None:
-            if profile.valid:
-                # no need to verify
-                return profile
-            # try to verify with owner's meta.key
-            owner = self.owner
-            if owner is not None:
-                meta = self.delegate.meta(identifier=owner)
-                if meta is not None and profile.verify(public_key=meta.key):
-                    # signature correct
-                    return profile
-            # profile error? continue to process by subclass
-            return profile
-
-    @property
-    def founder(self) -> Optional[ID]:
-        if self.__founder is None:
-            delegate: GroupDataSource = self.delegate
-            self.__founder = delegate.founder(identifier=self.identifier)
-        return self.__founder
-
-    @property
-    def owner(self) -> Optional[ID]:
-        delegate: GroupDataSource = self.delegate
-        return delegate.owner(identifier=self.identifier)
-
-    @property
-    def members(self) -> Optional[list]:
-        delegate: GroupDataSource = self.delegate
-        return delegate.members(identifier=self.identifier)

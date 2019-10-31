@@ -109,50 +109,70 @@ class Meta(dict, metaclass=ABCMeta):
             # no need to init again
             return
         super().__init__(meta)
-        # meta version
-        version = int(meta['version'])
-        self.__version = version
-        # public key
-        key = PublicKey(meta['key'])
-        self.__key = key
-        # seed & fingerprint
-        if version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
-            seed = meta['seed']
-            fingerprint = base64_decode(meta['fingerprint'])
-            if key.verify(seed.encode('utf-8'), fingerprint):
-                self.__seed = seed
-                self.__fingerprint = fingerprint
-            else:
-                raise ValueError('Meta key not match: %s' % meta)
-        else:
-            self.__seed = None
-            self.__fingerprint = None
+        # lazy
+        self.__version: int = 0
+        self.__key: PublicKey = None
+        self.__seed: str = None
+        self.__fingerprint: bytes = None
+        self.__status: int = 0
 
     def __eq__(self, other) -> bool:
         """ Check whether they can generate same IDs """
-        if other:
-            other = Meta(other)
-        else:
+        if not isinstance(other, dict):
             return False
+        if super().__eq__(other):
+            return True
+        # check with ID
+        other = Meta(other)
         id1 = self.generate_identifier(network=NetworkID.Main)
         id2 = other.generate_identifier(network=NetworkID.Main)
         return id1 == id2
 
     @property
     def version(self) -> int:
+        if self.__version is 0:
+            self.__version = int(self['version'])
         return self.__version
 
     @property
     def key(self) -> PublicKey:
+        if self.__key is None:
+            self.__key = PublicKey(self['key'])
         return self.__key
 
     @property
     def seed(self) -> Optional[str]:
+        if self.__seed is None and (self.version & Meta.Version_MKM):
+            # MKM, ExBTC, ExETH, ...
+            self.__seed = self['seed']
         return self.__seed
 
     @property
     def fingerprint(self) -> Optional[bytes]:
+        if self.__fingerprint is None and (self.version & Meta.Version_MKM):
+            # MKM, ExBTC, ExETH, ...
+            self.__fingerprint = base64_decode(self['fingerprint'])
         return self.__fingerprint
+
+    @property
+    def valid(self) -> bool:
+        if self.__status is 0:
+            key = self.key
+            if key is None:
+                # meta.key should not be empty
+                self.__status = -1
+            elif self.version & Meta.Version_MKM:
+                seed = self.seed
+                fingerprint = self.fingerprint
+                if key.verify(data=seed.encode('utf-8'), signature=fingerprint):
+                    # fingerprint matched
+                    self.__status = 1
+                else:
+                    # fingerprint not matched
+                    self.__status = -1
+            else:
+                self.__status = 1
+        return self.__status == 1
 
     def match_public_key(self, public_key: PublicKey) -> bool:
         """ Check whether match public key """
@@ -260,9 +280,10 @@ class Meta(dict, metaclass=ABCMeta):
         """
         if meta_class is None:
             cls.__meta_classes.pop(version, None)
-        else:
+        elif issubclass(meta_class, Meta):
             cls.__meta_classes[version] = meta_class
-        # TODO: check issubclass(meta_class, Meta)
+        else:
+            raise TypeError('%s must be subclass of Meta' % meta_class)
         return True
 
     @classmethod

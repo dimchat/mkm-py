@@ -65,35 +65,51 @@ class Immortals(UserDataSource):
         self.__profiles = {}
         self.__users = {}
         # load built-in users
-        self.__load_user('hulk')
-        self.__load_user('moki')
+        self.__load_user(username='hulk')
+        self.__load_user(username='moki')
 
     def __load_user(self, username: str):
+        # load meta and generate ID
+        identifier = self.identifier_from_meta(filename=username+'_meta.js')
+        if identifier is None:
+            return
+        # load private key
+        self.load_private_key(identifier=identifier, filename=username+'_secret.js')
+        # load profile
+        self.load_profile(identifier=identifier, filename=username+'_profile.js')
+
+    def identifier_from_meta(self, filename: str, network: NetworkID=NetworkID.Main) -> Optional[ID]:
         # load meta
-        meta = Meta(load_resource_file(filename=username+'_meta.js'))
+        meta = Meta(load_resource_file(filename=filename))
         if meta is None:
-            # meta not found
-            return False
-        # generate ID
-        identifier = meta.generate_identifier(network=NetworkID.Main)
+            return None
+        # generate
+        identifier = meta.generate_identifier(network=network)
         # cache them
         self.cache_identifier(identifier=identifier)
         self.cache_meta(meta=meta, identifier=identifier)
-        # load private key
-        private_key = PrivateKey(load_resource_file(filename=username+'_secret.js'))
-        if private_key is not None:
-            # cache key
-            self.cache_private_key(private_key=private_key, identifier=identifier)
-        # load profile
-        profile = Profile(load_resource_file(filename=username+'_profile.js'))
+        return identifier
+
+    def load_private_key(self, filename: str, identifier: ID) -> Optional[PrivateKey]:
+        key = PrivateKey(load_resource_file(filename=filename))
+        if key is None:
+            return None
+        # cache it
+        self.cache_private_key(private_key=key, identifier=identifier)
+        return key
+
+    def load_profile(self, filename: str, identifier: ID) -> Optional[Profile]:
+        profile = Profile(load_resource_file(filename=filename))
         if profile is None:
-            # profile not found
-            return True
+            return None
+        assert profile.identifier == identifier, 'profile ID not match: %s, %s' % (identifier, profile)
         if self.verify_profile(profile=profile):
             # profile contains signature
-            return True
-        if private_key is None:
-            return False
+            return profile
+        key = self.private_key_for_signature(identifier=identifier)
+        if key is None:
+            # profile not signed yet
+            return profile
         # copy 'name'
         name = profile.get('name')
         if name is None:
@@ -113,15 +129,15 @@ class Immortals(UserDataSource):
         # sign and cache
         self.sign_profile(profile=profile)
         self.cache_profile(profile=profile)
-        return True
+        return profile
 
     def cache_identifier(self, identifier: ID) -> bool:
+        assert identifier.valid, 'ID not valid: %s' % identifier
         self.__ids[identifier] = identifier
         return True
 
     def cache_meta(self, meta: Meta, identifier: ID) -> bool:
-        if not meta.match_identifier(identifier):
-            return False
+        assert meta.match_identifier(identifier), 'meta not match ID: %s, %s' % (identifier, meta)
         self.__metas[identifier] = meta
         return True
 
@@ -130,8 +146,7 @@ class Immortals(UserDataSource):
         return True
 
     def cache_profile(self, profile: Profile) -> bool:
-        if not self.verify_profile(profile=profile):
-            return False
+        assert profile.valid, 'profile not valid: %s' % profile
         self.__profiles[profile.identifier] = profile
         return True
 

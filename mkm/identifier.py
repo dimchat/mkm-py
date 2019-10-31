@@ -73,7 +73,7 @@ class ID(str):
         self.__terminal: str = None
 
     def __eq__(self, other) -> bool:
-        if other is None:
+        if not isinstance(other, str):
             return False
         if super().__eq__(other):
             return True
