@@ -87,7 +87,7 @@ class Immortals(UserDataSource):
         # generate
         identifier = meta.generate_identifier(network=network)
         # cache them
-        self.cache_identifier(identifier=identifier)
+        self.cache_id(identifier=identifier)
         self.cache_meta(meta=meta, identifier=identifier)
         return identifier
 
@@ -132,7 +132,7 @@ class Immortals(UserDataSource):
         self.cache_profile(profile=profile)
         return profile
 
-    def cache_identifier(self, identifier: ID) -> bool:
+    def cache_id(self, identifier: ID) -> bool:
         assert identifier.valid, 'ID not valid: %s' % identifier
         self.__ids[identifier] = identifier
         return True

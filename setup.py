@@ -37,6 +37,8 @@ setup(
         'Operating System :: OS Independent',
     ],
     install_requires=[
-        'base58', 'Crypto', 'numpy',
+        'base58',  # 1.0.3
+        'Crypto',  # pycryptodome==3.7.3
+        'numpy',   # 1.15.4
     ]
 )
