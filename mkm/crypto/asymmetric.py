@@ -73,11 +73,11 @@ class PublicKey(AsymmetricKey, metaclass=ABCMeta):
         return super().__new__(cls, key)
 
     def match(self, private_key) -> bool:
-        if not isinstance(private_key, PrivateKey):
+        if not isinstance(private_key, dict):
             return False
+        private_key = PrivateKey(private_key)
         # 1. if the SK has the same public key, return true
-        public_key = private_key.public_key
-        if public_key is not None and public_key.__eq__(self):
+        if private_key.public_key == self:
             return True
         # 2. try to verify the SK's signature
         promise = 'Moky loves May Lee forever!'.encode('utf-8')

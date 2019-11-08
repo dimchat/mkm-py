@@ -74,6 +74,7 @@ class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
             return False
         if super().__eq__(other):
             return True
+        other = SymmetricKey(other)
         promise = 'Moky loves May Lee forever!'.encode('utf-8')
         return self.decrypt(other.encrypt(promise)) == promise
 

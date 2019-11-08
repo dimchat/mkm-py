@@ -74,7 +74,7 @@ class Entity(metaclass=ABCMeta):
     def __eq__(self, other) -> bool:
         if not isinstance(other, Entity):
             return False
-        if super().__eq__(other):
+        if self is other:
             return True
         return self.__identifier == other.identifier
 
