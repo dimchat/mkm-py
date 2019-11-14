@@ -28,6 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
+import weakref
 from abc import ABCMeta
 from typing import Optional
 
@@ -61,7 +62,7 @@ class Entity(metaclass=ABCMeta):
         """
         super().__init__()
         self.__identifier: ID = identifier
-        self.delegate: EntityDataSource = None
+        self.__delegate: weakref.ReferenceType = None
 
     def __str__(self):
         clazz = self.__class__.__name__
@@ -77,6 +78,18 @@ class Entity(metaclass=ABCMeta):
         if self is other:
             return True
         return self.__identifier == other.identifier
+
+    @property
+    def delegate(self) -> Optional[EntityDataSource]:
+        if self.__delegate is not None:
+            return self.__delegate()
+
+    @delegate.setter
+    def delegate(self, value: Optional[EntityDataSource]):
+        if value is None:
+            self.__delegate = None
+        else:
+            self.__delegate = weakref.ref(value)
 
     @property
     def identifier(self) -> ID:
