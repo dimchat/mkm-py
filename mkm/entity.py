@@ -85,7 +85,7 @@ class Entity(metaclass=ABCMeta):
             return self.__delegate()
 
     @delegate.setter
-    def delegate(self, value: Optional[EntityDataSource]):
+    def delegate(self, value: EntityDataSource):
         if value is None:
             self.__delegate = None
         else:
@@ -112,9 +112,9 @@ class Entity(metaclass=ABCMeta):
         profile = self.profile
         if profile is not None:
             name = profile.name
-            if name is not None:
+            if name is not None and len(name) > 0:
                 return name
-        # get from identifier
+        # get ID.name
         return self.__identifier.name
 
     @property

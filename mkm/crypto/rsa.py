@@ -23,17 +23,18 @@
 # SOFTWARE.
 # ==============================================================================
 
-from typing import Optional
+from typing import Optional, Union
 
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from Crypto.Signature import PKCS1_v1_5 as Signature_PKCS1_v1_5
 
+from .cryptography import EncryptKey, DecryptKey
 from .asymmetric import PublicKey, PrivateKey
 
 
-class RSAPublicKey(PublicKey):
+class RSAPublicKey(PublicKey, EncryptKey):
     """ RSA Public Key """
 
     def __new__(cls, key: dict):
@@ -59,17 +60,22 @@ class RSAPublicKey(PublicKey):
         super().__init__(key)
         # data in 'PEM' format
         data = key['data']
-        self.key = RSA.importKey(data)
-        self.data = self.key.exportKey(format='DER')
+        rsa_key = RSA.importKey(data)
+        self.__key = rsa_key
+        self.__data = rsa_key.exportKey(format='DER')
+
+    @property
+    def data(self) -> bytes:
+        return self.__data
 
     def encrypt(self, data: bytes) -> bytes:
         # noinspection PyTypeChecker
-        cipher = Cipher_PKCS1_v1_5.new(self.key)
+        cipher = Cipher_PKCS1_v1_5.new(self.__key)
         return cipher.encrypt(data)
 
     def verify(self, data: bytes, signature: bytes) -> bool:
         hash_obj = SHA256.new(data)
-        verifier = Signature_PKCS1_v1_5.new(self.key)
+        verifier = Signature_PKCS1_v1_5.new(self.__key)
         try:
             # noinspection PyTypeChecker
             return verifier.verify(hash_obj, signature)
@@ -78,7 +84,7 @@ class RSAPublicKey(PublicKey):
             return False
 
 
-class RSAPrivateKey(PrivateKey):
+class RSAPrivateKey(PrivateKey, DecryptKey):
     """ RSA Private Key """
 
     def __new__(cls, key: dict):
@@ -120,7 +126,13 @@ class RSAPrivateKey(PrivateKey):
                 pos1 = data.find(tag1)
                 data = data[pos1: pos2 + len(tag2)]
         # create key
-        self.key = RSA.importKey(data)
+        rsa_key = RSA.importKey(data)
+        self.__key = rsa_key
+        self.__data = rsa_key.exportKey(format='DER')
+
+    @property
+    def data(self) -> bytes:
+        return self.__data
 
     @property
     def size(self):
@@ -131,8 +143,8 @@ class RSAPrivateKey(PrivateKey):
             return int(bits)
 
     @property
-    def public_key(self) -> PublicKey:
-        pk = self.key.publickey()
+    def public_key(self) -> Union[PublicKey, EncryptKey]:
+        pk = self.__key.publickey()
         data = pk.exportKey()
         info = {
             'algorithm': PublicKey.RSA,
@@ -145,7 +157,7 @@ class RSAPrivateKey(PrivateKey):
 
     # noinspection PyTypeChecker
     def decrypt(self, data: bytes) -> Optional[bytes]:
-        cipher = Cipher_PKCS1_v1_5.new(self.key)
+        cipher = Cipher_PKCS1_v1_5.new(self.__key)
         sentinel = ''
         # noinspection PyArgumentList
         plaintext = cipher.decrypt(data, sentinel)
@@ -155,7 +167,7 @@ class RSAPrivateKey(PrivateKey):
 
     def sign(self, data: bytes) -> bytes:
         hash_obj = SHA256.new(data)
-        signer = Signature_PKCS1_v1_5.new(self.key)
+        signer = Signature_PKCS1_v1_5.new(self.__key)
         return signer.sign(hash_obj)
 
 

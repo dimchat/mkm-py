@@ -45,7 +45,7 @@ class File:
     def __init__(self, path: str):
         super().__init__()
         self.__path = path
-        self.__data: Union[bytes, str] = None
+        self.__data: Union[bytes, str, None] = None
 
     @classmethod
     def exists(cls, path: str) -> bool:
@@ -121,7 +121,7 @@ class JSONFile(TextFile):
 
     def __init__(self, path: str):
         super().__init__(path=path)
-        self.__container: Union[dict, list] = None
+        self.__container: Union[dict, list, None] = None
 
     def read(self, **kwargs) -> Union[dict, list, None]:
         if self.__container is not None:

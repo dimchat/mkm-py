@@ -23,7 +23,8 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
+from typing import Optional
 
 
 class CryptographyKey(dict, metaclass=ABCMeta):
@@ -39,10 +40,67 @@ class CryptographyKey(dict, metaclass=ABCMeta):
         }
     """
 
-    def __init__(self, key: dict):
-        if self is key:
-            # no need to init again
-            return
-        super().__init__(key)
-        # process key data in subclass
-        self.data: bytes = None
+    @property
+    @abstractmethod
+    def data(self) -> bytes:
+        """
+        Get key data
+
+        :return: key data
+        """
+        raise NotImplemented
+
+
+class EncryptKey(metaclass=ABCMeta):
+
+    @abstractmethod
+    def encrypt(self, data: bytes) -> bytes:
+        """
+        ciphertext = encrypt(plaintext, PW)
+        ciphertext = encrypt(plaintext, PK)
+
+        :param data: plaintext
+        :return:     ciphertext
+        """
+        raise NotImplemented
+
+
+class DecryptKey(metaclass=ABCMeta):
+
+    @abstractmethod
+    def decrypt(self, data: bytes) -> Optional[bytes]:
+        """
+        plaintext = decrypt(ciphertext, PW);
+        plaintext = decrypt(ciphertext, SK);
+
+        :param data: ciphertext
+        :return:     plaintext
+        """
+        raise NotImplemented
+
+
+class SignKey(metaclass=ABCMeta):
+
+    @abstractmethod
+    def sign(self, data: bytes) -> bytes:
+        """
+        signature = sign(data, SK);
+
+        :param data: message data
+        :return:     signature
+        """
+        raise NotImplemented
+
+
+class VerifyKey(metaclass=ABCMeta):
+
+    @abstractmethod
+    def verify(self, data: bytes, signature: bytes) -> bool:
+        """
+        OK = verify(data, signature, PK)
+
+        :param data:      message data
+        :param signature: signature of message data
+        :return:          True on signature matched
+        """
+        raise NotImplemented

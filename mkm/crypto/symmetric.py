@@ -23,13 +23,12 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABCMeta, abstractmethod
-from typing import Optional
+from abc import ABC
 
-from .cryptography import CryptographyKey
+from .cryptography import CryptographyKey, EncryptKey, DecryptKey
 
 
-class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
+class SymmetricKey(CryptographyKey, EncryptKey, DecryptKey, ABC):
     """This class is used to encrypt or decrypt message data
 
         Symmetric Cryptography Key
@@ -77,26 +76,6 @@ class SymmetricKey(CryptographyKey, metaclass=ABCMeta):
         other = SymmetricKey(other)
         promise = 'Moky loves May Lee forever!'.encode('utf-8')
         return self.decrypt(other.encrypt(promise)) == promise
-
-    @abstractmethod
-    def encrypt(self, data: bytes) -> bytes:
-        """
-        ciphertext = encrypt(plaintext, PW)
-
-        :param data: plaintext
-        :return:     ciphertext
-        """
-        pass
-
-    @abstractmethod
-    def decrypt(self, data: bytes) -> Optional[bytes]:
-        """
-        plaintext = decrypt(ciphertext, PW);
-
-        :param data: ciphertext
-        :return:     plaintext
-        """
-        pass
 
     #
     #   Runtime

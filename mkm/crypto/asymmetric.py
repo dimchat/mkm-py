@@ -23,19 +23,19 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABCMeta, abstractmethod
-from typing import Optional
+from abc import ABC, abstractmethod
+from typing import Union
 
-from .cryptography import CryptographyKey
+from .cryptography import CryptographyKey, VerifyKey, SignKey, EncryptKey
 
 
-class AsymmetricKey(CryptographyKey, metaclass=ABCMeta):
+class AsymmetricKey(CryptographyKey, ABC):
 
     RSA = 'RSA'
     ECC = 'ECC'
 
 
-class PublicKey(AsymmetricKey, metaclass=ABCMeta):
+class PublicKey(AsymmetricKey, VerifyKey, ABC):
     """This class is used to en/decrypt symmetric key or sign/verify signature with message data
 
         Asymmetric Cryptography Public Key
@@ -84,27 +84,6 @@ class PublicKey(AsymmetricKey, metaclass=ABCMeta):
         signature = private_key.sign(promise)
         return self.verify(promise, signature)
 
-    @abstractmethod
-    def encrypt(self, data: bytes) -> bytes:
-        """
-        ciphertext = encrypt(plaintext, PK)
-
-        :param data: plaintext
-        :return:     ciphertext
-        """
-        pass
-
-    @abstractmethod
-    def verify(self, data: bytes, signature: bytes) -> bool:
-        """
-        OK = verify(data, signature, PK)
-
-        :param data:      message data
-        :param signature: signature of message data
-        :return:          True on signature matched
-        """
-        pass
-
     #
     #   Runtime
     #
@@ -138,7 +117,7 @@ class PublicKey(AsymmetricKey, metaclass=ABCMeta):
         return cls.__key_classes.get(algorithm)
 
 
-class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
+class PrivateKey(AsymmetricKey, SignKey, ABC):
     """This class is used to decrypt symmetric key or sign message data
 
         Asymmetric Cryptography Private Key
@@ -186,33 +165,14 @@ class PrivateKey(AsymmetricKey, metaclass=ABCMeta):
             return pk.match(private_key=sk)
 
     @property
-    def public_key(self) -> PublicKey:
+    @abstractmethod
+    def public_key(self) -> Union[PublicKey, EncryptKey]:
         """
         Get public key from private key
 
         :return: public key paired to this private key
         """
-        yield None
-
-    @abstractmethod
-    def decrypt(self, data: bytes) -> Optional[bytes]:
-        """
-        plaintext = decrypt(ciphertext, SK);
-
-        :param data: ciphertext
-        :return:     plaintext
-        """
-        pass
-
-    @abstractmethod
-    def sign(self, data: bytes) -> bytes:
-        """
-        signature = sign(data, SK);
-
-        :param data: message data
-        :return:     signature
-        """
-        pass
+        raise NotImplemented
 
     #
     #   Runtime

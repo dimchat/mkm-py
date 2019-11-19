@@ -38,13 +38,14 @@
 import os
 from typing import Optional
 
+from mkm import PublicKey
 from .dos import JSONFile
 from .crypto import PrivateKey
 from .types import NetworkID
 from .identifier import ID
 from .meta import Meta
 from .profile import Profile
-from .user import User, LocalUser
+from .user import User
 from .delegate import UserDataSource
 
 
@@ -181,11 +182,7 @@ class Immortals(UserDataSource):
         # check meta and private key
         meta = self.meta(identifier=identifier)
         if meta is not None:
-            key = self.private_key_for_signature(identifier=identifier)
-            if key is None:
-                user = User(identifier=identifier)
-            else:
-                user = LocalUser(identifier=identifier)
+            user = User(identifier=identifier)
             # cache it in barrack
             user.delegate = self
             self.__users[identifier] = user
@@ -203,14 +200,6 @@ class Immortals(UserDataSource):
     #
     #   UserDataSource
     #
-    def private_key_for_signature(self, identifier: ID) -> Optional[PrivateKey]:
-        return self.__private_keys.get(identifier)
-
-    def private_keys_for_decryption(self, identifier: ID) -> Optional[list]:
-        key = self.__private_keys.get(identifier)
-        if key is not None:
-            return [key]
-
     def contacts(self, identifier: ID) -> Optional[list]:
         if identifier not in self.__ids:
             return None
@@ -220,3 +209,17 @@ class Immortals(UserDataSource):
                 continue
             array.append(value)
         return array
+
+    def public_key_for_encryption(self, identifier: ID) -> PublicKey:
+        pass
+
+    def private_keys_for_decryption(self, identifier: ID) -> Optional[list]:
+        key = self.__private_keys.get(identifier)
+        if key is not None:
+            return [key]
+
+    def private_key_for_signature(self, identifier: ID) -> Optional[PrivateKey]:
+        return self.__private_keys.get(identifier)
+
+    def public_keys_for_verification(self, identifier: ID) -> Optional[list]:
+        pass

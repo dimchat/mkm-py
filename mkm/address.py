@@ -28,7 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
 from .crypto.utils import sha256, ripemd160, base58_encode, base58_decode
 from .types import NetworkID
@@ -76,22 +76,24 @@ class Address(str, metaclass=ABCMeta):
         return super().__new__(cls, address)
 
     @property
+    @abstractmethod
     def network(self) -> NetworkID:
         """
         Get network type of address
 
         :return: NetworkID
         """
-        yield None
+        raise NotImplemented
 
     @property
+    @abstractmethod
     def number(self) -> int:
         """
         Get search number of address
 
         :return: search number [0, 2^32)
         """
-        return 0
+        raise NotImplemented
 
     @property
     def is_broadcast(self) -> bool:

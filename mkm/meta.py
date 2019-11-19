@@ -29,10 +29,10 @@
 # ==============================================================================
 
 from abc import ABCMeta, abstractmethod
-from typing import Optional
+from typing import Optional, Union
 
 from .crypto.utils import base64_encode, base64_decode
-from .crypto import PublicKey, PrivateKey
+from .crypto import PublicKey, PrivateKey, EncryptKey
 
 from .types import NetworkID
 from .address import Address, DefaultAddress
@@ -97,11 +97,10 @@ class Meta(dict, metaclass=ABCMeta):
                 return meta
             # get class by meta version
             clazz = cls.meta_class(version=int(meta['version']))
-            if clazz is not None:
-                assert issubclass(clazz, Meta), '%s must be sub-class of Meta' % clazz
-                return clazz.__new__(clazz, meta)
-            else:
-                raise ModuleNotFoundError('Invalid meta version: %s' % meta)
+            if clazz is None:
+                raise ModuleNotFoundError('meta version not supported: %s' % meta)
+            assert issubclass(clazz, Meta), '%s must be sub-class of Meta' % clazz
+            return clazz.__new__(clazz, meta)
         # subclass
         return super().__new__(cls, meta)
 
@@ -112,10 +111,10 @@ class Meta(dict, metaclass=ABCMeta):
         super().__init__(meta)
         # lazy
         self.__version: int = 0
-        self.__key: PublicKey = None
+        self.__key: Union[PublicKey, EncryptKey, None] = None
         self.__seed: str = None
         self.__fingerprint: bytes = None
-        self.__status: int = 0
+        self.__status: int = 0  # 1 for valid, -1 for invalid
 
     def __eq__(self, other) -> bool:
         """ Check whether they can generate same IDs """
@@ -125,24 +124,46 @@ class Meta(dict, metaclass=ABCMeta):
             return True
         # check with ID
         other = Meta(other)
-        id1 = self.generate_identifier(network=NetworkID.Main)
-        id2 = other.generate_identifier(network=NetworkID.Main)
-        return id1 == id2
+        identifier = other.generate_identifier(network=NetworkID.Main)
+        return self.match_identifier(identifier)
 
     @property
     def version(self) -> int:
+        """
+        Meta algorithm version
+
+            0x01 - username@address
+            0x02 - btc_address
+            0x03 - username@btc_address
+            ...
+
+        :return: version number
+        """
         if self.__version is 0:
             self.__version = int(self['version'])
         return self.__version
 
     @property
-    def key(self) -> PublicKey:
+    def key(self) -> Union[PublicKey, EncryptKey]:
+        """
+        Public key (used for signature)
+
+            RSA
+            ECC
+
+        :return: public key
+        """
         if self.__key is None:
             self.__key = PublicKey(self['key'])
         return self.__key
 
     @property
     def seed(self) -> Optional[str]:
+        """
+        Seed to generate fingerprint
+
+        :return: ID.name
+        """
         if self.__seed is None and (self.version & Meta.Version_MKM):
             # MKM, ExBTC, ExETH, ...
             self.__seed = self['seed']
@@ -150,6 +171,14 @@ class Meta(dict, metaclass=ABCMeta):
 
     @property
     def fingerprint(self) -> Optional[bytes]:
+        """
+        Fingerprint to verify ID and public key
+
+            Build: fingerprint = sign(seed, privateKey)
+            Check: verify(seed, fingerprint, publicKey)
+
+        :return: signature
+        """
         if self.__fingerprint is None and (self.version & Meta.Version_MKM):
             # MKM, ExBTC, ExETH, ...
             self.__fingerprint = base64_decode(self['fingerprint'])
@@ -157,6 +186,12 @@ class Meta(dict, metaclass=ABCMeta):
 
     @property
     def valid(self) -> bool:
+        """
+        Check meta valid
+        (must call this when received a new meta from network)
+
+        :return: True on valid
+        """
         if self.__status is 0:
             key = self.key
             if key is None:
@@ -166,7 +201,10 @@ class Meta(dict, metaclass=ABCMeta):
                 # MKM, ExBTC, ExETH, ...
                 un = self.seed
                 ct = self.fingerprint
-                if un is not None and ct is not None and key.verify(data=un.encode('utf-8'), signature=ct):
+                if un is None or ct is None:
+                    # seed and fingerprint should not be empty
+                    self.__status = -1
+                elif key.verify(data=un.encode('utf-8'), signature=ct):
                     # fingerprint matched
                     self.__status = 1
                 else:
@@ -177,40 +215,77 @@ class Meta(dict, metaclass=ABCMeta):
                 self.__status = 1
         return self.__status == 1
 
+    def match(self, public_key: PublicKey=None, identifier: ID=None, address: Address=None):
+        if public_key is not None:
+            return self.match_public_key(public_key=public_key)
+        elif identifier is not None:
+            return self.match_identifier(identifier=identifier)
+        elif address is not None:
+            return self.match_address(address=address)
+
     def match_public_key(self, public_key: PublicKey) -> bool:
-        """ Check whether match public key """
+        """
+        Check whether match public key
+
+        :param public_key: user's public key
+        :return: True on matched
+        """
         if self.key == public_key:
             return True
         if self.version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
             # check whether keys equal by verifying signature
-            return public_key.verify(data=self.seed.encode('utf-8'), signature=self.fingerprint)
+            un = self.seed
+            ct = self.fingerprint
+            return public_key.verify(data=un.encode('utf-8'), signature=ct)
         else:  # BTC, ETH, ...
-            # ID with BTC/ETH address has no username
-            # so we can just compare the key.data to check matching
+            # NOTICE: ID with BTC/ETH address has no username, so
+            #         just compare the key.data to check matching
             return False
 
     def match_identifier(self, identifier: ID) -> bool:
-        """ Check ID(name+address) with meta info """
+        """
+        Check ID(name+address) with meta info
+        (must call this when received a new meta from network)
+
+        :param identifier: user ID
+        :return: True on matched
+        """
         if identifier is None:
             return False
         return self.generate_identifier(identifier.address.network) == identifier
 
     def match_address(self, address: Address) -> bool:
-        """ Check address with meta info """
+        """
+        Check address with meta info
+
+        :param address: user's ID.address
+        :return: True on matched
+        """
         if address is None:
             return False
         return self.generate_address(network=address.network) == address
 
-    def generate_identifier(self, network: NetworkID) -> Optional[ID]:
-        """ Generate ID with meta info and network ID """
+    def generate_identifier(self, network: NetworkID) -> ID:
+        """
+        Generate ID with meta info and network ID
+
+        :param network: ID type
+        :return: ID object
+        """
         address = self.generate_address(network=network)
         if address is not None:
             return ID.new(name=self.seed, address=address)
 
     @abstractmethod
-    def generate_address(self, network: NetworkID) -> Optional[Address]:
-        """ Generate address with meta info and network ID """
-        pass
+    def generate_address(self, network: NetworkID) -> Address:
+        """
+        Generate address with meta info and network ID
+
+        :param network: address type
+        :return: Address object
+        """
+        # NOTICE: must check meta valid before generate address
+        raise NotImplemented
 
     #
     #  Factories
@@ -319,10 +394,10 @@ class Meta(dict, metaclass=ABCMeta):
 
 class DefaultMeta(Meta):
 
-    def generate_address(self, network: NetworkID) -> Optional[Address]:
+    def generate_address(self, network: NetworkID) -> Address:
         assert self.version == Meta.Version_MKM, 'meta version error: %d' % self.version
-        if self.valid:
-            return DefaultAddress.new(data=self.fingerprint, network=network)
+        assert self.valid, 'meta not valid: %s' % self
+        return DefaultAddress.new(data=self.fingerprint, network=network)
 
 
 # register meta class with version

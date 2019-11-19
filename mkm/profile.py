@@ -29,10 +29,10 @@
 # ==============================================================================
 
 import json
-from typing import Optional
+from typing import Optional, Any, Union
 
 from .crypto.utils import base64_decode, base64_encode
-from .crypto import PublicKey, PrivateKey
+from .crypto import PublicKey, EncryptKey, VerifyKey, SignKey
 from .identifier import ID
 
 
@@ -54,9 +54,8 @@ class TAI(dict):
         self.__identifier: str = None
         self.__data: bytes = None
         self.__signature: bytes = None
-        # protected
-        self._properties: dict = {}
-        self._valid: bool = False
+        self.__properties: dict = None
+        self.__status: int = 0  # 1 for valid, -1 for invalid
 
     @property
     def identifier(self) -> str:
@@ -85,7 +84,7 @@ class TAI(dict):
 
     @property
     def valid(self) -> bool:
-        return self._valid
+        return self.__status >= 0
 
     """
         Profile Properties
@@ -93,68 +92,93 @@ class TAI(dict):
         Inner dictionary
     """
 
-    def get_property(self, key: str) -> Optional[object]:
-        if self._valid:
-            return self._properties.get(key)
+    def properties(self) -> Optional[dict]:
+        """ Load properties from data """
+        if self.__status == -1:
+            # invalid
+            return None
+        if self.__properties is None:
+            data = self.data
+            if data is None:
+                # create new properties
+                self.__properties = {}
+            else:
+                # get properties from data
+                self.__properties = json.loads(data)
+                assert isinstance(self.__properties, dict)
+        return self.__properties
 
-    def set_property(self, key: str, value: object=None):
+    def get_property(self, key: str) -> Optional[Any]:
+        """
+        Get profile property data with key
+
+        :param key: property key
+        :return: property value
+        """
+        properties = self.properties()
+        if properties is None:
+            return None
+        return properties.get(key)
+
+    def set_property(self, key: str, value: Any=None):
+        """
+        Update profile property with key and data
+        (this will reset 'data' and 'signature')
+
+        :param key:   property key
+        :param value: property value
+        """
+        self.__status = 0
+        properties = self.properties()
         if value is None:
-            self._properties.pop(key, None)
+            properties.pop(key, None)
         else:
-            self._properties[key] = value
-        self._reset()
-
-    def _reset(self):
-        """ Reset data signature after properties changed """
+            properties[key] = value
+        # clear data signature after properties changed
         self.pop('data', None)
         self.pop('signature', None)
         self.__data = None
         self.__signature = None
-        self._valid = False
 
     """
         Sign/Verify profile data
         ~~~~~~~~~~~~~~~~~~~~~~~~
     """
 
-    def verify(self, public_key: PublicKey) -> bool:
+    def verify(self, public_key: VerifyKey) -> bool:
         """
-        Verify 'data' and 'signature', if OK, refresh properties from 'data'
+        Verify 'data' and 'signature' with public key
 
         :param public_key: public key in meta.key
         :return: True on signature matched
         """
-        if self._valid:
-            # already verify
+        if self.__status == 1:
+            # already verify OK
             return True
         data = self.data
         signature = self.signature
         if data is None or signature is None:
             # data error
-            return False
-        if public_key.verify(data, signature):
+            self.__status = -1
+        elif public_key.verify(data, signature):
             # signature matched
-            self._valid = True
-            # refresh properties
-            dictionary = json.loads(data)
-            if isinstance(dictionary, dict):
-                self._properties = dictionary
-            else:
-                self._properties = {}
-        return self._valid
+            self.__status = 1
+        # NOTICE: if status is 0, it doesn't mean the profile is invalid,
+        #         try another key
+        return self.__status == 1
 
-    def sign(self, private_key: PrivateKey) -> bytes:
+    def sign(self, private_key: SignKey) -> bytes:
         """
         Encode properties to 'data' and sign it to 'signature'
 
         :param private_key: private key match meta.key
         :return: signature
         """
-        if self._valid:
+        if self.__status == 1:
             # already signed
             return self.__signature
-        self._valid = True
-        data: str = json.dumps(self._properties)
+        self.__status = 1
+        data: str = json.dumps(self.properties())
         self.__data = data.encode('utf-8')
         self.__signature = private_key.sign(self.__data)
         self['data'] = data  # JsON string
@@ -181,33 +205,25 @@ class Profile(TAI):
             return
         super().__init__(profile)
         # lazy
-        self.__key: PublicKey = None
-
-    def _reset(self):
-        super()._reset()
-        self.__key = None
+        self.__key: Union[PublicKey, EncryptKey, None] = None
 
     """
         Public Key for encryption
         ~~~~~~~~~~~~~~~~~~~~~~~~~
-        For safety considerations, the profile.key which used to encrypt message data should be different with meta.key
+        For safety considerations, the profile.key which used to encrypt message data
+        should be different with meta.key
     """
 
-    def verify(self, public_key: PublicKey) -> bool:
-        if self._valid:
-            # already verify
-            return True
-        if super().verify(public_key=public_key):
-            # get public key
-            self.__key = PublicKey(self._properties.get('key'))
-            return True
-
     @property
-    def key(self) -> Optional[PublicKey]:
+    def key(self) -> Union[PublicKey, EncryptKey, None]:
+        if self.__key is None:
+            key = self.get_property(key='key')
+            if key is not None:
+                self.__key = PublicKey(key=key)
         return self.__key
 
     @key.setter
-    def key(self, value: PublicKey):
+    def key(self, value: Union[PublicKey, EncryptKey]):
         self.__key = value
         self.set_property('key', value)
 
@@ -215,12 +231,18 @@ class Profile(TAI):
         Name
         ~~~~
         Nickname for user
-        Group name for group
+        Title for group
     """
 
     @property
     def name(self) -> Optional[str]:
-        return self.get_property(key='name')
+        value = self.get_property(key='name')
+        if value is not None:
+            return value
+        # get from 'names'
+        array = self.get_property(key='names')
+        if array is not None and len(array) > 0:
+            return array[0]
 
     @name.setter
     def name(self, value: str):

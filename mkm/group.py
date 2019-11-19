@@ -39,7 +39,6 @@ from typing import Optional
 
 from .identifier import ID
 from .entity import Entity
-from .profile import Profile
 from .delegate import GroupDataSource
 
 
@@ -62,36 +61,26 @@ class Group(Entity):
         # once the group founder is set, it will never change
         self.__founder: ID = None
 
-    @property
-    def profile(self) -> Optional[Profile]:
-        profile = super().profile
-        if profile is not None:
-            if profile.valid:
-                # no need to verify
-                return profile
-            # try to verify with owner's meta.key
-            owner = self.owner
-            if owner is not None:
-                meta = self.delegate.meta(identifier=owner)
-                if meta is not None and profile.verify(public_key=meta.key):
-                    # signature correct
-                    return profile
-            # profile error? continue to process by subclass
-            return profile
+    @Entity.delegate.getter
+    def delegate(self) -> Optional[GroupDataSource]:
+        facebook = super().delegate
+        assert facebook is None or isinstance(facebook, GroupDataSource), 'error: %s' % facebook
+        return facebook
+
+    # @delegate.setter
+    # def delegate(self, value: GroupDataSource):
+    #     super(Group, Group).delegate.__set__(self, value)
 
     @property
     def founder(self) -> Optional[ID]:
         if self.__founder is None:
-            assert isinstance(self.delegate, GroupDataSource), 'group delegate error: %s' % self.delegate
             self.__founder = self.delegate.founder(identifier=self.identifier)
         return self.__founder
 
     @property
     def owner(self) -> Optional[ID]:
-        assert isinstance(self.delegate, GroupDataSource), 'group delegate error: %s' % self.delegate
         return self.delegate.owner(identifier=self.identifier)
 
     @property
     def members(self) -> Optional[list]:
-        assert isinstance(self.delegate, GroupDataSource), 'group delegate error: %s' % self.delegate
         return self.delegate.members(identifier=self.identifier)

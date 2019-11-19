@@ -33,6 +33,7 @@ from .utils import base64_encode, base64_decode
 
 
 def pkcs7_pad(data: bytes, block_size: int) -> bytes:
+    assert data is not None, 'data cannot be None'
     amount = block_size - len(data) % block_size
     if amount == 0:
         amount = block_size
@@ -41,8 +42,9 @@ def pkcs7_pad(data: bytes, block_size: int) -> bytes:
 
 
 def pkcs7_unpad(data: bytes) -> bytes:
+    assert data is not None and len(data) > 0, 'data empty'
     amount = data[-1]
-    # assert len(data) >= amount
+    assert len(data) >= amount
     return data[:-amount]
 
 
@@ -90,8 +92,12 @@ class AESKey(SymmetricKey):
             self['iv'] = base64_encode(iv)
         else:
             iv = base64_decode(iv)
-        self.data = data
+        self.__data = data
         self.iv = iv
+
+    @property
+    def data(self) -> bytes:
+        return self.__data
 
     @property
     def size(self) -> int:

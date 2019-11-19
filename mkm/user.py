@@ -30,9 +30,8 @@
 
 from typing import Optional
 
-from .crypto import PublicKey, PrivateKey
+from .crypto import EncryptKey, DecryptKey, SignKey, VerifyKey
 from .entity import Entity
-from .profile import Profile
 from .delegate import UserDataSource
 
 
@@ -42,86 +41,24 @@ class User(Entity):
         User for communication
         ~~~~~~~~~~~~~~~~~~~~~~
 
-            functions:
-                verify(data, signature) - verify (encrypted content) data and signature
-                encrypt(data)           - encrypt (symmetric key) data
+        functions:
+            (User)
+            1. verify(data, signature) - verify (encrypted content) data and signature
+            2. encrypt(data)           - encrypt (symmetric key) data
+            (LocalUser)
+            3. sign(data)    - calculate signature of (encrypted content) data
+            4. decrypt(data) - decrypt (symmetric key) data
     """
 
-    def __meta_key(self) -> PublicKey:
-        meta = self.meta
-        if meta is not None:
-            return meta.key
+    @Entity.delegate.getter
+    def delegate(self) -> Optional[UserDataSource]:
+        facebook = super().delegate
+        assert facebook is None or isinstance(facebook, UserDataSource), 'error: %s' % facebook
+        return facebook
 
-    def __profile_key(self) -> Optional[PublicKey]:
-        profile = self.profile
-        if profile is not None:
-            return profile.key
-
-    @property
-    def profile(self) -> Optional[Profile]:
-        tai = super().profile
-        if tai is not None:
-            if tai.valid:
-                # no need to verify
-                return tai
-            # try to verify with meta.key
-            key = self.__meta_key()
-            if tai.verify(public_key=key):
-                # signature correct
-                return tai
-            # profile error? continue to process by subclass
-            return tai
-
-    def verify(self, data: bytes, signature: bytes) -> bool:
-        """Verify data with signature, use meta.key
-
-        :param data:
-        :param signature:
-        :return:
-        """
-        # # 1. get public key from profile
-        # key = self.__profile_key()
-        # if key is not None and key.verify(data=data, signature=signature):
-        #     return True
-        # 2. get public key from meta
-        key = self.__meta_key()
-        # 3. verify it
-        return key.verify(data=data, signature=signature)
-
-    def encrypt(self, data: bytes) -> bytes:
-        """Encrypt data, try profile.key first, if not found, use meta.key
-
-        :param data: plaintext
-        :return: ciphertext
-        """
-        # 1. get key for encryption from profile
-        key = self.__profile_key()
-        if key is None:
-            # 2. get key for encryption from meta instead
-            # NOTICE: meta.key will never changed, so use profile.key to encrypt is the better way
-            key = self.__meta_key()
-        # 3. encrypt it
-        return key.encrypt(data=data)
-
-
-class LocalUser(User):
-    """This class is for creating local user
-
-        User for communication
-        ~~~~~~~~~~~~~~~~~~~~~~
-
-            functions:
-                sign(data)    - calculate signature of (encrypted content) data
-                decrypt(data) - decrypt (symmetric key) data
-    """
-
-    def __sign_key(self) -> PrivateKey:
-        assert isinstance(self.delegate, UserDataSource), 'user delegate error: %s' % self.delegate
-        return self.delegate.private_key_for_signature(identifier=self.identifier)
-
-    def __decrypt_keys(self) -> list:
-        assert isinstance(self.delegate, UserDataSource), 'user delegate error: %s' % self.delegate
-        return self.delegate.private_keys_for_decryption(identifier=self.identifier)
+    # @delegate.setter
+    # def delegate(self, value: UserDataSource):
+    #     super(User, User).delegate.__set__(self, value)
 
     @property
     def contacts(self) -> Optional[list]:
@@ -130,8 +67,92 @@ class LocalUser(User):
 
         :return: contacts list
         """
-        assert isinstance(self.delegate, UserDataSource), 'user delegate error: %s' % self.delegate
         return self.delegate.contacts(identifier=self.identifier)
+
+    def __meta_key(self) -> VerifyKey:
+        meta = self.meta
+        assert meta is not None, 'failed to get meta for user: %s' % self.identifier
+        return meta.key
+
+    def __profile_key(self) -> Optional[EncryptKey]:
+        profile = self.profile
+        if profile is None or not profile.valid:
+            # profile not found or not valid
+            return None
+        return profile.key
+
+    # NOTICE: meta.key will never changed, so use profile.key to encrypt
+    #         is the better way
+    def __encrypt_key(self) -> EncryptKey:
+        # 0. get key from data source
+        key = self.delegate.public_key_for_encryption(identifier=self.identifier)
+        if key is not None:
+            return key
+        # 1. get key from profile
+        key = self.__profile_key()
+        if key is not None:
+            return key
+        # 2. get key from meta
+        key = self.__meta_key()
+        if isinstance(key, EncryptKey):
+            return key
+        raise LookupError('failed to get encrypt key for user: %s' % self.identifier)
+
+    # NOTICE: I suggest using the private key paired with meta.key to sign message
+    #         so here should return the meta.key
+    def __verify_keys(self) -> list:
+        # 0. get keys from data source
+        keys = self.delegate.public_keys_for_verification(identifier=self.identifier)
+        if keys is not None and len(keys) > 0:
+            return keys
+        keys = []
+        # # 1. get key from profile
+        # key = self.__profile_key()
+        # if isinstance(key, VerifyKey):
+        #     keys.append(key)
+        # 2. get key from meta
+        key = self.__meta_key()
+        assert key is not None, 'meta.key not found: %s' % self.identifier
+        keys.append(key)
+        return keys
+
+    def verify(self, data: bytes, signature: bytes) -> bool:
+        """
+        Verify data and signature with user's public keys
+
+        :param data:
+        :param signature:
+        :return:
+        """
+        keys = self.__verify_keys()
+        for key in keys:
+            if key.verify(data=data, signature=signature):
+                # matched!
+                return True
+
+    def encrypt(self, data: bytes) -> bytes:
+        """Encrypt data, try profile.key first, if not found, use meta.key
+
+        :param data: plaintext
+        :return: ciphertext
+        """
+        key = self.__encrypt_key()
+        assert key is not None, 'failed to get encrypt key for user: %s' % self.identifier
+        return key.encrypt(data=data)
+
+    #
+    #   interfaces for local user
+    #
+
+    # NOTICE: I suggest use the private key which paired to meta.key
+    #         to sign message
+    def __sign_key(self) -> SignKey:
+        return self.delegate.private_key_for_signature(identifier=self.identifier)
+
+    # NOTICE: if you provide a public key in profile for encryption
+    #         here you should return the private key paired with profile.key
+    def __decrypt_keys(self) -> list:
+        return self.delegate.private_keys_for_decryption(identifier=self.identifier)
 
     def sign(self, data: bytes) -> bytes:
         """
@@ -141,6 +162,7 @@ class LocalUser(User):
         :return: signature
         """
         key = self.__sign_key()
+        assert key is not None, 'failed to get sign key for user: %s' % self.identifier
         return key.sign(data=data)
 
     def decrypt(self, data: bytes) -> Optional[bytes]:
@@ -151,9 +173,11 @@ class LocalUser(User):
         :return: plaintext
         """
         keys = self.__decrypt_keys()
-        # try decrypting it with each private key
+        assert keys is not None and len(keys) > 0, 'failed to get decrypt keys: %s' % self.identifier
         for key in keys:
+            assert isinstance(key, DecryptKey), 'decrypt key error: %s' % key
             try:
+                # try decrypting it with each private key
                 plaintext = key.decrypt(data=data)
                 if plaintext is not None:
                     # OK!

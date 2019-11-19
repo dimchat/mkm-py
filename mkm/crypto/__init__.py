@@ -30,6 +30,7 @@
     Crypto Keys: SymmetricKey, PrivateKey, PublicKey
 """
 
+from .cryptography import SignKey, VerifyKey, EncryptKey, DecryptKey
 from .symmetric import SymmetricKey
 from .asymmetric import PrivateKey, PublicKey
 
@@ -39,6 +40,7 @@ from .rsa import RSAPublicKey, RSAPrivateKey
 
 __all__ = [
     # Crypto
+    'SignKey', 'VerifyKey', 'EncryptKey', 'DecryptKey',
     'SymmetricKey',
     'PrivateKey', 'PublicKey',
 ]

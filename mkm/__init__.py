@@ -36,7 +36,7 @@ from .identifier import ID, ANYONE, EVERYONE
 from .meta import Meta
 from .profile import Profile
 from .entity import Entity
-from .user import User, LocalUser
+from .user import User
 from .group import Group
 from .delegate import EntityDataSource, UserDataSource, GroupDataSource
 
@@ -51,7 +51,7 @@ __all__ = [
 
     # entity
     'NetworkID', 'Address', 'ID', 'Meta', 'Profile',
-    'Entity', 'User', 'LocalUser', 'Group',
+    'Entity', 'User', 'Group',
 
     # delegate
     'EntityDataSource', 'UserDataSource', 'GroupDataSource',

@@ -31,7 +31,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Optional
 
-from .crypto import PrivateKey
+from .crypto import EncryptKey, SignKey
 from .identifier import ID
 from .meta import Meta
 from .profile import Profile
@@ -57,7 +57,7 @@ class EntityDataSource(metaclass=ABCMeta):
         :param identifier: entity ID
         :return:           meta info
         """
-        pass
+        raise NotImplemented
 
     @abstractmethod
     def profile(self, identifier: ID) -> Optional[Profile]:
@@ -67,39 +67,27 @@ class EntityDataSource(metaclass=ABCMeta):
         :param identifier: entity ID
         :return:           profile info
         """
-        pass
+        raise NotImplemented
 
 
 class UserDataSource(EntityDataSource):
-    """This interface is for getting private information for local user
+    """This interface is for getting information for user
 
-        Local User Data Source
-        ~~~~~~~~~~~~~~~~~~~~~~
+        User Data Source
+        ~~~~~~~~~~~~~~~~
 
-        1. private key for signature, is the key matching with meta.key;
-        2. private key for decryption, is the key matching with profile.key,
-           if profile.key not exists, means it is the same key pair with meta.key
+        (Encryption/decryption)
+        1. public key for encryption
+           if profile.key not exists, means it is the same key with meta.key
+        2. private keys for decryption
+           the private keys paired with [profile.key, meta.key]
+
+        (Signature/Verification)
+        3. private key for signature
+           the private key paired with meta.key
+        4. public keys for verification
+           [meta.key]
     """
-
-    @abstractmethod
-    def private_key_for_signature(self, identifier: ID) -> Optional[PrivateKey]:
-        """
-        Get user's private key for signature
-
-        :param identifier: user ID
-        :return: private key
-        """
-        pass
-
-    @abstractmethod
-    def private_keys_for_decryption(self, identifier: ID) -> Optional[list]:
-        """
-        Get user's private keys for decryption
-
-        :param identifier: user ID
-        :return: private keys
-        """
-        pass
 
     @abstractmethod
     def contacts(self, identifier: ID) -> Optional[list]:
@@ -107,9 +95,53 @@ class UserDataSource(EntityDataSource):
         Get user's contacts list
 
         :param identifier: user ID
-        :return: contacts list (ID)
+        :return: contact ID list
         """
-        pass
+        raise NotImplemented
+
+    @abstractmethod
+    def public_key_for_encryption(self, identifier: ID) -> EncryptKey:
+        """
+        Get user's public key for encryption
+        (profile.key or meta.key)
+
+        :param identifier: user ID
+        :return: public key
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def private_keys_for_decryption(self, identifier: ID) -> Optional[list]:
+        """
+        Get user's private keys for decryption
+        (which paired with [profile.key, meta.key])
+
+        :param identifier: user ID
+        :return: private keys
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def private_key_for_signature(self, identifier: ID) -> Optional[SignKey]:
+        """
+        Get user's private key for signature
+        (which paired with profile.key or meta.key)
+
+        :param identifier: user ID
+        :return: private key
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def public_keys_for_verification(self, identifier: ID) -> list:
+        """
+        Get user's public keys for verification
+        [profile.key, meta.key]
+
+        :param identifier: user ID
+        :return: public keys
+        """
+        raise NotImplemented
 
 
 class GroupDataSource(EntityDataSource):
@@ -124,15 +156,30 @@ class GroupDataSource(EntityDataSource):
 
     @abstractmethod
     def founder(self, identifier: ID) -> Optional[ID]:
-        """ Get founder of the group """
-        pass
+        """
+        Get founder of the group
+
+        :param identifier: group ID
+        :return: founder ID
+        """
+        raise NotImplemented
 
     @abstractmethod
     def owner(self, identifier: ID) -> Optional[ID]:
-        """ Get current owner of the group """
-        pass
+        """
+        Get current owner of the group
+
+        :param identifier: group ID
+        :return: owner ID
+        """
+        raise NotImplemented
 
     @abstractmethod
     def members(self, identifier: ID) -> Optional[list]:
-        """ Get all members in the group """
-        pass
+        """
+        Get all members in the group
+
+        :param identifier: group ID
+        :return: member ID list
+        """
+        raise NotImplemented

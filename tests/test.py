@@ -272,7 +272,7 @@ class AccountTestCase(unittest.TestCase):
         id2 = ID(hulk_id)
         sk2 = immortals.private_key_for_signature(identifier=id2)
 
-        user2 = LocalUser(id2)
+        user2 = User(id2)
         user2.delegate = immortals
 
         print('user2: ', user2)
