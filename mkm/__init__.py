@@ -28,6 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
+from .crypto import SignKey, VerifyKey, EncryptKey, DecryptKey
 from .crypto import SymmetricKey, PrivateKey, PublicKey
 
 from .types import NetworkID
@@ -47,6 +48,7 @@ __author__ = 'Albert Moky'
 __all__ = [
 
     # crypto
+    'SignKey', 'VerifyKey', 'EncryptKey', 'DecryptKey',
     'SymmetricKey', 'PrivateKey', 'PublicKey',
 
     # entity

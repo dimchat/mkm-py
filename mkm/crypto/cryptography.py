@@ -48,7 +48,7 @@ class CryptographyKey(dict, metaclass=ABCMeta):
 
         :return: key data
         """
-        raise NotImplemented
+        pass
 
 
 class EncryptKey(metaclass=ABCMeta):

@@ -67,7 +67,7 @@ class EntityDataSource(metaclass=ABCMeta):
         :param identifier: entity ID
         :return:           profile info
         """
-        raise NotImplemented
+        pass
 
 
 class UserDataSource(EntityDataSource):
@@ -97,10 +97,10 @@ class UserDataSource(EntityDataSource):
         :param identifier: user ID
         :return: contact ID list
         """
-        raise NotImplemented
+        pass
 
     @abstractmethod
-    def public_key_for_encryption(self, identifier: ID) -> EncryptKey:
+    def public_key_for_encryption(self, identifier: ID) -> Optional[EncryptKey]:
         """
         Get user's public key for encryption
         (profile.key or meta.key)
@@ -108,7 +108,7 @@ class UserDataSource(EntityDataSource):
         :param identifier: user ID
         :return: public key
         """
-        raise NotImplemented
+        pass
 
     @abstractmethod
     def private_keys_for_decryption(self, identifier: ID) -> Optional[list]:
@@ -133,7 +133,7 @@ class UserDataSource(EntityDataSource):
         raise NotImplemented
 
     @abstractmethod
-    def public_keys_for_verification(self, identifier: ID) -> list:
+    def public_keys_for_verification(self, identifier: ID) -> Optional[list]:
         """
         Get user's public keys for verification
         [profile.key, meta.key]
@@ -141,7 +141,7 @@ class UserDataSource(EntityDataSource):
         :param identifier: user ID
         :return: public keys
         """
-        raise NotImplemented
+        pass
 
 
 class GroupDataSource(EntityDataSource):
@@ -162,7 +162,7 @@ class GroupDataSource(EntityDataSource):
         :param identifier: group ID
         :return: founder ID
         """
-        raise NotImplemented
+        pass
 
     @abstractmethod
     def owner(self, identifier: ID) -> Optional[ID]:
@@ -172,7 +172,7 @@ class GroupDataSource(EntityDataSource):
         :param identifier: group ID
         :return: owner ID
         """
-        raise NotImplemented
+        pass
 
     @abstractmethod
     def members(self, identifier: ID) -> Optional[list]:
@@ -182,4 +182,4 @@ class GroupDataSource(EntityDataSource):
         :param identifier: group ID
         :return: member ID list
         """
-        raise NotImplemented
+        pass
