@@ -128,9 +128,9 @@ class Address(ABC):
     @classmethod
     def address_classes(cls) -> list:
         """
-        Get content class with type
+        Get all address classes
 
-        :return: all address classes
+        :return: address class list
         """
         return cls.__address_classes
 

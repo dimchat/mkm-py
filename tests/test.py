@@ -290,6 +290,16 @@ class AccountTestCase(unittest.TestCase):
         ok = user2.verify(data, sig)
         self.assertTrue(ok, 'signature error')
 
+    def test_profile(self):
+        print('\n---------------- %s' % self)
+
+        id1 = ID(moki_id)
+        profile = immortals.profile(identifier=id1)
+        print('profile: ', profile)
+
+        profile2 = Profile.new(identifier=id1)
+        print('profile2: ' , profile2)
+
 
 if __name__ == '__main__':
     unittest.main()

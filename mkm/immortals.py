@@ -105,29 +105,18 @@ class Immortals(UserDataSource):
         if profile is None:
             return None
         assert profile.identifier == identifier, 'profile ID not match: %s, %s' % (identifier, profile)
-        if self.verify_profile(profile=profile):
-            # profile contains signature
-            return profile
-        key = self.private_key_for_signature(identifier=identifier)
-        if key is None:
-            # profile not signed yet
-            return profile
         # copy 'name'
         name = profile.get('name')
         if name is None:
             names = profile.get('names')
             if names is not None and len(names) > 0:
                 profile.set_property('name', names[0])
-        else:
-            profile.set_property('name', name)
         # copy 'avatar'
         avatar = profile.get('avatar')
         if avatar is None:
             photos = profile.get('photos')
             if photos is not None and len(photos) > 0:
                 profile.set_property('avatar', photos[0])
-        else:
-            profile.set_property('avatar', avatar)
         # sign and cache
         self.sign_profile(profile=profile)
         self.cache_profile(profile=profile)
@@ -153,8 +142,6 @@ class Immortals(UserDataSource):
         return True
 
     def verify_profile(self, profile: Profile) -> bool:
-        if profile.valid:
-            return True
         identifier = self.identifier(profile.identifier)
         meta = self.meta(identifier=identifier)
         if meta is None:
@@ -162,8 +149,6 @@ class Immortals(UserDataSource):
         return profile.verify(public_key=meta.key)
 
     def sign_profile(self, profile: Profile) -> Optional[Profile]:
-        if profile.valid:
-            return profile
         identifier = self.identifier(profile.identifier)
         key = self.private_key_for_signature(identifier)
         if key is None:

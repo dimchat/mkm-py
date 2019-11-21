@@ -29,22 +29,26 @@
 # ==============================================================================
 
 import json
-from abc import ABC, abstractmethod
 from typing import Optional, Union, Any
 
 from .crypto.utils import base64_decode, base64_encode
 from .crypto import PublicKey, EncryptKey, VerifyKey, SignKey
 from .identifier import ID
+from .tai import TAI
 
 
-class TAI(dict, ABC):
-    """
-        The Additional Information
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+class Profile(dict, TAI):
 
-        'Meta' is the information for entity which never changed, which contains the key for verify signature;
-        'TAI' is the variable part, which contains the key for asymmetric encryption.
-    """
+    # noinspection PyTypeChecker
+    def __new__(cls, profile: dict):
+        if profile is None:
+            return None
+        inst = TAI.__new__(TAI, profile)
+        if inst is not None:
+            # created by subclass
+            return inst
+        # new Profile(dict)
+        return super().__new__(cls, profile)
 
     def __init__(self, profile: dict):
         if self is profile:
@@ -66,7 +70,7 @@ class TAI(dict, ABC):
         return self.__identifier
 
     @property
-    def data(self) -> bytes:
+    def data(self) -> Optional[bytes]:
         """ Profile properties data """
         if self.__data is None:
             string: str = self.get('data')
@@ -75,7 +79,7 @@ class TAI(dict, ABC):
         return self.__data
 
     @property
-    def signature(self) -> bytes:
+    def signature(self) -> Optional[bytes]:
         """ Profile properties signature """
         if self.__signature is None:
             base64: str = self.get('signature')
@@ -87,22 +91,12 @@ class TAI(dict, ABC):
     def valid(self) -> bool:
         return self.__status >= 0
 
-    @property
-    @abstractmethod
-    def key(self) -> Optional[EncryptKey]:
-        """
-        Get public key for encryption
-
-        :return: public key
-        """
-        raise NotImplemented
-
     """
         Profile Properties
         ~~~~~~~~~~~~~~~~~~
-        Inner dictionary
     """
 
+    @property
     def properties(self) -> Optional[dict]:
         """ Load properties from data """
         if self.__status == -1:
@@ -119,37 +113,31 @@ class TAI(dict, ABC):
                 assert isinstance(self.__properties, dict)
         return self.__properties
 
-    def get_property(self, key: str) -> Optional[Any]:
-        """
-        Get profile property data with key
-
-        :param key: property key
-        :return: property value
-        """
-        properties = self.properties()
-        if properties is None:
-            return None
-        return properties.get(key)
-
     def set_property(self, key: str, value: Any=None):
-        """
-        Update profile property with key and data
-        (this will reset 'data' and 'signature')
-
-        :param key:   property key
-        :param value: property value
-        """
-        self.__status = 0
-        properties = self.properties()
-        if value is None:
-            properties.pop(key, None)
-        else:
-            properties[key] = value
-        # clear data signature after properties changed
+        """ Update profile property with key and data """
         self.pop('data', None)
         self.pop('signature', None)
         self.__data = None
         self.__signature = None
+        self.__status = 0
+        return super().set_property(key=key, value=value)
+
+    """
+        Name
+        ~~~~
+        Nickname for user
+        Title for group
+    """
+
+    @property
+    def name(self) -> Optional[str]:
+        value = self.get_property(key='name')
+        if value is not None:
+            return value
+
+    @name.setter
+    def name(self, value: str):
+        self.set_property(key='name', value=value)
 
     """
         Sign/Verify profile data
@@ -189,25 +177,35 @@ class TAI(dict, ABC):
             # already signed
             return self.__signature
         self.__status = 1
-        data: str = json.dumps(self.properties())
+        data: str = json.dumps(self.properties)
         self.__data = data.encode('utf-8')
         self.__signature = private_key.sign(self.__data)
         self['data'] = data  # JsON string
         self['signature'] = base64_encode(self.__signature)
         return self.__signature
 
+    @classmethod
+    def new(cls, identifier: ID):
+        """ Create new empty profile object with entity ID """
+        profile = {
+            'ID': identifier,
+        }
+        return cls(profile)
 
-class Profile(TAI):
+
+class UserProfile(Profile):
 
     # noinspection PyTypeChecker
     def __new__(cls, profile: dict):
         if profile is None:
             return None
-        elif cls is Profile:
-            if isinstance(profile, Profile):
-                # return Profile object directly
-                return profile
-        # new Profile(dict)
+        elif cls is UserProfile:
+            # TODO: check ID type
+            # 1. if ID type is user, convert to UserProfile
+            # 2. if public key not exists, no need to convert to UserProfile
+            if 'key' not in profile:
+                return None
+        # new UserProfile(dict)
         return super().__new__(cls, profile)
 
     def __init__(self, profile: dict):
@@ -239,10 +237,8 @@ class Profile(TAI):
         self.set_property('key', value)
 
     """
-        Name
-        ~~~~
-        Nickname for user
-        Title for group
+        Nickname
+        ~~~~~~~~
     """
 
     @property
@@ -255,14 +251,6 @@ class Profile(TAI):
         if array is not None and len(array) > 0:
             return array[0]
 
-    @name.setter
-    def name(self, value: str):
-        self.set_property(key='name', value=value)
 
-    @classmethod
-    def new(cls, identifier: ID):
-        """ Create new empty profile object with entity ID """
-        profile = {
-            'ID': identifier,
-        }
-        return cls(profile)
+# register user profile class
+Profile.register(UserProfile)
