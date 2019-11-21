@@ -23,19 +23,26 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Union
 
 from .cryptography import CryptographyKey, VerifyKey, SignKey, EncryptKey
 
 
-class AsymmetricKey(CryptographyKey, ABC):
+class AsymmetricKey(CryptographyKey):
 
     RSA = 'RSA'
     ECC = 'ECC'
 
+    @property
+    @abstractmethod
+    def size(self) -> int:
+        data = self.data
+        if data is not None:
+            return len(data)
 
-class PublicKey(AsymmetricKey, VerifyKey, ABC):
+
+class PublicKey(AsymmetricKey, VerifyKey):
     """This class is used to en/decrypt symmetric key or sign/verify signature with message data
 
         Asymmetric Cryptography Public Key
@@ -71,6 +78,11 @@ class PublicKey(AsymmetricKey, VerifyKey, ABC):
                 raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
         # subclass
         return super().__new__(cls, key)
+
+    @property
+    @abstractmethod
+    def size(self) -> int:
+        return super().size
 
     def match(self, private_key) -> bool:
         if not isinstance(private_key, dict):
@@ -117,7 +129,7 @@ class PublicKey(AsymmetricKey, VerifyKey, ABC):
         return cls.__key_classes.get(algorithm)
 
 
-class PrivateKey(AsymmetricKey, SignKey, ABC):
+class PrivateKey(AsymmetricKey, SignKey):
     """This class is used to decrypt symmetric key or sign message data
 
         Asymmetric Cryptography Private Key

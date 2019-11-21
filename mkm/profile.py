@@ -29,14 +29,15 @@
 # ==============================================================================
 
 import json
-from typing import Optional, Any, Union
+from abc import ABC, abstractmethod
+from typing import Optional, Union, Any
 
 from .crypto.utils import base64_decode, base64_encode
 from .crypto import PublicKey, EncryptKey, VerifyKey, SignKey
 from .identifier import ID
 
 
-class TAI(dict):
+class TAI(dict, ABC):
     """
         The Additional Information
         ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -85,6 +86,16 @@ class TAI(dict):
     @property
     def valid(self) -> bool:
         return self.__status >= 0
+
+    @property
+    @abstractmethod
+    def key(self) -> Optional[EncryptKey]:
+        """
+        Get public key for encryption
+
+        :return: public key
+        """
+        raise NotImplemented
 
     """
         Profile Properties
@@ -205,7 +216,7 @@ class Profile(TAI):
             return
         super().__init__(profile)
         # lazy
-        self.__key: Union[PublicKey, EncryptKey, None] = None
+        self.__key: PublicKey = None  # EncryptKey
 
     """
         Public Key for encryption

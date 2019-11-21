@@ -23,11 +23,11 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import Optional
 
 
-class CryptographyKey(dict, metaclass=ABCMeta):
+class CryptographyKey(ABC):
     """Cryptography key with designated algorithm
 
         Cryptography Key
@@ -48,10 +48,20 @@ class CryptographyKey(dict, metaclass=ABCMeta):
 
         :return: key data
         """
-        pass
+        raise NotImplemented
+
+    @property
+    @abstractmethod
+    def size(self) -> int:
+        """
+        Get key size
+
+        :return: key size
+        """
+        raise NotImplemented
 
 
-class EncryptKey(metaclass=ABCMeta):
+class EncryptKey(CryptographyKey):
 
     @abstractmethod
     def encrypt(self, data: bytes) -> bytes:
@@ -65,7 +75,7 @@ class EncryptKey(metaclass=ABCMeta):
         raise NotImplemented
 
 
-class DecryptKey(metaclass=ABCMeta):
+class DecryptKey(CryptographyKey):
 
     @abstractmethod
     def decrypt(self, data: bytes) -> Optional[bytes]:
@@ -79,7 +89,7 @@ class DecryptKey(metaclass=ABCMeta):
         raise NotImplemented
 
 
-class SignKey(metaclass=ABCMeta):
+class SignKey(CryptographyKey):
 
     @abstractmethod
     def sign(self, data: bytes) -> bytes:
@@ -92,7 +102,7 @@ class SignKey(metaclass=ABCMeta):
         raise NotImplemented
 
 
-class VerifyKey(metaclass=ABCMeta):
+class VerifyKey(CryptographyKey):
 
     @abstractmethod
     def verify(self, data: bytes, signature: bytes) -> bool:

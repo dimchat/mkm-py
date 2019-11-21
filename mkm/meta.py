@@ -28,7 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import Optional, Union
 
 from .crypto.utils import base64_encode, base64_decode
@@ -39,7 +39,7 @@ from .address import Address, DefaultAddress
 from .identifier import ID
 
 
-class Meta(dict, metaclass=ABCMeta):
+class Meta(dict, ABC):
     """This class is used to generate entity ID
 
         User/Group Meta data

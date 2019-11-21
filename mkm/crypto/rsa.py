@@ -34,7 +34,7 @@ from .cryptography import EncryptKey, DecryptKey
 from .asymmetric import PublicKey, PrivateKey
 
 
-class RSAPublicKey(PublicKey, EncryptKey):
+class RSAPublicKey(dict, PublicKey, EncryptKey):
     """ RSA Public Key """
 
     def __new__(cls, key: dict):
@@ -68,6 +68,14 @@ class RSAPublicKey(PublicKey, EncryptKey):
     def data(self) -> bytes:
         return self.__data
 
+    @property
+    def size(self):
+        bits = self.get('sizeInBits')
+        if bits is None:
+            return 1024 / 8  # RSA-1024
+        else:
+            return int(bits) / 8
+
     def encrypt(self, data: bytes) -> bytes:
         # noinspection PyTypeChecker
         cipher = Cipher_PKCS1_v1_5.new(self.__key)
@@ -84,7 +92,7 @@ class RSAPublicKey(PublicKey, EncryptKey):
             return False
 
 
-class RSAPrivateKey(PrivateKey, DecryptKey):
+class RSAPrivateKey(dict, PrivateKey, DecryptKey):
     """ RSA Private Key """
 
     def __new__(cls, key: dict):
@@ -112,7 +120,7 @@ class RSAPrivateKey(PrivateKey, DecryptKey):
         data: str = key.get('data')
         if data is None:
             # generate private key data
-            private_key = RSA.generate(self.size)
+            private_key = RSA.generate(bits=self.bits)
             data: bytes = private_key.exportKey()
             self['data'] = data.decode('utf-8')
             self['mode'] = 'ECB'
@@ -136,9 +144,17 @@ class RSAPrivateKey(PrivateKey, DecryptKey):
 
     @property
     def size(self):
-        bits = self.get('keySizeInBits')
+        bits = self.get('sizeInBits')
         if bits is None:
-            return 1024
+            return 1024 / 8  # RSA-1024
+        else:
+            return int(bits) / 8
+
+    @property
+    def bits(self):
+        bits = self.get('sizeInBits')
+        if bits is None:
+            return 1024  # RSA-1024
         else:
             return int(bits)
 

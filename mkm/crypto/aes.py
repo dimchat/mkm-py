@@ -48,7 +48,7 @@ def pkcs7_unpad(data: bytes) -> bytes:
     return data[:-amount]
 
 
-class AESKey(SymmetricKey):
+class AESKey(dict, SymmetricKey):
     """ AES Key """
 
     def __new__(cls, key: dict):
@@ -103,7 +103,7 @@ class AESKey(SymmetricKey):
     def size(self) -> int:
         size = self.get('size')
         if size is None:
-            return 32
+            return 32  # AES-256
         else:
             return int(size)
 

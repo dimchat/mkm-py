@@ -28,13 +28,13 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 from .crypto.utils import sha256, ripemd160, base58_encode, base58_decode
 from .types import NetworkID
 
 
-class Address(str, metaclass=ABCMeta):
+class Address(ABC):
     """This class is used to build address for ID
 
         Address for MKM ID
@@ -162,17 +162,7 @@ def user_number(code: bytes) -> int:
     return int.from_bytes(code, byteorder='little')
 
 
-class DefaultAddress(Address):
-
-    def __new__(cls, address: str):
-        if address is None:
-            return None
-        elif cls is DefaultAddress:
-            if isinstance(address, DefaultAddress):
-                # return DefaultAddress directly
-                return address
-        # new DefaultAddress(str)
-        return super().__new__(cls, address)
+class DefaultAddress(str, Address):
 
     def __init__(self, address: str):
         if self is address:
@@ -231,7 +221,7 @@ Address.register(DefaultAddress)  # default
 """
 
 
-class ConstantAddress(Address):
+class ConstantAddress(str, Address):
 
     def __new__(cls, address: str, network: NetworkID, number: int):
         self = super().__new__(cls, address)

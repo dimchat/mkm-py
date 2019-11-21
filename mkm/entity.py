@@ -29,7 +29,7 @@
 # ==============================================================================
 
 import weakref
-from abc import ABCMeta
+from abc import ABC
 from typing import Optional
 
 from .types import NetworkID
@@ -39,7 +39,7 @@ from .profile import Profile
 from .delegate import EntityDataSource
 
 
-class Entity(metaclass=ABCMeta):
+class Entity(ABC):
     """Base class of User and Group, ...
 
         Entity (User/Group)

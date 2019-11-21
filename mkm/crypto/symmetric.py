@@ -23,12 +23,12 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABC
+from abc import abstractmethod
 
-from .cryptography import CryptographyKey, EncryptKey, DecryptKey
+from .cryptography import EncryptKey, DecryptKey
 
 
-class SymmetricKey(CryptographyKey, EncryptKey, DecryptKey, ABC):
+class SymmetricKey(EncryptKey, DecryptKey):
     """This class is used to encrypt or decrypt message data
 
         Symmetric Cryptography Key
@@ -76,6 +76,13 @@ class SymmetricKey(CryptographyKey, EncryptKey, DecryptKey, ABC):
         other = SymmetricKey(other)
         promise = 'Moky loves May Lee forever!'.encode('utf-8')
         return self.decrypt(other.encrypt(promise)) == promise
+
+    @property
+    @abstractmethod
+    def size(self) -> int:
+        data = self.data
+        if data is not None:
+            return len(data)
 
     #
     #   Runtime

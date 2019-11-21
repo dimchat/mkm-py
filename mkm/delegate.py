@@ -28,7 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import Optional
 
 from .crypto import EncryptKey, SignKey
@@ -37,7 +37,7 @@ from .meta import Meta
 from .profile import Profile
 
 
-class EntityDataSource(metaclass=ABCMeta):
+class EntityDataSource(ABC):
     """This interface is for getting information for entity(user/group)
 
         Entity Data Source
