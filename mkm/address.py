@@ -54,26 +54,24 @@ class Address(ABC):
         """
         if address is None:
             return None
-        elif cls is Address:
-            if isinstance(address, Address):
-                # return Address object directly
-                return address
-            # Address for broadcast
-            length = len(address)
-            # anywhere
-            if length == len(ANYWHERE) and address.lower() == ANYWHERE:
-                return ANYWHERE
-            # everywhere
-            if length == len(EVERYWHERE) and address.lower() == EVERYWHERE:
-                return EVERYWHERE
-            # try to create address object
-            for clazz in cls.address_classes():
-                inst = clazz.__new__(clazz, address)
-                if inst is not None:
-                    return inst
-            raise ValueError('unrecognized address: %s' % address)
-        # subclass
-        return super().__new__(cls, address)
+        assert cls is Address, 'call Address() directly'
+        if isinstance(address, Address):
+            # return Address object directly
+            return address
+        # Address for broadcast
+        length = len(address)
+        # anywhere
+        if length == len(ANYWHERE) and address.lower() == ANYWHERE:
+            return ANYWHERE
+        # everywhere
+        if length == len(EVERYWHERE) and address.lower() == EVERYWHERE:
+            return EVERYWHERE
+        # try to create address object
+        for clazz in cls.address_classes():
+            inst = clazz.__new__(clazz, address)
+            if inst is not None:
+                return inst
+        raise ValueError('unrecognized address: %s' % address)
 
     @property
     @abstractmethod

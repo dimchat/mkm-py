@@ -54,19 +54,17 @@ class SymmetricKey(EncryptKey, DecryptKey):
         """
         if key is None:
             return None
-        elif cls is SymmetricKey:
-            if isinstance(key, SymmetricKey):
-                # return SymmetricKey object directly
-                return key
-            # get class by algorithm name
-            clazz = cls.key_class(algorithm=key['algorithm'])
-            if clazz is not None:
-                assert issubclass(clazz, SymmetricKey), '%s must be sub-class of SymmetricKey' % clazz
-                return clazz.__new__(clazz, key)
-            else:
-                raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
-        # subclass
-        return super().__new__(cls, key)
+        assert cls is SymmetricKey, 'call SymmetricKey() directly'
+        if isinstance(key, SymmetricKey):
+            # return SymmetricKey object directly
+            return key
+        # get class by algorithm name
+        clazz = cls.key_class(algorithm=key['algorithm'])
+        if clazz is not None:
+            assert issubclass(clazz, SymmetricKey), '%s must be sub-class of SymmetricKey' % clazz
+            return clazz.__new__(clazz, key)
+        else:
+            raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, dict):

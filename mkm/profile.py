@@ -43,10 +43,11 @@ class Profile(dict, TAI):
     def __new__(cls, profile: dict):
         if profile is None:
             return None
-        inst = TAI.__new__(TAI, profile)
-        if inst is not None:
-            # created by subclass
-            return inst
+        elif cls is Profile:
+            inst = TAI.__new__(TAI, profile)
+            if inst is not None:
+                # created by subclass
+                return inst
         # new Profile(dict)
         return super().__new__(cls, profile)
 
@@ -204,6 +205,7 @@ class UserProfile(Profile):
             # 1. if ID type is user, convert to UserProfile
             # 2. if public key not exists, no need to convert to UserProfile
             if 'key' not in profile:
+                # not a user profile
                 return None
         # new UserProfile(dict)
         return super().__new__(cls, profile)

@@ -49,15 +49,15 @@ class TAI(ABC):
     def __new__(cls, profile: dict):
         if profile is None:
             return None
-        elif cls is TAI:
-            if isinstance(profile, TAI):
-                # return Profile object directly
-                return profile
-            # try to create Profile object
-            for clazz in cls.tai_classes():
-                inst = clazz.__new__(clazz, profile)
-                if inst is not None:
-                    return inst
+        assert cls is TAI, 'call TAI() directly'
+        if isinstance(profile, TAI):
+            # return Profile object directly
+            return profile
+        # try to create Profile object
+        for clazz in cls.tai_classes():
+            inst = clazz.__new__(clazz, profile)
+            if inst is not None:
+                return inst
 
     @property
     @abstractmethod

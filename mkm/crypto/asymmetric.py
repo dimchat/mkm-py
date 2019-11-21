@@ -65,19 +65,17 @@ class PublicKey(AsymmetricKey, VerifyKey):
         """
         if key is None:
             return None
-        elif cls is PublicKey:
-            if isinstance(key, PublicKey):
-                # return PublicKey object directly
-                return key
-            # get class by algorithm name
-            clazz = cls.key_class(algorithm=key['algorithm'])
-            if clazz is not None:
-                assert issubclass(clazz, PublicKey), '%s must be sub-class of PublicKey' % clazz
-                return clazz.__new__(clazz, key)
-            else:
-                raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
-        # subclass
-        return super().__new__(cls, key)
+        assert cls is PublicKey, 'call PublicKey() directly'
+        if isinstance(key, PublicKey):
+            # return PublicKey object directly
+            return key
+        # get class by algorithm name
+        clazz = cls.key_class(algorithm=key['algorithm'])
+        if clazz is not None:
+            assert issubclass(clazz, PublicKey), '%s must be sub-class of PublicKey' % clazz
+            return clazz.__new__(clazz, key)
+        else:
+            raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
 
     @property
     @abstractmethod
@@ -152,19 +150,17 @@ class PrivateKey(AsymmetricKey, SignKey):
         """
         if key is None:
             return None
-        elif cls is PrivateKey:
-            if isinstance(key, PrivateKey):
-                # return PrivateKey object directly
-                return key
-            # get class by algorithm name
-            clazz = cls.key_class(algorithm=key['algorithm'])
-            if clazz is not None:
-                assert issubclass(clazz, PrivateKey), '%s must be sub-class of PrivateKey' % clazz
-                return clazz.__new__(clazz, key)
-            else:
-                raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
-        # subclass
-        return super().__new__(cls, key)
+        assert cls is PrivateKey, 'call PrivateKey() directly'
+        if isinstance(key, PrivateKey):
+            # return PrivateKey object directly
+            return key
+        # get class by algorithm name
+        clazz = cls.key_class(algorithm=key['algorithm'])
+        if clazz is not None:
+            assert issubclass(clazz, PrivateKey), '%s must be sub-class of PrivateKey' % clazz
+            return clazz.__new__(clazz, key)
+        else:
+            raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, dict):
