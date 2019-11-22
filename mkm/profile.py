@@ -100,7 +100,7 @@ class Profile(dict, TAI):
     @property
     def properties(self) -> Optional[dict]:
         """ Load properties from data """
-        if self.__status == -1:
+        if self.__status < 0:
             # invalid
             return None
         if self.__properties is None:
@@ -116,12 +116,15 @@ class Profile(dict, TAI):
 
     def set_property(self, key: str, value: Any=None):
         """ Update profile property with key and data """
+        # 1. reset status
+        self.__status = 0
+        # 2. update property value with name
+        super().set_property(key=key, value=value)
+        # 3. clear data signature after properties changed
         self.pop('data', None)
         self.pop('signature', None)
         self.__data = None
         self.__signature = None
-        self.__status = 0
-        return super().set_property(key=key, value=value)
 
     """
         Name
