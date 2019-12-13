@@ -75,12 +75,33 @@ class ID(str):
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, str):
+            # other ID empty
             return False
         if super().__eq__(other):
+            # same object
             return True
-        identifier = ID(other)
-        assert identifier.valid, 'other ID not valid: %s' % other
-        return self.name == identifier.name and self.address == identifier.address
+        if isinstance(other, ID):
+            # check address
+            address = self.address
+            if address != other.address:
+                return False
+            # check name
+            name = self.name
+            if name is None or len(name) == 0:
+                return other.name is None or len(other.name) == 0
+            else:
+                return name == other.name
+        assert isinstance(other, str), 'ID error: %s' % other
+        # comparing without terminal
+        pair = other.split('/', 1)
+        str1 = pair[0]
+        assert len(str1) > 0, 'ID error: %s' % other
+        terminal = self.terminal
+        if terminal is None or len(terminal) == 0:
+            return str1 == self
+        else:
+            pair = self.split('/', 1)
+            return str1 == pair[0]
 
     def __hash__(self) -> int:
         # get address string

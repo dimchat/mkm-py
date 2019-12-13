@@ -70,7 +70,7 @@ class Entity(ABC):
         network = identifier.address.network
         number = identifier.address.number
         name = self.name
-        return '<%s: %s(%d|%d) "%s" />' % (clazz, identifier, network, number, name)
+        return '<%s: %s(%s|%d) "%s" />' % (clazz, identifier, network, number, name)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Entity):

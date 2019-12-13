@@ -230,6 +230,8 @@ class Meta(dict, ABC):
         :param public_key: user's public key
         :return: True on matched
         """
+        if not self.valid:
+            return False
         if self.key == public_key:
             return True
         if self.version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
@@ -394,9 +396,32 @@ class Meta(dict, ABC):
 
 class DefaultMeta(Meta):
 
+    def __init__(self, meta: dict):
+        if self is meta:
+            # no need to init again
+            return
+        super().__init__(meta)
+        # id caches
+        self.__ids: dict = {}
+
+    def generate_identifier(self, network: NetworkID) -> ID:
+        # check cache
+        identifier = self.__ids.get(network)
+        if identifier is None:
+            # generate and cache it
+            identifier = super().generate_identifier(network=network)
+            assert identifier.valid, 'failed to generate ID with network: %s' % network
+            self.__ids[network] = identifier
+        return identifier
+
     def generate_address(self, network: NetworkID) -> Address:
         assert self.version == Meta.Version_MKM, 'meta version error: %d' % self.version
         assert self.valid, 'meta not valid: %s' % self
+        # check cache
+        identifier: ID = self.__ids.get(network)
+        if identifier is not None:
+            return identifier.address
+        # generate
         return DefaultAddress.new(data=self.fingerprint, network=network)
 
 
