@@ -155,13 +155,21 @@ class Profile(dict, TAI):
         :param public_key: public key in meta.key
         :return: True on signature matched
         """
-        if self.__status == 1:
+        if self.__status > 0:
             # already verify OK
             return True
         data = self.data
         signature = self.signature
-        if data is None or signature is None:
-            # data error
+        if data is None:
+            # NOTICE: if data is empty, signature should be empty at the same time
+            #         this happen while profile not found
+            if signature is None:
+                self.__status = 0
+            else:
+                # data signature error
+                self.__status = -1
+        elif signature is None:
+            # signature error
             self.__status = -1
         elif public_key.verify(data, signature):
             # signature matched
@@ -177,7 +185,7 @@ class Profile(dict, TAI):
         :param private_key: private key match meta.key
         :return: signature
         """
-        if self.__status == 1:
+        if self.__status > 0:
             # already signed
             return self.__signature
         self.__status = 1

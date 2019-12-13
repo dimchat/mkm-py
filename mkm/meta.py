@@ -236,9 +236,9 @@ class Meta(dict, ABC):
             return True
         if self.version & Meta.Version_MKM:  # MKM, ExBTC, ExETH, ...
             # check whether keys equal by verifying signature
-            un = self.seed
-            ct = self.fingerprint
-            return public_key.verify(data=un.encode('utf-8'), signature=ct)
+            seed = self.seed.encode('utf-8')
+            fingerprint = self.fingerprint
+            return public_key.verify(data=seed, signature=fingerprint)
         else:  # BTC, ETH, ...
             # NOTICE: ID with BTC/ETH address has no username, so
             #         just compare the key.data to check matching
