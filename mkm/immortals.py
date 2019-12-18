@@ -88,7 +88,6 @@ class Immortals(UserDataSource):
 
     @staticmethod
     def __load_meta(filename: str) -> Optional[Meta]:
-        # load meta
         return Meta(load_resource_file(filename=filename))
 
     @staticmethod

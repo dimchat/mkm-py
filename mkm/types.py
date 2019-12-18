@@ -146,3 +146,41 @@ class NetworkID(IntEnum):
 
     def is_robot(self) -> bool:
         return self.value == self.Robot.value
+
+
+class MetaVersion(IntEnum):
+    """
+        @enum MKMMetaVersion
+
+        @abstract Defined for meta data structure to generate identifier.
+
+        @discussion Generate & check ID/Address
+
+            MKMMetaVersion_MKM give a seed string first, and sign this seed to get
+            fingerprint; after that, use the fingerprint to generate address.
+            This will get a firmly relationship between (username, address & key).
+
+            MKMMetaVersion_BTC use the key data to generate address directly.
+            This can build a BTC address for the entity ID without username.
+
+            MKMMetaVersion_ExBTC use the key data to generate address directly, and
+            sign the seed to get fingerprint (just for binding username & key).
+            This can build an entity ID with username and BTC address.
+
+        Bits:
+            0000 0001 - this meta contains seed as ID.name
+            0000 0010 - this meta generate BTC address
+            0000 0100 - this meta generate ETH address
+            ...
+    """
+    MKM = 0x01    # 0000 0001
+    Default = MKM
+
+    BTC = 0x02    # 0000 0010
+    ExBTC = 0x03  # 0000 0011
+
+    ETH = 0x04    # 0000 0100
+    ExETH = 0x05  # 0000 0101
+
+    def has_seed(self) -> bool:
+        return self.value & self.MKM.value
