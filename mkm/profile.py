@@ -71,7 +71,7 @@ class Profile(dict, TAI):
         return self.__identifier
 
     @property
-    def data(self) -> Optional[bytes]:
+    def _data(self) -> Optional[bytes]:
         """ Profile properties data """
         if self.__data is None:
             string: str = self.get('data')
@@ -80,7 +80,7 @@ class Profile(dict, TAI):
         return self.__data
 
     @property
-    def signature(self) -> Optional[bytes]:
+    def _signature(self) -> Optional[bytes]:
         """ Profile properties signature """
         if self.__signature is None:
             base64: str = self.get('signature')
@@ -98,13 +98,13 @@ class Profile(dict, TAI):
     """
 
     @property
-    def properties(self) -> Optional[dict]:
+    def _properties(self) -> Optional[dict]:
         """ Load properties from data """
         if self.__status < 0:
             # invalid
             return None
         if self.__properties is None:
-            data = self.data
+            data = self._data
             if data is None:
                 # create new properties
                 self.__properties = {}
@@ -158,8 +158,8 @@ class Profile(dict, TAI):
         if self.__status > 0:
             # already verify OK
             return True
-        data = self.data
-        signature = self.signature
+        data = self._data
+        signature = self._signature
         if data is None:
             # NOTICE: if data is empty, signature should be empty at the same time
             #         this happen while profile not found
@@ -189,7 +189,7 @@ class Profile(dict, TAI):
             # already signed
             return self.__signature
         self.__status = 1
-        data: str = json.dumps(self.properties)
+        data: str = json.dumps(self._properties)
         self.__data = data.encode('utf-8')
         self.__signature = private_key.sign(self.__data)
         self['data'] = data  # JsON string
@@ -212,10 +212,13 @@ class UserProfile(Profile):
         if profile is None:
             return None
         elif cls is UserProfile:
-            # TODO: check ID type
             # 1. if ID type is user, convert to UserProfile
             # 2. if public key not exists, no need to convert to UserProfile
-            if 'key' not in profile:
+            identifier = profile.get('ID')
+            if isinstance(identifier, ID):
+                if not identifier.type.is_user():
+                    return None
+            elif 'avatar' not in profile and 'key' not in profile:
                 # not a user profile
                 return None
         # new UserProfile(dict)
@@ -235,7 +238,6 @@ class UserProfile(Profile):
         For safety considerations, the profile.key which used to encrypt message data
         should be different with meta.key
     """
-
     @property
     def key(self) -> Union[PublicKey, EncryptKey, None]:
         if self.__key is None:
@@ -253,7 +255,6 @@ class UserProfile(Profile):
         Nickname
         ~~~~~~~~
     """
-
     @property
     def name(self) -> Optional[str]:
         value = self.get_property(key='name')
@@ -263,6 +264,28 @@ class UserProfile(Profile):
         array = self.get_property(key='names')
         if array is not None and len(array) > 0:
             return array[0]
+
+    @name.setter
+    def name(self, value: str):
+        self.set_property(key='name', value=value)
+
+    """
+        Avatar
+        ~~~~~~
+    """
+    @property
+    def avatar(self) -> Optional[str]:
+        value = self.get_property(key='avatar')
+        if value is not None:
+            return value
+        # get from 'names'
+        array = self.get_property(key='photos')
+        if array is not None and len(array) > 0:
+            return array[0]
+
+    @avatar.setter
+    def avatar(self, value: str):
+        self.set_property(key='avatar', value=value)
 
 
 # register user profile class

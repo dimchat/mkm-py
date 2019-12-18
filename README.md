@@ -154,15 +154,15 @@ you must verify it with the consensus algorithm before accept its **public key**
         """ Check address with meta info """
         if address is None:
             return False
-        return self.generate_address(network=address.network) == address
+        return self._generate_address(network=address.network) == address
 
     def generate_identifier(self, network: NetworkID) -> ID:
         """ Generate ID with meta info and network ID """
-        address = self.generate_address(network=network)
+        address = self._generate_address(network=network)
         return ID.new(name=self.seed, address=address)
 
     @abstractmethod
-    def generate_address(self, network: NetworkID) -> Address:
+    def _generate_address(self, network: NetworkID) -> Address:
         """ Generate address with meta info and network ID """
         pass
 ```

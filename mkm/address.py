@@ -67,7 +67,7 @@ class Address(ABC):
         if length == len(EVERYWHERE) and address.lower() == EVERYWHERE:
             return EVERYWHERE
         # try to create address object
-        for clazz in cls.address_classes():
+        for clazz in cls.__address_classes:
             inst = clazz.__new__(clazz, address)
             if inst is not None:
                 return inst
@@ -122,15 +122,6 @@ class Address(ABC):
         else:
             raise TypeError('%s must be subclass of Address' % address_class)
         return True
-
-    @classmethod
-    def address_classes(cls) -> list:
-        """
-        Get all address classes
-
-        :return: address class list
-        """
-        return cls.__address_classes
 
 
 """

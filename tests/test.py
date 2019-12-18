@@ -158,9 +158,7 @@ class BaseTestCase(unittest.TestCase):
         self.assertTrue(ok, 'meta algorithm error')
 
         identifier = moki_meta.generate_identifier(NetworkID.Main)
-        address = moki_meta.generate_address(NetworkID.Main)
         print_id(identifier)
-        print_address(address)
 
     def test_id(self):
         print('\n---------------- %s' % self)

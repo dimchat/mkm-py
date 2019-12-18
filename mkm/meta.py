@@ -71,7 +71,8 @@ class Meta(dict, ABC):
                 # return Meta object directly
                 return meta
             # get class by meta version
-            clazz = cls.meta_class(version=MetaVersion(int(meta['version'])))
+            version = MetaVersion(int(meta['version']))
+            clazz = cls.__meta_classes.get(version)
             if clazz is None:
                 raise ModuleNotFoundError('meta version not supported: %s' % meta)
             assert issubclass(clazz, Meta), '%s must be sub-class of Meta' % clazz
@@ -173,12 +174,12 @@ class Meta(dict, ABC):
                 # meta.key should not be empty
                 self.__status = -1
             elif self.version.has_seed():
-                un = self.seed
-                ct = self.fingerprint
-                if un is None or ct is None:
+                seed = self.seed
+                fingerprint = self.fingerprint
+                if seed is None or fingerprint is None:
                     # seed and fingerprint should not be empty
                     self.__status = -1
-                elif key.verify(data=un.encode('utf-8'), signature=ct):
+                elif key.verify(data=seed.encode('utf-8'), signature=fingerprint):
                     # fingerprint matched
                     self.__status = 1
                 else:
@@ -239,7 +240,7 @@ class Meta(dict, ABC):
         """
         if address is None:
             return False
-        return self.generate_address(network=address.network) == address
+        return self._generate_address(network=address.network) == address
 
     def generate_identifier(self, network: NetworkID) -> ID:
         """
@@ -248,12 +249,12 @@ class Meta(dict, ABC):
         :param network: ID type
         :return: ID object
         """
-        address = self.generate_address(network=network)
+        address = self._generate_address(network=network)
         if address is not None:
             return ID.new(name=self.seed, address=address)
 
     @abstractmethod
-    def generate_address(self, network: NetworkID) -> Address:
+    def _generate_address(self, network: NetworkID) -> Address:
         """
         Generate address with meta info and network ID
 
@@ -345,16 +346,6 @@ class Meta(dict, ABC):
             raise TypeError('%s must be subclass of Meta' % meta_class)
         return True
 
-    @classmethod
-    def meta_class(cls, version: MetaVersion):
-        """
-        Get meta class with version
-
-        :param version: meta version for different meta algorithm
-        :return: meta class
-        """
-        return cls.__meta_classes.get(version)
-
 
 """
     Default Meta for generate ID with address
@@ -392,7 +383,7 @@ class DefaultMeta(Meta):
             self.__ids[network] = identifier
         return identifier
 
-    def generate_address(self, network: NetworkID) -> Address:
+    def _generate_address(self, network: NetworkID) -> Address:
         assert self.version == MetaVersion.MKM, 'meta version error: %d' % self.version
         assert self.valid, 'meta not valid: %s' % self
         # check cache

@@ -54,7 +54,7 @@ class TAI(ABC):
             # return Profile object directly
             return profile
         # try to create Profile object
-        for clazz in cls.tai_classes():
+        for clazz in cls.__tai_classes:
             inst = clazz.__new__(clazz, profile)
             if inst is not None:
                 return inst
@@ -66,26 +66,6 @@ class TAI(ABC):
         Entity ID
 
         :return: Entity ID
-        """
-        raise NotImplemented
-
-    @property
-    @abstractmethod
-    def data(self) -> Optional[bytes]:
-        """
-        Serialized properties
-
-        :return: JsON string data
-        """
-        raise NotImplemented
-
-    @property
-    @abstractmethod
-    def signature(self) -> Optional[bytes]:
-        """
-        Signature for serialized properties
-
-        :return: signature data
         """
         raise NotImplemented
 
@@ -117,7 +97,7 @@ class TAI(ABC):
 
     @property
     @abstractmethod
-    def properties(self) -> Optional[dict]:
+    def _properties(self) -> Optional[dict]:
         """
         Get all properties when valid
 
@@ -132,7 +112,7 @@ class TAI(ABC):
         :param key: property key
         :return: property value
         """
-        properties = self.properties
+        properties = self._properties
         if properties is None:
             return None
         return properties.get(key)
@@ -146,7 +126,7 @@ class TAI(ABC):
         :param key:   property key
         :param value: property value
         """
-        properties = self.properties
+        properties = self._properties
         assert properties is not None, 'failed to get properties'
         if value is None:
             properties.pop(key, None)
@@ -199,12 +179,3 @@ class TAI(ABC):
         else:
             raise TypeError('%s must be subclass of TAI' % tai_class)
         return True
-
-    @classmethod
-    def tai_classes(cls) -> list:
-        """
-        Get all TAI classes
-
-        :return: TAI class list
-        """
-        return cls.__tai_classes

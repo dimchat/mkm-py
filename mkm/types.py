@@ -173,8 +173,8 @@ class MetaVersion(IntEnum):
             0000 0100 - this meta generate ETH address
             ...
     """
+    Default = 0x01
     MKM = 0x01    # 0000 0001
-    Default = MKM
 
     BTC = 0x02    # 0000 0010
     ExBTC = 0x03  # 0000 0011
