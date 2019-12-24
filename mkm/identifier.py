@@ -94,14 +94,12 @@ class ID(str):
         assert isinstance(other, str), 'ID error: %s' % other
         # comparing without terminal
         pair = other.split('/', 1)
-        str1 = pair[0]
-        assert len(str1) > 0, 'ID error: %s' % other
+        assert len(pair[0]) > 0, 'ID error: %s' % other
         terminal = self.terminal
         if terminal is None or len(terminal) == 0:
-            return str1 == self
+            return pair[0] == self
         else:
-            pair = self.split('/', 1)
-            return str1 == pair[0]
+            return pair[0] == self.split('/', 1)[0]
 
     def __hash__(self) -> int:
         # get address string
@@ -163,9 +161,7 @@ class ID(str):
 
     @property
     def valid(self) -> bool:
-        address = self.address
-        if address is not None:
-            return address.number > 0
+        return self.number > 0
 
     @property
     def is_broadcast(self) -> bool:

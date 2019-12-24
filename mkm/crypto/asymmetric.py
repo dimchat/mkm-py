@@ -72,7 +72,6 @@ class PublicKey(AsymmetricKey, VerifyKey):
         # get class by algorithm name
         clazz = cls.key_class(algorithm=key['algorithm'])
         if clazz is not None:
-            assert issubclass(clazz, PublicKey), '%s must be sub-class of PublicKey' % clazz
             return clazz.__new__(clazz, key)
         else:
             raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
@@ -157,7 +156,6 @@ class PrivateKey(AsymmetricKey, SignKey):
         # get class by algorithm name
         clazz = cls.key_class(algorithm=key['algorithm'])
         if clazz is not None:
-            assert issubclass(clazz, PrivateKey), '%s must be sub-class of PrivateKey' % clazz
             return clazz.__new__(clazz, key)
         else:
             raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
