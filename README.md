@@ -137,36 +137,6 @@ class BTCAddress(Address):
 When you get a meta for the entity ID from the network,
 you must verify it with the consensus algorithm before accept its **public key**.
 
-```python
-    """
-    Meta algorithm
-        1. compare meta.seed with ID.name
-        2. build address with meta, compare it with ID.address
-        3. if matches, get public key from meta
-    """
-    def match_identifier(self, identifier: ID) -> bool:
-        """ Check ID(name+address) with meta info """
-        if identifier is None:
-            return False
-        return self.generate_identifier(identifier.address.network) == identifier
-
-    def match_address(self, address: Address) -> bool:
-        """ Check address with meta info """
-        if address is None:
-            return False
-        return self.generate_address(network=address.network) == address
-
-    def generate_identifier(self, network: NetworkID) -> ID:
-        """ Generate ID with meta info and network ID """
-        address = self.generate_address(network=network)
-        return ID.new(name=self.seed, address=address)
-
-    @abstractmethod
-    def generate_address(self, network: NetworkID) -> Address:
-        """ Generate address with meta info and network ID """
-        pass
-```
-
 ### <span id="id-terminal">1.3. Terminal</span>
 
 A resource identifier as **Login Point**.
