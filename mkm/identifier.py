@@ -97,7 +97,7 @@ class ID(str):
         assert len(pair[0]) > 0, 'ID error: %s' % other
         terminal = self.terminal
         if terminal is None or len(terminal) == 0:
-            return pair[0] == self
+            return super().__eq__(pair[0])
         else:
             return pair[0] == self.split('/', 1)[0]
 
