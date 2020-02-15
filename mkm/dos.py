@@ -99,7 +99,7 @@ class File:
     def append(self, data: AnyStr, mode: str='ab', encoding=None) -> bool:
         if not os.path.exists(self.__path):
             # new file
-            return self.write(data=data, mode=mode)
+            return self.write(data, mode=mode)
         # append to exists file
         with open(self.__path, mode=mode, encoding=encoding) as file:
             if len(data) == file.write(data):
@@ -114,10 +114,10 @@ class TextFile(File):
         return super().read(mode=mode, encoding=encoding)
 
     def write(self, text: str, mode: str='w', encoding='utf-8') -> bool:
-        return super().write(data=text, mode=mode, encoding=encoding)
+        return super().write(text, mode=mode, encoding=encoding)
 
     def append(self, text: str, mode: str='a', encoding='utf-8') -> bool:
-        return super().append(data=text, mode=mode, encoding=encoding)
+        return super().append(text, mode=mode, encoding=encoding)
 
 
 class JSONFile(TextFile):
@@ -142,7 +142,7 @@ class JSONFile(TextFile):
         text = json.dumps(container)
         if text is None:
             raise ValueError('cannot convert to JSON string: %s' % container)
-        if super().write(text=text):
+        if super().write(text):
             # OK, update cache
             self.__container = container
             return True
