@@ -47,13 +47,14 @@ class File:
         self.__path = path
         self.__data: Union[bytes, str, None] = None
 
-    @classmethod
-    def exists(cls, path: str) -> bool:
+    def exists(self, path: str=None) -> bool:
+        if path is None:
+            path = self.__path
         return os.path.exists(path)
 
     @classmethod
     def make_dirs(cls, directory: str) -> bool:
-        if cls.exists(directory):
+        if os.path.exists(directory):
             # directory exists
             return os.path.isdir(directory)
         try:
@@ -66,13 +67,13 @@ class File:
         if self.__data is not None:
             # get data from cache
             return self.__data
-        if not self.exists(self.__path):
+        if not os.path.exists(self.__path):
             # file not found
             return None
         if not os.path.isfile(self.__path):
             # the path is not a file
             raise IOError('%s is not a file' % self.__path)
-        with open(self.__path, mode) as file:
+        with open(self.__path, mode, encoding='utf-8') as file:
             self.__data = file.read()
         return self.__data
 
@@ -80,18 +81,18 @@ class File:
         directory = os.path.dirname(self.__path)
         if not self.make_dirs(directory):
             return False
-        with open(self.__path, mode) as file:
+        with open(self.__path, mode, encoding='utf-8') as file:
             if len(data) == file.write(data):
                 # OK, update cache
                 self.__data = data
                 return True
 
     def append(self, data: Union[bytes, str], mode: str='ab') -> bool:
-        if not self.exists(self.__path):
+        if not os.path.exists(self.__path):
             # new file
             return self.write(data=data, mode=mode)
         # append to exists file
-        with open(self.__path, mode) as file:
+        with open(self.__path, mode, encoding='utf-8') as file:
             if len(data) == file.write(data):
                 # OK, erase cache
                 self.__data = None
@@ -100,7 +101,7 @@ class File:
     def remove(self, path: str=None) -> bool:
         if path is None:
             path = self.__path
-        if self.exists(path):
+        if os.path.exists(path):
             os.remove(path)
             return True
 
