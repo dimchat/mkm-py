@@ -30,7 +30,6 @@
 
 from typing import Optional
 
-from .types import NetworkID
 from .address import Address, ANYWHERE, EVERYWHERE
 
 
@@ -146,7 +145,7 @@ class ID(str):
             return self.__terminal
 
     @property
-    def type(self) -> NetworkID:
+    def type(self) -> int:
         """ ID type """
         address = self.address
         if address is not None:
@@ -167,6 +166,16 @@ class ID(str):
     def is_broadcast(self) -> bool:
         assert self.address is not None, 'ID error: %s' % self
         return self.address.is_broadcast
+
+    @property
+    def is_user(self) -> bool:
+        assert self.address is not None, 'ID error: %s' % self
+        return self.address.is_user
+
+    @property
+    def is_group(self) -> bool:
+        assert self.address is not None, 'ID error: %s' % self
+        return self.address.is_group
 
     #
     #   Factory

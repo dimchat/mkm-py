@@ -32,7 +32,6 @@ import weakref
 from abc import ABC
 from typing import Optional
 
-from .types import NetworkID
 from .identifier import ID
 from .meta import Meta
 from .profile import Profile
@@ -96,10 +95,10 @@ class Entity(ABC):
         return self.__identifier
 
     @property
-    def type(self) -> NetworkID:
+    def type(self) -> int:
         """ Entity type """
         assert self.__identifier is not None, 'entity ID should not be empty'
-        return self.__identifier.address.network
+        return self.__identifier.type
 
     @property
     def number(self) -> int:

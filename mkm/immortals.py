@@ -161,7 +161,7 @@ class Immortals(UserDataSource):
         return self.__ids.get(string)
 
     def user(self, identifier: ID) -> Optional[User]:
-        assert identifier.type.is_user(), 'ID type error: %s' % identifier
+        assert identifier.is_user, 'ID type error: %s' % identifier
         user = self.__users.get(identifier)
         if user is None:
             # only create exists account
@@ -183,7 +183,7 @@ class Immortals(UserDataSource):
     #   UserDataSource
     #
     def contacts(self, identifier: ID) -> Optional[list]:
-        assert identifier.type.is_user(), 'ID error: %s' % identifier
+        assert identifier.is_user, 'ID error: %s' % identifier
         if identifier not in self.__ids:
             return None
         array = []
@@ -194,21 +194,21 @@ class Immortals(UserDataSource):
         return array
 
     def public_key_for_encryption(self, identifier: ID) -> Optional[EncryptKey]:
-        assert identifier.type.is_user(), 'ID error: %s' % identifier
+        assert identifier.is_user, 'ID error: %s' % identifier
         # NOTICE: return nothing to use profile.key or meta.key
         return None
 
     def private_keys_for_decryption(self, identifier: ID) -> Optional[list]:
-        assert identifier.type.is_user(), 'ID error: %s' % identifier
+        assert identifier.is_user, 'ID error: %s' % identifier
         key = self.__private_keys.get(identifier)
         if isinstance(key, DecryptKey):
             return [key]
 
     def private_key_for_signature(self, identifier: ID) -> Optional[SignKey]:
-        assert identifier.type.is_user(), 'ID error: %s' % identifier
+        assert identifier.is_user, 'ID error: %s' % identifier
         return self.__private_keys.get(identifier)
 
     def public_keys_for_verification(self, identifier: ID) -> Optional[list]:
-        assert identifier.type.is_user(), 'ID error: %s' % identifier
+        assert identifier.is_user, 'ID error: %s' % identifier
         # NOTICE: return nothing to use meta.key
         return None

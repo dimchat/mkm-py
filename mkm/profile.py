@@ -216,7 +216,7 @@ class UserProfile(Profile):
             # 2. if public key not exists, no need to convert to UserProfile
             identifier = profile.get('ID')
             if isinstance(identifier, ID):
-                if not identifier.type.is_user():
+                if not identifier.is_user:
                     return None
             elif 'avatar' not in profile and 'key' not in profile:
                 # not a user profile

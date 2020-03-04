@@ -126,26 +126,13 @@ class NetworkID(IntEnum):
     Thing = 0x80           # 1000 0000 (IoT)
     Robot = 0xC8           # 1100 1000
 
-    def is_user(self) -> bool:
-        return (self.value & self.Main.value) or (self.value == self.BTCMain.value)
+    @classmethod
+    def is_user(cls, network: int) -> bool:
+        return (network & cls.Main.value) == cls.Main.value or network == cls.BTCMain.value
 
-    def is_person(self) -> bool:
-        return (self.value == self.Main.value) or (self.value == self.BTCMain.value)
-
-    def is_group(self) -> bool:
-        return self.value & self.Group.value
-
-    def is_station(self) -> bool:
-        return self.value == self.Station.value
-
-    def is_provider(self) -> bool:
-        return self.value == self.Provider.value
-
-    def is_thing(self) -> bool:
-        return self.value & self.Thing.value
-
-    def is_robot(self) -> bool:
-        return self.value == self.Robot.value
+    @classmethod
+    def is_group(cls, network: int) -> bool:
+        return (network & cls.Group.value) == cls.Group.value
 
 
 class MetaVersion(IntEnum):
@@ -181,6 +168,3 @@ class MetaVersion(IntEnum):
 
     ETH = 0x04    # 0000 0100
     ExETH = 0x05  # 0000 0101
-
-    def has_seed(self) -> bool:
-        return self.value & self.MKM.value

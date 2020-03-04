@@ -29,6 +29,7 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
+from typing import Union
 
 from .crypto.utils import sha256, ripemd160, base58_encode, base58_decode
 from .types import NetworkID
@@ -75,11 +76,11 @@ class Address(ABC):
 
     @property
     @abstractmethod
-    def network(self) -> NetworkID:
+    def network(self) -> int:
         """
         Get network type of address
 
-        :return: NetworkID
+        :return: integer as NetworkID
         """
         raise NotImplemented
 
@@ -96,13 +97,22 @@ class Address(ABC):
     @property
     def is_broadcast(self) -> bool:
         assert self.network is not None, 'address error: %s' % self
-        value = self.network.value
-        if value == NetworkID.Group.value:
+        if self.network == EVERYWHERE.network:
             # group address
             return self == EVERYWHERE
-        elif value == NetworkID.Main.value:
+        elif self.network == ANYWHERE.network:
             # user address
             return self == ANYWHERE
+
+    @property
+    def is_user(self) -> bool:
+        assert self.network is not None, 'address error: %s' % self
+        return NetworkID.is_user(network=self.network)
+
+    @property
+    def is_group(self) -> bool:
+        assert self.network is not None, 'address error: %s' % self
+        return NetworkID.is_group(network=self.network)
 
     #
     #   Runtime
@@ -170,11 +180,11 @@ class DefaultAddress(str, Address):
         if check_code(prefix + digest) != code:
             raise ValueError('BTC address check code error: %s' % address)
         network = ord(prefix)
-        self.__network = NetworkID(network)
+        self.__network = network
         self.__number = user_number(code)
 
     @property
-    def network(self) -> NetworkID:
+    def network(self) -> int:
         return self.__network
 
     @property
@@ -185,7 +195,7 @@ class DefaultAddress(str, Address):
     #   Factory
     #
     @classmethod
-    def new(cls, data: bytes, network: NetworkID=0) -> Address:
+    def new(cls, data: bytes, network: Union[NetworkID, int]=0) -> Address:
         """
         Generate address with fingerprint and network ID
 
@@ -193,6 +203,8 @@ class DefaultAddress(str, Address):
         :param network: address type
         :return:        Address object
         """
+        if isinstance(network, NetworkID):
+            network = network.value
         prefix = chr(network).encode('latin1')
         digest = ripemd160(sha256(data))
         code = check_code(prefix + digest)
@@ -212,14 +224,16 @@ Address.register(DefaultAddress)  # default
 
 class ConstantAddress(str, Address):
 
-    def __new__(cls, address: str, network: NetworkID, number: int):
+    def __new__(cls, address: str, network: Union[NetworkID, int], number: int):
         self = super().__new__(cls, address)
+        if isinstance(network, NetworkID):
+            network = network.value
         self.__network = network
         self.__number = number
         return self
 
     @property
-    def network(self) -> NetworkID:
+    def network(self) -> int:
         return self.__network
 
     @property

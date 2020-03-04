@@ -39,6 +39,10 @@ from .address import Address, DefaultAddress
 from .identifier import ID
 
 
+def contains_seed(version: int) -> bool:
+    return (version & MetaVersion.MKM.value) == MetaVersion.MKM.value
+
+
 class Meta(dict, ABC):
     """This class is used to generate entity ID
 
@@ -71,7 +75,11 @@ class Meta(dict, ABC):
                 # return Meta object directly
                 return meta
             # get class by meta version
-            version = MetaVersion(int(meta['version']))
+            version = meta['version']
+            if isinstance(version, MetaVersion):
+                version = version.value
+            else:
+                version = int(version)
             clazz = cls.__meta_classes.get(version)
             if clazz is None:
                 raise ModuleNotFoundError('meta version not supported: %s' % meta)
@@ -84,8 +92,14 @@ class Meta(dict, ABC):
             # no need to init again
             return
         super().__init__(meta)
+        # Meta algorithm version
+        version = meta['version']
+        if isinstance(version, MetaVersion):
+            version = version.value
+        else:
+            version = int(version)
+        self.__version = version
         # lazy
-        self.__version: MetaVersion = None
         self.__key: Union[PublicKey, EncryptKey, None] = None
         self.__seed: str = None
         self.__fingerprint: bytes = None
@@ -103,19 +117,17 @@ class Meta(dict, ABC):
         return self.match_identifier(identifier)
 
     @property
-    def version(self) -> MetaVersion:
+    def version(self) -> int:
         """
         Meta algorithm version
 
             0x01 - username@address
             0x02 - btc_address
             0x03 - username@btc_address
+            0x04 - eth_address
+            0x05 - username@eth_address
             ...
-
-        :return: version number
         """
-        if self.__version is None:
-            self.__version = MetaVersion(int(self['version']))
         return self.__version
 
     @property
@@ -139,7 +151,7 @@ class Meta(dict, ABC):
 
         :return: ID.name
         """
-        if self.__seed is None and self.version.has_seed():
+        if self.__seed is None and contains_seed(self.version):
             # MKM, ExBTC, ExETH, ...
             self.__seed = self['seed']
         return self.__seed
@@ -154,7 +166,7 @@ class Meta(dict, ABC):
 
         :return: signature
         """
-        if self.__fingerprint is None and self.version.has_seed():
+        if self.__fingerprint is None and contains_seed(self.version):
             # MKM, ExBTC, ExETH, ...
             self.__fingerprint = base64_decode(self['fingerprint'])
         return self.__fingerprint
@@ -172,7 +184,7 @@ class Meta(dict, ABC):
             if key is None:
                 # meta.key should not be empty
                 self.__status = -1
-            elif self.version.has_seed():
+            elif contains_seed(self.version):
                 seed = self.seed
                 fingerprint = self.fingerprint
                 if seed is None or fingerprint is None:
@@ -208,7 +220,7 @@ class Meta(dict, ABC):
             return False
         if self.key == public_key:
             return True
-        if self.version.has_seed():
+        if contains_seed(self.version):
             # check whether keys equal by verifying signature
             seed = self.seed
             fingerprint = self.fingerprint
@@ -241,19 +253,21 @@ class Meta(dict, ABC):
             return False
         return self.generate_address(network=address.network) == address
 
-    def generate_identifier(self, network: NetworkID) -> ID:
+    def generate_identifier(self, network: Union[NetworkID, int]) -> ID:
         """
         Generate ID with meta info and network ID
 
         :param network: ID type
         :return: ID object
         """
+        if isinstance(network, NetworkID):
+            network = network.value
         address = self.generate_address(network=network)
         if address is not None:
             return ID.new(name=self.seed, address=address)
 
     @abstractmethod
-    def generate_address(self, network: NetworkID) -> Address:
+    def generate_address(self, network: int) -> Address:
         """
         Generate address with meta info and network ID
 
@@ -277,7 +291,9 @@ class Meta(dict, ABC):
         :param fingerprint: - signature
         :return: Meta object
         """
-        if version.has_seed():
+        if isinstance(version, MetaVersion):
+            version = version.value
+        if contains_seed(version):
             # MKM, ExBTC, ExETH, ...
             meta = {
                 'version': version,
@@ -304,7 +320,9 @@ class Meta(dict, ABC):
         :param version:     - meta version
         :return:
         """
-        if version.has_seed():
+        if isinstance(version, MetaVersion):
+            version = version.value
+        if contains_seed(version):
             # MKM, ExBTC, ExETH, ...
             # generate fingerprint with private key
             fingerprint = private_key.sign(seed.encode('utf-8'))
@@ -326,10 +344,10 @@ class Meta(dict, ABC):
     #
     #   Runtime
     #
-    __meta_classes = {}  # class map
+    __meta_classes = {}  # int -> class
 
     @classmethod
-    def register(cls, version: MetaVersion, meta_class=None) -> bool:
+    def register(cls, version: Union[MetaVersion, int], meta_class=None) -> bool:
         """
         Register meta class with version
 
@@ -337,6 +355,10 @@ class Meta(dict, ABC):
         :param meta_class: if content class is None, then remove with type
         :return: False on error
         """
+        if isinstance(version, MetaVersion):
+            version = version.value
+        else:
+            version = int(version)
         if meta_class is None:
             cls.__meta_classes.pop(version, None)
         elif issubclass(meta_class, Meta):
@@ -370,9 +392,9 @@ class DefaultMeta(Meta):
             return
         super().__init__(meta)
         # id caches
-        self.__ids: dict = {}
+        self.__ids: dict = {}  # int -> ID
 
-    def generate_identifier(self, network: NetworkID) -> ID:
+    def generate_identifier(self, network: int) -> ID:
         # check cache
         identifier = self.__ids.get(network)
         if identifier is None:
@@ -382,7 +404,7 @@ class DefaultMeta(Meta):
             self.__ids[network] = identifier
         return identifier
 
-    def generate_address(self, network: NetworkID) -> Address:
+    def generate_address(self, network: int) -> Address:
         assert self.version == MetaVersion.MKM, 'meta version error: %d' % self.version
         assert self.valid, 'meta not valid: %s' % self
         # check cache
