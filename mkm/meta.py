@@ -39,10 +39,6 @@ from .address import Address, DefaultAddress
 from .identifier import ID
 
 
-def contains_seed(version: int) -> bool:
-    return (version & MetaVersion.MKM.value) == MetaVersion.MKM.value
-
-
 class Meta(dict, ABC):
     """This class is used to generate entity ID
 
@@ -131,6 +127,10 @@ class Meta(dict, ABC):
         return self.__version
 
     @property
+    def has_seed(self) -> bool:
+        return MetaVersion.has_seed(version=self.version)
+
+    @property
     def key(self) -> Union[PublicKey, EncryptKey]:
         """
         Public key (used for signature)
@@ -151,7 +151,7 @@ class Meta(dict, ABC):
 
         :return: ID.name
         """
-        if self.__seed is None and contains_seed(self.version):
+        if self.__seed is None and self.has_seed:
             # MKM, ExBTC, ExETH, ...
             self.__seed = self['seed']
         return self.__seed
@@ -166,7 +166,7 @@ class Meta(dict, ABC):
 
         :return: signature
         """
-        if self.__fingerprint is None and contains_seed(self.version):
+        if self.__fingerprint is None and self.has_seed:
             # MKM, ExBTC, ExETH, ...
             self.__fingerprint = base64_decode(self['fingerprint'])
         return self.__fingerprint
@@ -184,7 +184,7 @@ class Meta(dict, ABC):
             if key is None:
                 # meta.key should not be empty
                 self.__status = -1
-            elif contains_seed(self.version):
+            elif self.has_seed:
                 seed = self.seed
                 fingerprint = self.fingerprint
                 if seed is None or fingerprint is None:
@@ -220,7 +220,7 @@ class Meta(dict, ABC):
             return False
         if self.key == public_key:
             return True
-        if contains_seed(self.version):
+        if self.has_seed:
             # check whether keys equal by verifying signature
             seed = self.seed
             fingerprint = self.fingerprint
@@ -293,7 +293,7 @@ class Meta(dict, ABC):
         """
         if isinstance(version, MetaVersion):
             version = version.value
-        if contains_seed(version):
+        if MetaVersion.has_seed(version=version):
             # MKM, ExBTC, ExETH, ...
             meta = {
                 'version': version,
@@ -322,7 +322,7 @@ class Meta(dict, ABC):
         """
         if isinstance(version, MetaVersion):
             version = version.value
-        if contains_seed(version):
+        if MetaVersion.has_seed(version=version):
             # MKM, ExBTC, ExETH, ...
             # generate fingerprint with private key
             fingerprint = private_key.sign(seed.encode('utf-8'))

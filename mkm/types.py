@@ -168,3 +168,7 @@ class MetaVersion(IntEnum):
 
     ETH = 0x04    # 0000 0100
     ExETH = 0x05  # 0000 0101
+
+    @classmethod
+    def has_seed(cls, version: int) -> bool:
+        return (version & cls.MKM.value) == cls.MKM.value
