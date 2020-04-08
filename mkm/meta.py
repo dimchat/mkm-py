@@ -31,8 +31,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Union
 
-from .crypto.utils import base64_encode, base64_decode
 from .crypto import PublicKey, PrivateKey, EncryptKey
+from .crypto import Base64
 
 from .types import NetworkID, MetaVersion
 from .address import Address, DefaultAddress
@@ -168,7 +168,7 @@ class Meta(dict, ABC):
         """
         if self.__fingerprint is None and self.has_seed:
             # MKM, ExBTC, ExETH, ...
-            self.__fingerprint = base64_decode(self['fingerprint'])
+            self.__fingerprint = Base64.decode(self['fingerprint'])
         return self.__fingerprint
 
     @property
@@ -299,7 +299,7 @@ class Meta(dict, ABC):
                 'version': version,
                 'seed': seed,
                 'key': key,
-                'fingerprint': base64_encode(fingerprint),
+                'fingerprint': Base64.encode(fingerprint),
             }
         else:
             # BTC, ETH, ...
@@ -330,7 +330,7 @@ class Meta(dict, ABC):
                 'version': version,
                 'seed': seed,
                 'key': private_key.public_key,
-                'fingerprint': base64_encode(fingerprint),
+                'fingerprint': Base64.encode(fingerprint),
             }
         else:
             # BTC, ETH, ...

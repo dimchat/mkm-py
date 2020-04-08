@@ -10,7 +10,7 @@
 
 from setuptools import setup, find_packages
 
-__version__ = '0.8.10'
+__version__ = '0.9.0'
 __author__ = 'Albert Moky'
 __contact__ = 'albert.moky@gmail.com'
 
@@ -37,8 +37,5 @@ setup(
         'Operating System :: OS Independent',
     ],
     install_requires=[
-        'base58',  # 1.0.3
-        'Crypto',  # pycryptodome==3.7.3
-        'numpy',   # 1.15.4
     ]
 )

@@ -31,7 +31,9 @@
 from abc import ABC, abstractmethod
 from typing import Union
 
-from .crypto.utils import sha256, ripemd160, base58_encode, base58_decode
+from .crypto import Base58
+from .crypto import sha256, ripemd160
+
 from .types import NetworkID
 
 
@@ -169,7 +171,7 @@ class DefaultAddress(str, Address):
             return
         super().__init__()
         # get fields from string
-        prefix_digest_code = base58_decode(address)
+        prefix_digest_code = Base58.decode(address)
         if len(prefix_digest_code) != 25:
             raise ValueError('BTC address length error: %s' % address)
         # split them
@@ -208,7 +210,7 @@ class DefaultAddress(str, Address):
         prefix = chr(network).encode('latin1')
         digest = ripemd160(sha256(data))
         code = check_code(prefix + digest)
-        address = base58_encode(prefix + digest + code)
+        address = Base58.encode(prefix + digest + code)
         return cls(address)
 
 

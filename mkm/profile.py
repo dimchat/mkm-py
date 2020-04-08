@@ -31,8 +31,9 @@
 import json
 from typing import Optional, Union, Any
 
-from .crypto.utils import base64_decode, base64_encode
 from .crypto import PublicKey, EncryptKey, VerifyKey, SignKey
+from .crypto import Base64
+
 from .identifier import ID
 from .tai import TAI
 
@@ -85,7 +86,7 @@ class Profile(dict, TAI):
         if self.__signature is None:
             base64: str = self.get('signature')
             if base64 is not None:
-                self.__signature = base64_decode(base64)
+                self.__signature = Base64.decode(base64)
         return self.__signature
 
     @property
@@ -193,7 +194,7 @@ class Profile(dict, TAI):
         self.__data = data.encode('utf-8')
         self.__signature = private_key.sign(self.__data)
         self['data'] = data  # JsON string
-        self['signature'] = base64_encode(self.__signature)
+        self['signature'] = Base64.encode(self.__signature)
         return self.__signature
 
     @classmethod
