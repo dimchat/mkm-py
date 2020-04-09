@@ -32,10 +32,10 @@ from .crypto import SignKey, VerifyKey, EncryptKey, DecryptKey
 from .crypto import SymmetricKey, PrivateKey, PublicKey
 
 from .crypto import BaseCoder, Base64, Base58, Hex
-from .crypto import Digest, MD5, SHA256, RipeMD160
-from .crypto import md5, sha256, ripemd160
+from .crypto import Digest, MD5, SHA1, SHA256, RipeMD160
+from .crypto import md5, sha1, sha256, ripemd160
 
-from .types import NetworkID
+from .types import NetworkID, MetaVersion
 from .address import Address, ANYWHERE, EVERYWHERE
 from .identifier import ID, ANYONE, EVERYONE
 from .meta import Meta
@@ -59,11 +59,12 @@ __all__ = [
     'BaseCoder',
     'Base64', 'Base58', 'Hex',
     'Digest',
-    'MD5', 'SHA256', 'RipeMD160',
-    'md5', 'sha256', 'ripemd160',
+    'MD5', 'SHA1', 'SHA256', 'RipeMD160',
+    'md5', 'sha1', 'sha256', 'ripemd160',
 
     # entity
-    'NetworkID', 'Address', 'ID', 'Meta', 'Profile',
+    'NetworkID', 'MetaVersion',
+    'Address', 'ID', 'Meta', 'Profile',
     'Entity', 'User', 'Group',
 
     # delegate
