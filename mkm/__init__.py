@@ -32,7 +32,7 @@ from .crypto import SignKey, VerifyKey, EncryptKey, DecryptKey
 from .crypto import SymmetricKey, PrivateKey, PublicKey
 
 from .crypto import BaseCoder, Base64, Base58, Hex
-from .crypto import Digest, MD5, SHA1, SHA256, RipeMD160
+from .crypto import Digest, MD5, SHA1, SHA256, RIPEMD160
 from .crypto import md5, sha1, sha256, ripemd160
 
 from .types import NetworkID, MetaVersion
@@ -59,7 +59,7 @@ __all__ = [
     'BaseCoder',
     'Base64', 'Base58', 'Hex',
     'Digest',
-    'MD5', 'SHA1', 'SHA256', 'RipeMD160',
+    'MD5', 'SHA1', 'SHA256', 'RIPEMD160',
     'md5', 'sha1', 'sha256', 'ripemd160',
 
     # entity

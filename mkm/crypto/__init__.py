@@ -34,7 +34,7 @@ from .cryptography import SignKey, VerifyKey, EncryptKey, DecryptKey
 from .symmetric import SymmetricKey
 from .asymmetric import PrivateKey, PublicKey
 
-from .digest import Digest, MD5, SHA1, SHA256, RipeMD160, md5, sha1, sha256, ripemd160
+from .digest import Digest, MD5, SHA1, SHA256, RIPEMD160, md5, sha1, sha256, ripemd160
 from .coder import BaseCoder, Base58, Base64, Hex
 
 
@@ -45,7 +45,7 @@ __all__ = [
     'PrivateKey', 'PublicKey',
 
     # Data
-    'Digest', 'MD5', 'SHA1', 'SHA256', 'RipeMD160',
+    'Digest', 'MD5', 'SHA1', 'SHA256', 'RIPEMD160',
     'md5', 'sha1', 'sha256', 'ripemd160',
     'BaseCoder', 'Base64', 'Base58', 'Hex',
 ]

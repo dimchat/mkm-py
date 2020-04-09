@@ -97,7 +97,7 @@ def sha1(data: bytes) -> bytes:
 
 
 def ripemd160(data: bytes) -> bytes:
-    return RipeMD160.coder.digest(data=data)
+    return RIPEMD160.coder.digest(data=data)
 
 
 class MD5:
@@ -130,11 +130,11 @@ class SHA256:
         return SHA256.coder.digest(data=data)
 
 
-class RipeMD160:
+class RIPEMD160:
 
     coder: Digest = R160()
 
     @staticmethod
     def digest(data: bytes) -> bytes:
-        assert RipeMD160.coder is not None, 'RIPEMD160 coder not set yet'
-        return RipeMD160.coder.digest(data=data)
+        assert RIPEMD160.coder is not None, 'RIPEMD160 coder not set yet'
+        return RIPEMD160.coder.digest(data=data)
