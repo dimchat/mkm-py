@@ -219,9 +219,9 @@ class UserProfile(Profile):
             if isinstance(identifier, ID):
                 if not identifier.is_user:
                     return None
-            elif 'avatar' not in profile and 'key' not in profile:
-                # not a user profile
-                return None
+            # elif 'avatar' not in profile and 'key' not in profile:
+            #     # not a user profile
+            #     return None
         # new UserProfile(dict)
         return super().__new__(cls, profile)
 

@@ -71,7 +71,10 @@ class Address(ABC):
             return EVERYWHERE
         # try to create address object
         for clazz in cls.__address_classes:
-            inst = clazz.__new__(clazz, address)
+            try:
+                inst = clazz.__new__(clazz, address)
+            except ValueError:
+                continue
             if inst is not None:
                 return inst
         raise ValueError('unrecognized address: %s' % address)
@@ -130,7 +133,7 @@ class Address(ABC):
         :return: False on error
         """
         if issubclass(address_class, Address):
-            cls.__address_classes.append(address_class)
+            cls.__address_classes.insert(0, address_class)
         else:
             raise TypeError('%s must be subclass of Address' % address_class)
         return True
