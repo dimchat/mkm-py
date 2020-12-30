@@ -78,7 +78,7 @@ The ID format is ```name@address[/terminal]```.
 The **network type** of a person is ```8```, and group is ```16```:
 
 ```python
-class NetworkID(IntEnum):
+class NetworkType(IntEnum):
     # Person Account
     Main = 0x08         # 0000 1000 (Person)
 
@@ -121,7 +121,7 @@ def check_code(data: bytes) -> bytes:
 class BTCAddress(Address):
     
     @classmethod
-    def new(cls, data: bytes, network: NetworkID=0) -> Address:
+    def new(cls, data: bytes, network: NetworkType=0) -> Address:
         """Generate address with fingerprint and network ID
         :param data:    fingerprint (signature/key.data)
         :param network: address type

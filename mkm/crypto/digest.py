@@ -31,52 +31,14 @@
 """
 
 import hashlib
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 
-class Digest(ABC):
+class DataDigester:
 
     @abstractmethod
     def digest(self, data: bytes) -> bytes:
         raise NotImplemented
-
-
-"""
-    Implementations
-"""
-
-
-class M5(Digest):
-
-    def digest(self, data: bytes) -> bytes:
-        """ MD5 digest """
-        hash_obj = hashlib.md5()
-        hash_obj.update(data)
-        return hash_obj.digest()
-
-
-class S1(Digest):
-
-    def digest(self, data: bytes) -> bytes:
-        """ SHA1 Digest """
-        return hashlib.sha1(data).digest()
-
-
-class S256(Digest):
-
-    def digest(self, data: bytes) -> bytes:
-        """ SHA-256 """
-        # return SHA256.new(data).digest()
-        return hashlib.sha256(data).digest()
-
-
-class R160(Digest):
-
-    def digest(self, data: bytes) -> bytes:
-        """ RIPEMD-160 """
-        hash_obj = hashlib.new('ripemd160')
-        hash_obj.update(data)
-        return hash_obj.digest()
 
 
 """
@@ -85,24 +47,65 @@ class R160(Digest):
 
 
 def md5(data: bytes) -> bytes:
-    return MD5.coder.digest(data=data)
-
-
-def sha256(data: bytes) -> bytes:
-    return SHA256.coder.digest(data=data)
+    return MD5.digest(data=data)
 
 
 def sha1(data: bytes) -> bytes:
-    return SHA1.coder.digest(data=data)
+    return SHA1.digest(data=data)
+
+
+def sha256(data: bytes) -> bytes:
+    return SHA256.digest(data=data)
+
+
+def keccak256(data: bytes) -> bytes:
+    return KECCAK256.digest(data=data)
 
 
 def ripemd160(data: bytes) -> bytes:
-    return RIPEMD160.coder.digest(data=data)
+    return RIPEMD160.digest(data=data)
+
+
+"""
+    Implementations
+"""
+
+
+class M5(DataDigester):
+
+    def digest(self, data: bytes) -> bytes:
+        """ MD5 digest """
+        hash_obj = hashlib.md5()
+        hash_obj.update(data)
+        return hash_obj.digest()
+
+
+class S1(DataDigester):
+
+    def digest(self, data: bytes) -> bytes:
+        """ SHA1 Digest """
+        return hashlib.sha1(data).digest()
+
+
+class S256(DataDigester):
+
+    def digest(self, data: bytes) -> bytes:
+        """ SHA-256 """
+        return hashlib.sha256(data).digest()
+
+
+class R160(DataDigester):
+
+    def digest(self, data: bytes) -> bytes:
+        """ RIPEMD-160 """
+        hash_obj = hashlib.new('ripemd160')
+        hash_obj.update(data)
+        return hash_obj.digest()
 
 
 class MD5:
 
-    coder: Digest = M5()
+    coder: DataDigester = M5()
 
     @staticmethod
     def digest(data: bytes) -> bytes:
@@ -112,7 +115,7 @@ class MD5:
 
 class SHA1:
 
-    coder: Digest = S1()
+    coder: DataDigester = S1()
 
     @staticmethod
     def digest(data: bytes) -> bytes:
@@ -122,7 +125,7 @@ class SHA1:
 
 class SHA256:
 
-    coder: Digest = S256()
+    coder: DataDigester = S256()
 
     @staticmethod
     def digest(data: bytes) -> bytes:
@@ -130,9 +133,19 @@ class SHA256:
         return SHA256.coder.digest(data=data)
 
 
+class KECCAK256:
+
+    coder: DataDigester = None
+
+    @staticmethod
+    def digest(data: bytes) -> bytes:
+        assert KECCAK256.coder is not None, 'KECCAK256 coder not set yet'
+        return KECCAK256.coder.digest(data=data)
+
+
 class RIPEMD160:
 
-    coder: Digest = R160()
+    coder: DataDigester = R160()
 
     @staticmethod
     def digest(data: bytes) -> bytes:

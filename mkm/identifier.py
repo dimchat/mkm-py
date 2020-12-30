@@ -28,12 +28,13 @@
 # SOFTWARE.
 # ==============================================================================
 
-from typing import Optional
+from abc import abstractmethod
+from typing import Optional, Union
 
 from .address import Address, ANYWHERE, EVERYWHERE
 
 
-class ID(str):
+class ID:
     """
         ID for entity (User/Group)
         ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,154 +47,110 @@ class ID(str):
             terminal - entity login resource(device), OPTIONAL
     """
 
-    def __new__(cls, identifier: str):
-        """
-        Create ID object with string
-
-        :param identifier: ID string with format 'name@address/terminal'
-        :return: ID object
-        """
-        if identifier is None:
-            return None
-        elif cls is ID:
-            if isinstance(identifier, ID):
-                # return ID object directly
-                return identifier
-        # new ID(str)
-        return super().__new__(cls, identifier)
-
-    def __init__(self, identifier: str):
-        if self is identifier:
-            # no need to init again
-            return
-        super().__init__()
-        # lazy
-        self.__name: str = None
-        self.__address: Address = None
-        self.__terminal: str = None
-
     def __eq__(self, other) -> bool:
-        if not isinstance(other, str):
-            # other ID empty
+        if other is None:
             return False
+        if not isinstance(other, ID):
+            assert isinstance(other, str), 'ID error: %s' % other
+            other = ID.parse(identifier=other)
         if super().__eq__(other):
             # same object
             return True
-        if isinstance(other, ID):
-            # check address
-            address = self.address
-            if address != other.address:
-                return False
-            # check name
-            name = self.name
-            if name is None or len(name) == 0:
-                return other.name is None or len(other.name) == 0
-            else:
-                return name == other.name
-        assert isinstance(other, str), 'ID error: %s' % other
-        # comparing without terminal
-        pair = other.split('/', 1)
-        assert len(pair[0]) > 0, 'ID error: %s' % other
-        terminal = self.terminal
-        if terminal is None or len(terminal) == 0:
-            return super().__eq__(pair[0])
-        else:
-            return pair[0] == self.split('/', 1)[0]
+        return self.address == other.address and self.name == other.name
 
     def __hash__(self) -> int:
-        # get address string
-        string = str(self.address)
-        # append name
-        name = self.name
-        if name is not None and len(name) > 0:
-            string = name + '@' + string
-        # append terminal
-        terminal = self.terminal
-        if terminal is not None and len(terminal) > 0:
-            string = string + '/' + terminal
+        string = concat(address=self.address, name=self.name, terminal=self.terminal)
         return hash(string)
 
     @property
+    @abstractmethod
     def name(self) -> Optional[str]:
-        if self.valid:
-            return self.__name
+        raise NotImplemented
 
     @property
+    @abstractmethod
     def address(self) -> Address:
-        if self.__address is None:
-            # split ID string
-            pair = self.split('/', 1)
-            if len(pair) == 2:
-                # got terminal
-                self.__terminal = pair[1]
-            else:
-                self.__terminal = ''
-            pair = pair[0].split('@', 1)
-            if len(pair) == 2:
-                # got name & address
-                self.__name = pair[0]
-                self.__address = Address(pair[1])
-            else:
-                # got address
-                self.__name = ''
-                self.__address = Address(pair[0])
-        return self.__address
+        raise NotImplemented
 
     @property
+    @abstractmethod
     def terminal(self) -> Optional[str]:
-        if self.valid:
-            return self.__terminal
+        raise NotImplemented
 
     @property
     def type(self) -> int:
         """ ID type """
-        address = self.address
-        if address is not None:
-            return address.network
-
-    @property
-    def number(self) -> int:
-        """ Search number of this ID """
-        address = self.address
-        if address is not None:
-            return address.number
-
-    @property
-    def valid(self) -> bool:
-        return self.number > 0
+        return self.address.network
 
     @property
     def is_broadcast(self) -> bool:
-        assert self.address is not None, 'ID error: %s' % self
         return self.address.is_broadcast
 
     @property
     def is_user(self) -> bool:
-        assert self.address is not None, 'ID error: %s' % self
         return self.address.is_user
 
     @property
     def is_group(self) -> bool:
-        assert self.address is not None, 'ID error: %s' % self
         return self.address.is_group
 
+    @classmethod
+    def convert(cls, members: list) -> list:
+        """
+        Convert ID list from string array
+
+        :param members: string array
+        :return: ID list
+        """
+        array = []
+        for item in members:
+            identifier = cls.parse(identifier=item)
+            if identifier is None:
+                continue
+            array.append(identifier)
+        return array
+
+    @classmethod
+    def revert(cls, members: list) -> list:
+        """
+        Revert ID list to string array
+
+        :param members: ID list
+        :return: string array
+        """
+        array = []
+        for item in members:
+            array.append(str(item))
+        return array
+
     #
-    #   Factory
+    #   Factory methods
     #
     @classmethod
-    def new(cls, address: Address, name: str=None, terminal: str=None):
-        # concatenate ID string
-        string = str(address)
-        if name is not None:
-            string = name + '@' + string
-        if terminal is not None:
-            string = string + '/' + terminal
-        # new ID(str)
-        identifier = cls(string)
-        identifier.__name = name
-        identifier.__address = address
-        identifier.__terminal = terminal
-        return identifier
+    def create(cls, address: Address, name: Optional[str]=None, terminal: Optional[str]=None):  # -> Optional[ID]:
+        factory = cls.factory()
+        assert isinstance(factory, Factory), 'ID factory not found'
+        return factory.create_identifier(address=address, name=name, terminal=terminal)
+
+    @classmethod
+    def parse(cls, identifier: str):  # -> Optional[ID]:
+        if identifier is None:
+            return None
+        if isinstance(identifier, ID):
+            return identifier
+        factory = cls.factory()
+        assert isinstance(factory, Factory), 'ID factory not found'
+        return factory.parse_identifier(identifier=identifier)
+
+    @classmethod
+    def factory(cls):  # -> Factory:
+        return cls.s_factory
+
+    @classmethod
+    def register(cls, factory):
+        cls.s_factory = factory
+
+    s_factory = None
 
 
 """
@@ -202,5 +159,122 @@ class ID(str):
 """
 
 
-ANYONE = ID.new(name="anyone", address=ANYWHERE)
-EVERYONE = ID.new(name="everyone", address=EVERYWHERE)
+ANYONE = ID.create(name="anyone", address=ANYWHERE)
+EVERYONE = ID.create(name="everyone", address=EVERYWHERE)
+
+
+"""
+    ID factory
+    ~~~~~~~~~~
+"""
+
+
+class Factory:
+
+    @abstractmethod
+    def create_identifier(self, address: Address, name: Optional[str]=None, terminal: Optional[str]=None) -> ID:
+        """
+        Create ID
+
+        :param address:  ID.address
+        :param name:     ID.name
+        :param terminal: ID.terminal
+        :return: ID
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def parse_identifier(self, identifier: str) -> Optional[ID]:
+        """
+        Parse string object to ID
+
+        :param identifier: ID string
+        :return: ID
+        """
+        raise NotImplemented
+
+
+class IDFactory(Factory):
+
+    def __init__(self):
+        super().__init__()
+        self.__ids = {}
+
+    def create_identifier(self, address: Address, name: Optional[str]=None, terminal: Optional[str]=None) -> ID:
+        identifier = concat(address=address, name=name, terminal=terminal)
+        _id = self.__ids.get(identifier)
+        if _id is None:
+            _id = Identifier(identifier=identifier, address=address, name=name, terminal=terminal)
+            self.__ids[identifier] = _id
+        return _id
+
+    def parse_identifier(self, identifier: Union[ID, str, None]) -> Optional[ID]:
+        if identifier is None:
+            return None
+        if isinstance(identifier, ID):
+            return identifier
+        assert isinstance(identifier, str), 'ID error: %s' % identifier
+        _id = self.__ids.get(identifier)
+        if _id is None:
+            _id = create(string=identifier)
+            if _id is not None:
+                self.__ids[identifier] = _id
+        return _id
+
+
+def create(string: str) -> Optional[ID]:
+    # split ID string
+    pair = string.split('/', 1)
+    # terminal
+    if len(pair) == 1:
+        # no terminal
+        terminal = None
+    else:
+        # got terminal
+        terminal = pair[1]
+    # name @ address
+    assert len(pair[0]) > 0, 'ID error: %s' % string
+    pair = pair[0].split('@', 1)
+    if len(pair) == 1:
+        # got address without name
+        name = None
+        address = Address.parse(address=pair[0])
+    else:
+        # got name & address
+        name = pair[0]
+        address = Address.parse(address=pair[1])
+    if address is not None:
+        return Identifier(identifier=string, address=address, name=name, terminal=terminal)
+
+
+def concat(address: Address, name: Optional[str] = None, terminal: Optional[str] = None):
+    string = str(address)
+    if name is not None and len(name) > 0:
+        string = name + '@' + string
+    if terminal is not None and len(terminal) > 0:
+        string = string + '/' + terminal
+    return string
+
+
+ID.register(factory=IDFactory())
+
+
+class Identifier(str, ID):
+
+    def __init__(self, identifier: str, address: Address, name: Optional[str]=None, terminal: Optional[str]=None):
+        super().__init__(identifier)
+        self.__name = name
+        self.__address = address
+        self.__terminal = terminal
+
+    @property
+    def name(self) -> Optional[str]:
+        return self.__name
+
+    @property
+    def address(self) -> Address:
+        return self.__address
+
+    @property
+    def terminal(self) -> Optional[str]:
+        return self.__terminal

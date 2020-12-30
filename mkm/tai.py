@@ -28,13 +28,15 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Optional, Any
 
-from .crypto import VerifyKey, SignKey, EncryptKey
+from .crypto import VerifyKey, SignKey
+
+from .identifier import ID
 
 
-class TAI(ABC):
+class TAI:
     """
         The Additional Information
         ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,98 +47,19 @@ class TAI(ABC):
             which could contain a public key for asymmetric encryption.
     """
 
-    # noinspection PyTypeChecker
-    def __new__(cls, profile: dict):
-        if profile is None:
-            return None
-        assert cls is TAI, 'call TAI() directly'
-        if isinstance(profile, TAI):
-            # return Profile object directly
-            return profile
-        # try to create Profile object
-        for clazz in cls.__tai_classes:
-            inst = clazz.__new__(clazz, profile)
-            if inst is not None:
-                return inst
-
-    @property
-    @abstractmethod
-    def identifier(self) -> str:
-        """
-        Entity ID
-
-        :return: Entity ID
-        """
-        raise NotImplemented
-
     @property
     @abstractmethod
     def valid(self) -> bool:
         """
-        If signature matched
+        Check if signature matched
 
-        :return: True on valid
+        :return: True on matched
         """
         raise NotImplemented
 
-    @property
-    def key(self) -> Optional[EncryptKey]:
-        """
-        Get public key to encrypt message for user
-
-        :return: public key
-        """
-        return None
-
-    """
-        Properties
-        ~~~~~~~~~~
-        
-        Inner dictionary which will be serialized to 'data'
-    """
-
-    @property
-    @abstractmethod
-    def _properties(self) -> Optional[dict]:
-        """
-        Get all properties when valid
-
-        :return: inner dictionary
-        """
-        raise NotImplemented
-
-    def get_property(self, key: str) -> Optional[Any]:
-        """
-        Get property value with key
-
-        :param key: property key
-        :return: property value
-        """
-        properties = self._properties
-        if properties is None:
-            return None
-        return properties.get(key)
-
-    @abstractmethod
-    def set_property(self, key: str, value: Any=None):
-        """
-        Update property with key and data
-        (this will clear 'data' and 'signature')
-
-        :param key:   property key
-        :param value: property value
-        """
-        properties = self._properties
-        assert properties is not None, 'failed to get properties'
-        if value is None:
-            properties.pop(key, None)
-        else:
-            properties[key] = value
-
-    """
-        Sign/Verify profile data
-        ~~~~~~~~~~~~~~~~~~~~~~~~
-    """
+    #
+    #  signature
+    #
 
     @abstractmethod
     def verify(self, public_key: VerifyKey) -> bool:
@@ -159,23 +82,155 @@ class TAI(ABC):
         raise NotImplemented
 
     #
-    #   Runtime
+    #  properties
     #
-    __tai_classes = []  # class list
+
+    @property
+    @abstractmethod
+    def properties(self) -> Optional[dict]:
+        """
+        Get all properties when valid
+
+        :return: inner dictionary
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def get_property(self, key: str) -> Optional[Any]:
+        """
+        Get property value with key
+
+        :param key: property key
+        :return: property value
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def set_property(self, key: str, value: Any=None):
+        """
+        Update property with key and data
+        (this will clear 'data' and 'signature')
+
+        :param key:   property key
+        :param value: property value
+        """
+        raise NotImplemented
+
+
+class Document(TAI):
+
+    #
+    #  Document types
+    #
+    VISA = 'visa'          # for login/communication
+    PROFILE = 'profile'    # for user info
+    BULLETIN = 'bulletin'  # for group info
+
+    @property
+    @abstractmethod
+    def type(self) -> str:
+        """
+        Get document type
+
+        :return: doc type
+        """
+        raise NotImplemented
+
+    @property
+    @abstractmethod
+    def identifier(self) -> ID:
+        """
+        Get entity ID
+
+        :return: Entity ID
+        """
+        raise NotImplemented
+
+    #
+    #  properties getter/setter
+    #
+    @property
+    def name(self) -> str:
+        """
+        Get entity name
+
+        :return: name string
+        """
+        raise NotImplemented
+
+    @name.setter
+    def name(self, string: str):
+        """
+        Set entity name
+
+        :param string: name string
+        :return:
+        """
+        raise NotImplemented
+
+    #
+    #  Factory methods
+    #
+    @classmethod
+    def create_document(cls, t: str, identifier: ID, data: Optional[bytes]=None, signature: Optional[bytes]=None):
+        factory = cls.factory(t=t)
+        assert isinstance(factory, DocumentFactory), 'document type not found: %s' % t
+        return factory.create_document(identifier=identifier, data=data, signature=signature)
 
     @classmethod
-    def register(cls, tai_class) -> bool:
-        """
-        Register TAI class
+    def parse_document(cls, document: dict):
+        if document is None:
+            return None
+        if isinstance(document, Document):
+            return document
+        t = document_type(document=document)
+        factory = cls.factory(t=t)
+        if factory is None:
+            factory = cls.factory(t='*')  # unknown
+            assert isinstance(factory, DocumentFactory), 'cannot parse document: %s' % document
+        return factory.parse_document(document=document)
 
-        :param tai_class: class for parsing Profile
-        :return: False on error
+    @classmethod
+    def factory(cls, t: str):  # -> DocumentFactory:
+        return s_factories.get(t)
+
+    @classmethod
+    def register(cls, t: str, factory):
+        s_factories[t] = factory
+
+
+def document_type(document: dict) -> str:
+    return document.get('type')
+
+
+"""
+    Document Factory
+    ~~~~~~~~~~~~~~~~
+"""
+s_factories = {}
+
+
+class DocumentFactory:
+
+    @abstractmethod
+    def create_document(self, identifier: ID, data: Optional[bytes]=None, signature: Optional[bytes]=None) -> Document:
         """
-        from .profile import Profile
-        assert tai_class is not TAI, 'should not register TAI itself!'
-        assert tai_class is not Profile, 'cannot register Profile!'
-        if issubclass(tai_class, TAI):
-            cls.__tai_classes.append(tai_class)
-        else:
-            raise TypeError('%s must be subclass of TAI' % tai_class)
-        return True
+        1. Create a new empty document with entity ID
+
+        2. Create document with data & signature loaded from local storage
+
+        :param identifier: entity ID
+        :param data:       document data
+        :param signature:  document signature
+        :return: Document
+        """
+        raise NotImplemented
+
+    def parse_document(self, document: dict) -> Optional[Document]:
+        """
+        Parse map object to entity document
+
+        :param document:
+        :return:
+        """
+        raise NotImplemented

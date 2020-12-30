@@ -23,191 +23,48 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import abstractmethod
-from typing import Union
+from abc import ABC, abstractmethod
 
-from .cryptography import CryptographyKey, VerifyKey, SignKey, EncryptKey
+from .cryptography import CryptographyKey
 
 
-class AsymmetricKey(CryptographyKey):
+class AsymmetricKey(CryptographyKey, ABC):
 
     RSA = 'RSA'
     ECC = 'ECC'
 
-    @property
+
+class VerifyKey(AsymmetricKey):
+
     @abstractmethod
-    def size(self) -> int:
-        data = self.data
-        if data is not None:
-            return len(data)
-
-
-class PublicKey(AsymmetricKey, VerifyKey):
-    """This class is used to en/decrypt symmetric key or sign/verify signature with message data
-
-        Asymmetric Cryptography Public Key
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        key data format: {
-            algorithm : "RSA", // "ECC", ...
-            data      : "{BASE64_ENCODE}",
-            ...
-        }
-    """
-
-    # noinspection PyTypeChecker
-    def __new__(cls, key: dict):
+    def verify(self, data: bytes, signature: bytes) -> bool:
         """
-        Create public key
+        OK = verify(data, signature, PK)
 
-        :param key: key info with algorithm='RSA'
-        :return: public key
-        """
-        if key is None:
-            return None
-        assert cls is PublicKey, 'call PublicKey() directly'
-        if isinstance(key, PublicKey):
-            # return PublicKey object directly
-            return key
-        # get class by algorithm name
-        clazz = cls.key_class(algorithm=key['algorithm'])
-        if clazz is not None:
-            return clazz.__new__(clazz, key)
-        else:
-            raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
-
-    @property
-    @abstractmethod
-    def size(self) -> int:
-        return super().size
-
-    def match(self, private_key) -> bool:
-        if not isinstance(private_key, dict):
-            return False
-        private_key = PrivateKey(private_key)
-        # 1. if the SK has the same public key, return true
-        if private_key.public_key == self:
-            return True
-        # 2. try to verify the SK's signature
-        promise = 'Moky loves May Lee forever!'.encode('utf-8')
-        signature = private_key.sign(promise)
-        return self.verify(promise, signature)
-
-    #
-    #   Runtime
-    #
-    __key_classes = {}  # class map
-
-    @classmethod
-    def register(cls, algorithm: str, key_class=None) -> bool:
-        """
-        Register public key class with algorithm
-
-        :param algorithm: key algorithm
-        :param key_class: if key class is None, then remove with algorithm
-        :return: False on error
-        """
-        if key_class is None:
-            cls.__key_classes.pop(algorithm, None)
-        elif issubclass(key_class, PublicKey):
-            cls.__key_classes[algorithm] = key_class
-        else:
-            raise TypeError('%s must be subclass of PublicKey' % key_class)
-        return True
-
-    @classmethod
-    def key_class(cls, algorithm: str):
-        """
-        Get public key class with algorithm
-
-        :param algorithm: key algorithm
-        :return: public key class
-        """
-        return cls.__key_classes.get(algorithm)
-
-
-class PrivateKey(AsymmetricKey, SignKey):
-    """This class is used to decrypt symmetric key or sign message data
-
-        Asymmetric Cryptography Private Key
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        key data format: {
-            algorithm : "RSA", // "ECC", ...
-            data      : "{BASE64_ENCODE}",
-            ...
-        }
-    """
-
-    # noinspection PyTypeChecker
-    def __new__(cls, key: dict):
-        """
-        Create private key
-
-        :param key: key info with algorithm='RSA'
-        :return: private key
-        """
-        if key is None:
-            return None
-        assert cls is PrivateKey, 'call PrivateKey() directly'
-        if isinstance(key, PrivateKey):
-            # return PrivateKey object directly
-            return key
-        # get class by algorithm name
-        clazz = cls.key_class(algorithm=key['algorithm'])
-        if clazz is not None:
-            return clazz.__new__(clazz, key)
-        else:
-            raise ModuleNotFoundError('Invalid key algorithm: %s' % key)
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, dict):
-            return False
-        if super().__eq__(other):
-            return True
-        pk = self.public_key
-        if pk is not None:
-            sk = PrivateKey(other)
-            return pk.match(private_key=sk)
-
-    @property
-    @abstractmethod
-    def public_key(self) -> Union[PublicKey, EncryptKey]:
-        """
-        Get public key from private key
-
-        :return: public key paired to this private key
+        :param data:      message data
+        :param signature: signature of message data
+        :return:          True on signature matched
         """
         raise NotImplemented
 
-    #
-    #   Runtime
-    #
-    __key_classes = {}  # class map
 
-    @classmethod
-    def register(cls, algorithm: str, key_class=None) -> bool:
-        """
-        Register private key class with algorithm
+class SignKey(AsymmetricKey):
 
-        :param algorithm: key algorithm
-        :param key_class: if key class is None, then remove with algorithm
-        :return: False on error
+    @abstractmethod
+    def sign(self, data: bytes) -> bytes:
         """
-        if key_class is None:
-            cls.__key_classes.pop(algorithm, None)
-        elif issubclass(key_class, PrivateKey):
-            cls.__key_classes[algorithm] = key_class
-        else:
-            raise TypeError('%s must be subclass of PrivateKey' % key_class)
-        return True
+        signature = sign(data, SK);
 
-    @classmethod
-    def key_class(cls, algorithm: str):
+        :param data: message data
+        :return:     signature
         """
-        Get private key class with algorithm
+        raise NotImplemented
 
-        :param algorithm: key algorithm
-        :return: private key class
-        """
-        return cls.__key_classes.get(algorithm)
+
+promise = 'Moky loves May Lee forever!'.encode('utf-8')
+
+
+def asymmetric_keys_match(private_key: SignKey, public_key: VerifyKey) -> bool:
+    # try to verify with signature
+    signature = private_key.sign(data=promise)
+    return public_key.verify(data=promise, signature=signature)

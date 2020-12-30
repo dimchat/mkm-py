@@ -28,126 +28,176 @@
 # SOFTWARE.
 # ==============================================================================
 
-import json
+from abc import abstractmethod
 from typing import Optional, Union, Any
 
 from .crypto import PublicKey, EncryptKey, VerifyKey, SignKey
-from .crypto import Base64
+from .crypto import json_encode, json_decode, utf8_encode, utf8_decode, base64_encode, base64_decode
 
 from .identifier import ID
-from .tai import TAI
+from .tai import Document, document_type
 
 
-class Profile(dict, TAI):
-
-    # noinspection PyTypeChecker
-    def __new__(cls, profile: dict):
-        if profile is None:
-            return None
-        elif cls is Profile:
-            inst = TAI.__new__(TAI, profile)
-            if inst is not None:
-                # created by subclass
-                return inst
-        # new Profile(dict)
-        return super().__new__(cls, profile)
-
-    def __init__(self, profile: dict):
-        if self is profile:
-            # no need to init again
-            return
-        super().__init__(profile)
-        # lazy
-        self.__identifier: str = None
-        self.__data: bytes = None
-        self.__signature: bytes = None
-        self.__properties: dict = None
-        self.__status: int = 0  # 1 for valid, -1 for invalid
+class Visa(Document):
+    """
+        User Document
+        ~~~~~~~~~~~~~
+        This interface is defined for authorizing other apps to login,
+        which can generate a temporary asymmetric key pair for messaging.
+    """
 
     @property
-    def identifier(self) -> str:
-        """ Profile ID """
+    @abstractmethod
+    def key(self) -> Union[PublicKey, EncryptKey, None]:
+        """
+        Get public key to encrypt message for user
+
+        :return: public key
+        """
+        raise NotImplemented
+
+    @key.setter
+    @abstractmethod
+    def key(self, value: Union[PublicKey, EncryptKey]):
+        """
+        Set public key for other user to encrypt message
+
+        :param value: public key as visa.key
+        """
+        raise NotImplemented
+
+    @property
+    def avatar(self) -> Optional[str]:
+        """
+        Get avatar URL
+
+        :return: URL string
+        """
+        return None
+
+    @avatar.setter
+    def avatar(self, url: str):
+        """
+        Set avatar URL
+
+        :param url: URL string
+        """
+        pass
+
+
+class Bulletin(Document):
+    """
+        Group Document
+        ~~~~~~~~~~~~~~
+    """
+
+    @property
+    @abstractmethod
+    def assistants(self) -> Optional[list]:
+        """
+        Get group assistants
+
+        :return: bot ID list
+        """
+        raise NotImplemented
+
+    @assistants.setter
+    def assistants(self, bots: list):
+        """
+        Set group assistants
+
+        :param bots: bot ID list
+        """
+        raise NotImplemented
+
+
+"""
+    Implements
+    ~~~~~~~~~~
+"""
+
+
+def document_identifier(document: dict) -> ID:
+    return ID.parse(identifier=document.get('ID'))
+
+
+def document_data(document: dict) -> Optional[bytes]:
+    utf8 = document.get('data')
+    if utf8 is not None:
+        return utf8_encode(string=utf8)
+
+
+def document_signature(document: dict) -> Optional[bytes]:
+    base64 = document.get('signature')
+    if base64 is not None:
+        return base64_decode(string=base64)
+
+
+class BaseDocument(dict, Document):
+
+    def __init__(self, document: dict, t: Optional[str]=None, identifier: Optional[ID]=None,
+                 data: Optional[bytes]=None, signature: Optional[bytes]=None):
+        super().__init__(document)
+        self.__identifier = identifier
+        self.__data = data              # JsON.encode(properties)
+        self.__signature = signature    # LocalUser(identifier).sign(data)
+        self.__properties = None
+        self.__status = 0               # 1 for valid, -1 for invalid
+        # set
+        if identifier is not None:
+            self['ID'] = identifier
+        if t is not None:
+            self.__properties = {
+                'type': t,
+            }
+        if data is not None and signature is not None:
+            """ Create entity document with data and signature loaded from local storage """
+            self.__status = 1  # all documents must be verified before saving into local storage
+            self['data'] = utf8_decode(data=data)
+            self['signature'] = base64_encode(data=data)
+
+    @property
+    def type(self) -> str:
+        t = self.get_property(key='type')
+        if t is None:
+            t = document_type(document=self)
+        return t
+
+    @property
+    def identifier(self) -> ID:
         if self.__identifier is None:
-            self.__identifier = self['ID']
+            self.__identifier = document_identifier(document=self)
         return self.__identifier
 
     @property
-    def _data(self) -> Optional[bytes]:
-        """ Profile properties data """
+    def data(self) -> Optional[bytes]:
+        """
+        Get serialized properties
+
+        :return: JsON string
+        """
         if self.__data is None:
-            string: str = self.get('data')
-            if string is not None:
-                self.__data = string.encode('utf-8')
+            self.__data = document_data(document=self)
         return self.__data
 
     @property
-    def _signature(self) -> Optional[bytes]:
-        """ Profile properties signature """
+    def signature(self) -> Optional[bytes]:
+        """
+        Get signature for serialized properties
+
+        :return: signature data
+        """
         if self.__signature is None:
-            base64: str = self.get('signature')
-            if base64 is not None:
-                self.__signature = Base64.decode(base64)
+            self.__signature = document_signature(document=self)
         return self.__signature
 
     @property
     def valid(self) -> bool:
-        return self.__status >= 0
+        return self.__status > 0
 
-    """
-        Profile Properties
-        ~~~~~~~~~~~~~~~~~~
-    """
-
-    @property
-    def _properties(self) -> Optional[dict]:
-        """ Load properties from data """
-        if self.__status < 0:
-            # invalid
-            return None
-        if self.__properties is None:
-            data = self._data
-            if data is None:
-                # create new properties
-                self.__properties = {}
-            else:
-                # get properties from data
-                self.__properties = json.loads(data)
-                assert isinstance(self.__properties, dict)
-        return self.__properties
-
-    def set_property(self, key: str, value: Any=None):
-        """ Update profile property with key and data """
-        # 1. reset status
-        self.__status = 0
-        # 2. update property value with name
-        super().set_property(key=key, value=value)
-        # 3. clear data signature after properties changed
-        self.pop('data', None)
-        self.pop('signature', None)
-        self.__data = None
-        self.__signature = None
-
-    """
-        Name
-        ~~~~
-        Nickname for user
-        Title for group
-    """
-
-    @property
-    def name(self) -> Optional[str]:
-        value = self.get_property(key='name')
-        if value is not None:
-            return value
-
-    @name.setter
-    def name(self, value: str):
-        self.set_property(key='name', value=value)
-
-    """
-        Sign/Verify profile data
-        ~~~~~~~~~~~~~~~~~~~~~~~~
-    """
+    #
+    #  signature
+    #
 
     def verify(self, public_key: VerifyKey) -> bool:
         """
@@ -159,8 +209,8 @@ class Profile(dict, TAI):
         if self.__status > 0:
             # already verify OK
             return True
-        data = self._data
-        signature = self._signature
+        data = self.data
+        signature = self.signature
         if data is None:
             # NOTICE: if data is empty, signature should be empty at the same time
             #         this happen while profile not found
@@ -172,7 +222,7 @@ class Profile(dict, TAI):
         elif signature is None:
             # signature error
             self.__status = -1
-        elif public_key.verify(data, signature):
+        elif public_key.verify(data=data, signature=signature):
             # signature matched
             self.__status = 1
         # NOTICE: if status is 0, it doesn't mean the profile is invalid,
@@ -190,48 +240,74 @@ class Profile(dict, TAI):
             # already signed
             return self.__signature
         self.__status = 1
-        data: str = json.dumps(self._properties)
-        self.__data = data.encode('utf-8')
-        self.__signature = private_key.sign(self.__data)
-        self['data'] = data  # JsON string
-        self['signature'] = Base64.encode(self.__signature)
+        self.__data = json_encode(self.properties)
+        self.__signature = private_key.sign(data=self.__data)
+        self['data'] = utf8_decode(data=self.__data)  # JsON string
+        self['signature'] = base64_encode(data=self.__signature)
         return self.__signature
 
-    @classmethod
-    def new(cls, identifier: ID):
-        """ Create new empty profile object with entity ID """
-        profile = {
-            'ID': identifier,
-        }
-        return cls(profile)
+    #
+    #  properties
+    #
 
-
-class UserProfile(Profile):
-
-    # noinspection PyTypeChecker
-    def __new__(cls, profile: dict):
-        if profile is None:
+    @property
+    def properties(self) -> Optional[dict]:
+        """ Load properties from data """
+        if self.__status < 0:
+            # invalid
             return None
-        elif cls is UserProfile:
-            # 1. if ID type is user, convert to UserProfile
-            # 2. if public key not exists, no need to convert to UserProfile
-            identifier = profile.get('ID')
-            if isinstance(identifier, ID):
-                if not identifier.is_user:
-                    return None
-            # elif 'avatar' not in profile and 'key' not in profile:
-            #     # not a user profile
-            #     return None
-        # new UserProfile(dict)
-        return super().__new__(cls, profile)
+        if self.__properties is None:
+            data = self.data
+            if data is None:
+                # create new properties
+                self.__properties = {}
+            else:
+                # get properties from data
+                self.__properties = json_decode(data=data)
+                assert isinstance(self.__properties, dict), 'document data error: %s' % self
+        return self.__properties
 
-    def __init__(self, profile: dict):
-        if self is profile:
-            # no need to init again
-            return
-        super().__init__(profile)
-        # lazy
-        self.__key: PublicKey = None  # EncryptKey
+    def get_property(self, key: str) -> Optional[Any]:
+        info = self.properties
+        if info is not None:
+            return info.get(key)
+
+    def set_property(self, key: str, value: Any=None):
+        """ Update profile property with key and value """
+        # 1. reset status
+        self.__status = 0
+        # 2. update property value with name
+        info = self.properties
+        assert isinstance(info, dict), 'failed to get properties: %s' % self
+        if value is None:
+            info.pop(key, None)
+        else:
+            info[key] = value
+        # 3. clear data signature after properties changed
+        self.pop('data', None)
+        self.pop('signature', None)
+        self.__data = None
+        self.__signature = None
+
+    #
+    #  properties getter/setter
+    #
+
+    @property
+    def name(self) -> Optional[str]:
+        return self.get_property(key='name')
+
+    @name.setter
+    def name(self, value: str):
+        self.set_property(key='name', value=value)
+
+
+class BaseVisa(BaseDocument, Visa):
+
+    def __init__(self, document: dict, t: Optional[str]=None, identifier: Optional[ID]=None,
+                 data: Optional[bytes]=None, signature: Optional[bytes]=None):
+        super().__init__(document, t, identifier=identifier, data=data, signature=signature)
+        self.__key = None
 
     """
         Public Key for encryption
@@ -242,33 +318,15 @@ class UserProfile(Profile):
     @property
     def key(self) -> Union[PublicKey, EncryptKey, None]:
         if self.__key is None:
-            key = self.get_property(key='key')
-            if key is not None:
-                self.__key = PublicKey(key=key)
+            info = self.get_property('key')
+            if info is not None:
+                self.__key = PublicKey.parse(key=info)
         return self.__key
 
     @key.setter
     def key(self, value: Union[PublicKey, EncryptKey]):
-        self.__key = value
         self.set_property('key', value)
-
-    """
-        Nickname
-        ~~~~~~~~
-    """
-    @property
-    def name(self) -> Optional[str]:
-        value = self.get_property(key='name')
-        if value is not None:
-            return value
-        # get from 'names'
-        array = self.get_property(key='names')
-        if array is not None and len(array) > 0:
-            return array[0]
-
-    @name.setter
-    def name(self, value: str):
-        self.set_property(key='name', value=value)
+        self.__key = value
 
     """
         Avatar
@@ -276,18 +334,29 @@ class UserProfile(Profile):
     """
     @property
     def avatar(self) -> Optional[str]:
-        value = self.get_property(key='avatar')
-        if value is not None:
-            return value
-        # get from 'names'
-        array = self.get_property(key='photos')
-        if array is not None and len(array) > 0:
-            return array[0]
+        return self.get_property(key='avatar')
 
     @avatar.setter
     def avatar(self, value: str):
         self.set_property(key='avatar', value=value)
 
 
-# register user profile class
-Profile.register(UserProfile)
+class BaseBulletin(BaseDocument, Bulletin):
+
+    def __init__(self, document: dict, t: Optional[str]=None, identifier: Optional[ID]=None,
+                 data: Optional[bytes]=None, signature: Optional[bytes]=None):
+        super().__init__(document, t, identifier=identifier, data=data, signature=signature)
+        self.__assistants = None
+
+    @property
+    def assistants(self) -> Optional[list]:
+        if self.__assistants is None:
+            assistants = self.get_property('assistants')
+            if assistants is not None:
+                self.__assistants = ID.convert(assistants)
+        return self.__assistants
+
+    @assistants.setter
+    def assistants(self, bots: list):
+        self.set_property('assistants', bots)
+        self.__assistants = bots

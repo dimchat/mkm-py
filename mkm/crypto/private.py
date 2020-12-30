@@ -23,45 +23,54 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Optional
 
-from .cryptography import EncryptKey, DecryptKey, key_algorithm
+from .cryptography import key_algorithm
+from .asymmetric import SignKey, asymmetric_keys_match
+from .public import PublicKey
 
 
-class SymmetricKey(EncryptKey, DecryptKey, ABC):
-    """This class is used to encrypt or decrypt message data
+class PrivateKey(SignKey):
+    """This class is used to decrypt symmetric key or sign message data
 
-        Symmetric Cryptography Key
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Asymmetric Cryptography Private Key
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         key data format: {
-            algorithm : "AES", // "DES", ...
+            algorithm : "RSA", // "ECC", ...
             data      : "{BASE64_ENCODE}",
             ...
         }
     """
 
-    AES = 'AES'
-    DES = 'DES'
-
     def __eq__(self, other) -> bool:
         if super().__eq__(other):
             return True
-        if isinstance(other, SymmetricKey):
-            return symmetric_keys_equal(key1=self, key2=other)
+        if isinstance(other, SignKey):
+            return asymmetric_keys_match(private_key=other, public_key=self.public_key)
+
+    @property
+    @abstractmethod
+    def public_key(self) -> Optional[PublicKey]:
+        """
+        Get public key from private key
+
+        :return: public key paired to this private key
+        """
+        raise NotImplemented
 
     #
     #   Factory methods
     #
     @classmethod
-    def generate(cls, algorithm: str):  # -> Optional[SymmetricKey]:
+    def generate(cls, algorithm: str):  # -> Optional[PrivateKey]:
         factory = cls.factory(algorithm=algorithm)
         assert factory is not None, 'key algorithm not found: %s' % algorithm
-        return factory.generate_symmetric_key()
+        return factory.generate_private_key()
 
     @classmethod
-    def parse(cls, key: dict):  # -> Optional[SymmetricKey]:
+    def parse(cls, key: dict):  # -> Optional[PrivateKey]:
         if key is None:
             return None
         elif isinstance(key, cls):
@@ -72,22 +81,15 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
         if factory is None:
             factory = cls.factory(algorithm='*')  # unknown
             assert factory is not None, 'cannot parse key: %s' % key
-        return factory.parse_symmetric_key(key=key)
+        return factory.parse_private_key(key=key)
 
     @classmethod
-    def factory(cls, algorithm: str):  # -> Optional[SymmetricKeyFactory]:
+    def factory(cls, algorithm: str):  # -> Optional[PrivateKeyFactory]:
         return s_factories.get(algorithm)
 
     @classmethod
     def register(cls, algorithm: str, factory):
         s_factories[algorithm] = factory
-
-
-promise = 'Moky loves May Lee forever!'.encode('utf-8')
-
-
-def symmetric_keys_equal(key1: SymmetricKey, key2: SymmetricKey) -> bool:
-    return key1.decrypt(key2.encrypt(promise)) == promise
 
 
 """
@@ -97,23 +99,23 @@ def symmetric_keys_equal(key1: SymmetricKey, key2: SymmetricKey) -> bool:
 s_factories = {}
 
 
-class SymmetricKeyFactory:
+class PrivateKeyFactory:
 
     @abstractmethod
-    def generate_symmetric_key(self) -> Optional[SymmetricKey]:
+    def generate_private_key(self) -> Optional[PrivateKey]:
         """
         Generate key
 
-        :return: SymmetricKey
+        :return: PrivateKey
         """
         raise NotImplemented
 
     @abstractmethod
-    def parse_symmetric_key(self, key: dict) -> Optional[SymmetricKey]:
+    def parse_private_key(self, key: dict) -> Optional[PrivateKey]:
         """
         Parse map object to key
 
         :param key: key info
-        :return: SymmetricKey
+        :return: PrivateKey
         """
         raise NotImplemented

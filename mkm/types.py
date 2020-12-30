@@ -31,7 +31,7 @@
 from enum import IntEnum
 
 
-class NetworkID(IntEnum):
+class NetworkType(IntEnum):
     """
         @enum MKMNetworkID
 
@@ -126,16 +126,16 @@ class NetworkID(IntEnum):
     Thing = 0x80           # 1000 0000 (IoT)
     Robot = 0xC8           # 1100 1000
 
-    @classmethod
-    def is_user(cls, network: int) -> bool:
-        return (network & cls.Main.value) == cls.Main.value or network == cls.BTCMain.value
 
-    @classmethod
-    def is_group(cls, network: int) -> bool:
-        return (network & cls.Group.value) == cls.Group.value
+def network_is_user(network: int) -> bool:
+    return (network & NetworkType.Main.value) == NetworkType.Main.value or network == NetworkType.BTCMain.value
 
 
-class MetaVersion(IntEnum):
+def network_is_group(network: int) -> bool:
+    return (network & NetworkType.Group.value) == NetworkType.Group.value
+
+
+class MetaType(IntEnum):
     """
         @enum MKMMetaVersion
 
@@ -169,6 +169,6 @@ class MetaVersion(IntEnum):
     ETH = 0x04    # 0000 0100
     ExETH = 0x05  # 0000 0101
 
-    @classmethod
-    def has_seed(cls, version: int) -> bool:
-        return (version & cls.MKM.value) == cls.MKM.value
+
+def meta_has_seed(version: int) -> bool:
+    return (version & MetaType.MKM.value) == MetaType.MKM.value
