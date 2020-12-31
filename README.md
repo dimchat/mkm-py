@@ -80,20 +80,20 @@ The **network type** of a person is ```8```, and group is ```16```:
 ```python
 class NetworkType(IntEnum):
     # Person Account
-    Main = 0x08         # 0000 1000 (Person)
+    MAIN = 0x08         # 0000 1000 (Person)
 
     # Virtual Groups
-    Group = 0x10        # 0001 0000 (Multi-Persons)
-    Polylogue = 0x10    # 0001 0000 (Multi-Persons Chat, N < 100)
-    Chatroom = 0x30     # 0011 0000 (Multi-Persons Chat, N >= 100)
+    GROUP = 0x10        # 0001 0000 (Multi-Persons)
+    POLYLOGUE = 0x10    # 0001 0000 (Multi-Persons Chat, N < 100)
+    CHATROOM = 0x30     # 0011 0000 (Multi-Persons Chat, N >= 100)
 
     # Network
-    Provider = 0x76     # 0111 0110 (Service Provider)
-    Station = 0x88      # 1000 1000 (Server Node)
+    PROVIDER = 0x76     # 0111 0110 (Service Provider)
+    STATION = 0x88      # 1000 1000 (Server Node)
 
     # Internet of Things
-    Thing = 0x80        # 1000 0000 (IoT)
-    Robot = 0xC8        # 1100 1000
+    THING = 0x80        # 1000 0000 (IoT)
+    ROBOT = 0xC8        # 1100 1000
 ```
 
 ### <span id="id-name">1.1. Name</span>

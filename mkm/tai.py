@@ -31,6 +31,7 @@
 from abc import abstractmethod
 from typing import Optional, Any
 
+from .crypto import SOMap
 from .crypto import VerifyKey, SignKey
 
 from .identifier import ID
@@ -117,7 +118,7 @@ class TAI:
         raise NotImplemented
 
 
-class Document(TAI):
+class Document(TAI, SOMap):
 
     #
     #  Document types
@@ -172,31 +173,34 @@ class Document(TAI):
     #  Factory methods
     #
     @classmethod
-    def create_document(cls, t: str, identifier: ID, data: Optional[bytes]=None, signature: Optional[bytes]=None):
-        factory = cls.factory(t=t)
-        assert isinstance(factory, DocumentFactory), 'document type not found: %s' % t
+    def create_document(cls, doc_type: str, identifier: ID,
+                        data: Optional[bytes]=None, signature: Optional[bytes]=None):
+        factory = cls.factory(doc_type=doc_type)
+        assert isinstance(factory, Factory), 'document type not found: %s' % doc_type
         return factory.create_document(identifier=identifier, data=data, signature=signature)
 
     @classmethod
     def parse_document(cls, document: dict):
         if document is None:
             return None
-        if isinstance(document, Document):
+        elif isinstance(document, Document):
             return document
-        t = document_type(document=document)
-        factory = cls.factory(t=t)
+        elif isinstance(document, SOMap):
+            document = document.dictionary
+        doc_type = document_type(document=document)
+        factory = cls.factory(doc_type=doc_type)
         if factory is None:
-            factory = cls.factory(t='*')  # unknown
-            assert isinstance(factory, DocumentFactory), 'cannot parse document: %s' % document
+            factory = cls.factory(doc_type='*')  # unknown
+            assert isinstance(factory, Factory), 'cannot parse document: %s' % document
         return factory.parse_document(document=document)
 
     @classmethod
-    def factory(cls, t: str):  # -> DocumentFactory:
-        return s_factories.get(t)
+    def factory(cls, doc_type: str):  # -> Factory:
+        return s_factories.get(doc_type)
 
     @classmethod
-    def register(cls, t: str, factory):
-        s_factories[t] = factory
+    def register(cls, doc_type: str, factory):
+        s_factories[doc_type] = factory
 
 
 def document_type(document: dict) -> str:
@@ -210,7 +214,7 @@ def document_type(document: dict) -> str:
 s_factories = {}
 
 
-class DocumentFactory:
+class Factory:
 
     @abstractmethod
     def create_document(self, identifier: ID, data: Optional[bytes]=None, signature: Optional[bytes]=None) -> Document:
@@ -226,6 +230,7 @@ class DocumentFactory:
         """
         raise NotImplemented
 
+    @abstractmethod
     def parse_document(self, document: dict) -> Optional[Document]:
         """
         Parse map object to entity document

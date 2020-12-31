@@ -31,11 +31,12 @@
 from abc import abstractmethod
 from typing import Optional, Union, Any
 
+from .crypto import Dictionary
 from .crypto import PublicKey, EncryptKey, VerifyKey, SignKey
 from .crypto import json_encode, json_decode, utf8_encode, utf8_decode, base64_encode, base64_decode
 
 from .identifier import ID
-from .tai import Document, document_type
+from .tai import Document, Factory, document_type
 
 
 class Visa(Document):
@@ -133,9 +134,9 @@ def document_signature(document: dict) -> Optional[bytes]:
         return base64_decode(string=base64)
 
 
-class BaseDocument(dict, Document):
+class BaseDocument(Dictionary, Document):
 
-    def __init__(self, document: dict, t: Optional[str]=None, identifier: Optional[ID]=None,
+    def __init__(self, document: dict, doc_type: Optional[str]=None, identifier: Optional[ID]=None,
                  data: Optional[bytes]=None, signature: Optional[bytes]=None):
         super().__init__(document)
         self.__identifier = identifier
@@ -146,27 +147,29 @@ class BaseDocument(dict, Document):
         # set
         if identifier is not None:
             self['ID'] = identifier
-        if t is not None:
-            self.__properties = {
-                'type': t,
-            }
-        if data is not None and signature is not None:
-            """ Create entity document with data and signature loaded from local storage """
-            self.__status = 1  # all documents must be verified before saving into local storage
-            self['data'] = utf8_decode(data=data)
-            self['signature'] = base64_encode(data=data)
+            if data is None or signature is None:
+                """ Create a new empty document """
+                assert doc_type is not None, 'document type empty'
+                self.__properties = {
+                    'type': doc_type,
+                }
+            else:
+                """ Create entity document with data and signature loaded from local storage """
+                self.__status = 1  # all documents must be verified before saving into local storage
+                self['data'] = utf8_decode(data=data)
+                self['signature'] = base64_encode(data=data)
 
     @property
     def type(self) -> str:
-        t = self.get_property(key='type')
-        if t is None:
-            t = document_type(document=self)
-        return t
+        doc_type = self.get_property(key='type')
+        if doc_type is None:
+            doc_type = document_type(document=self.dictionary)
+        return doc_type
 
     @property
     def identifier(self) -> ID:
         if self.__identifier is None:
-            self.__identifier = document_identifier(document=self)
+            self.__identifier = document_identifier(document=self.dictionary)
         return self.__identifier
 
     @property
@@ -177,7 +180,7 @@ class BaseDocument(dict, Document):
         :return: JsON string
         """
         if self.__data is None:
-            self.__data = document_data(document=self)
+            self.__data = document_data(document=self.dictionary)
         return self.__data
 
     @property
@@ -188,7 +191,7 @@ class BaseDocument(dict, Document):
         :return: signature data
         """
         if self.__signature is None:
-            self.__signature = document_signature(document=self)
+            self.__signature = document_signature(document=self.dictionary)
         return self.__signature
 
     @property
@@ -304,9 +307,9 @@ class BaseDocument(dict, Document):
 
 class BaseVisa(BaseDocument, Visa):
 
-    def __init__(self, document: dict, t: Optional[str]=None, identifier: Optional[ID]=None,
+    def __init__(self, document: dict, identifier: Optional[ID]=None,
                  data: Optional[bytes]=None, signature: Optional[bytes]=None):
-        super().__init__(document, t, identifier=identifier, data=data, signature=signature)
+        super().__init__(document, Document.VISA, identifier=identifier, data=data, signature=signature)
         self.__key = None
 
     """
@@ -343,9 +346,9 @@ class BaseVisa(BaseDocument, Visa):
 
 class BaseBulletin(BaseDocument, Bulletin):
 
-    def __init__(self, document: dict, t: Optional[str]=None, identifier: Optional[ID]=None,
+    def __init__(self, document: dict, identifier: Optional[ID]=None,
                  data: Optional[bytes]=None, signature: Optional[bytes]=None):
-        super().__init__(document, t, identifier=identifier, data=data, signature=signature)
+        super().__init__(document, Document.BULLETIN, identifier=identifier, data=data, signature=signature)
         self.__assistants = None
 
     @property
@@ -360,3 +363,37 @@ class BaseBulletin(BaseDocument, Bulletin):
     def assistants(self, bots: list):
         self.set_property('assistants', bots)
         self.__assistants = bots
+
+
+"""
+    Factories
+    ~~~~~~~~~
+"""
+
+
+class DocumentFactory(Factory):
+
+    def create_document(self, identifier: ID, data: Optional[bytes]=None, signature: Optional[bytes]=None) -> Document:
+        if identifier.is_group:
+            return BaseBulletin(document={}, identifier=identifier, data=data, signature=signature)
+        elif identifier.is_user:
+            return BaseVisa(document={}, identifier=identifier, data=data, signature=signature)
+        else:
+            return BaseDocument(document={}, doc_type=Document.PROFILE, identifier=identifier,
+                                data=data, signature=signature)
+
+    def parse_document(self, document: dict) -> Optional[Document]:
+        identifier = document_identifier(document=document)
+        if identifier.is_group:
+            return BaseBulletin(document=document)
+        elif identifier.is_user:
+            return BaseVisa(document=document)
+        else:
+            return BaseDocument(document=document)
+
+
+factory = DocumentFactory()
+Document.register('*', factory=factory)
+Document.register(Document.VISA, factory=factory)
+Document.register(Document.PROFILE, factory=factory)
+Document.register(Document.BULLETIN, factory=factory)

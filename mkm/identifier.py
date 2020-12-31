@@ -144,13 +144,13 @@ class ID:
 
     @classmethod
     def factory(cls):  # -> Factory:
-        return cls.s_factory
+        return cls.__factory
 
     @classmethod
     def register(cls, factory):
-        cls.s_factory = factory
+        cls.__factory = factory
 
-    s_factory = None
+    __factory = None
 
 
 """
@@ -161,6 +161,27 @@ class ID:
 
 ANYONE = ID.create(name="anyone", address=ANYWHERE)
 EVERYONE = ID.create(name="everyone", address=EVERYWHERE)
+
+
+class Identifier(str, ID):
+
+    def __init__(self, identifier: str, address: Address, name: Optional[str]=None, terminal: Optional[str]=None):
+        super().__init__(identifier)
+        self.__name = name
+        self.__address = address
+        self.__terminal = terminal
+
+    @property
+    def name(self) -> Optional[str]:
+        return self.__name
+
+    @property
+    def address(self) -> Address:
+        return self.__address
+
+    @property
+    def terminal(self) -> Optional[str]:
+        return self.__terminal
 
 
 """
@@ -257,24 +278,3 @@ def concat(address: Address, name: Optional[str] = None, terminal: Optional[str]
 
 
 ID.register(factory=IDFactory())
-
-
-class Identifier(str, ID):
-
-    def __init__(self, identifier: str, address: Address, name: Optional[str]=None, terminal: Optional[str]=None):
-        super().__init__(identifier)
-        self.__name = name
-        self.__address = address
-        self.__terminal = terminal
-
-    @property
-    def name(self) -> Optional[str]:
-        return self.__name
-
-    @property
-    def address(self) -> Address:
-        return self.__address
-
-    @property
-    def terminal(self) -> Optional[str]:
-        return self.__terminal

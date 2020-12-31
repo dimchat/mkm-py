@@ -26,8 +26,10 @@
 from abc import abstractmethod
 from typing import Optional
 
+from .types import SOMap
 
-class CryptographyKey:
+
+class CryptographyKey(SOMap):
     """Cryptography key with designated algorithm
 
         Cryptography Key

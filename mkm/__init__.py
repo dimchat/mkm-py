@@ -28,6 +28,8 @@
 # SOFTWARE.
 # ==============================================================================
 
+from .crypto import SOMap, Dictionary
+
 from .crypto import DataCoder, Base64, Base58, Hex
 from .crypto import base64_encode, base64_decode, base58_encode, base58_decode, hex_encode, hex_decode
 from .crypto import DataParser, JSON, UTF8
@@ -45,8 +47,8 @@ from .types import NetworkType, MetaType
 from .address import Address, AddressFactory, ANYWHERE, EVERYWHERE
 from .identifier import ID, ANYONE, EVERYONE
 from .meta import Meta, BaseMeta, MetaFactory
-from .tai import Document, DocumentFactory
-from .profile import Visa, Bulletin, BaseDocument, BaseVisa, BaseBulletin
+from .tai import Document
+from .profile import Visa, Bulletin, BaseDocument, BaseVisa, BaseBulletin, DocumentFactory
 
 name = "MingKeMing"
 
@@ -54,7 +56,10 @@ __author__ = 'Albert Moky'
 
 __all__ = [
 
-    # data
+    # Types
+    'SOMap', 'Dictionary',
+
+    # Data
     'DataCoder', 'Base64', 'Base58', 'Hex',
     'base64_encode', 'base64_decode', 'base58_encode', 'base58_decode', 'hex_encode', 'hex_decode',
     'DataParser', 'JSON', 'UTF8',
@@ -69,7 +74,7 @@ __all__ = [
     'PrivateKey', 'PrivateKeyFactory',
     'SymmetricKey', 'SymmetricKeyFactory',
 
-    # entity
+    # Entity
     'NetworkType', 'MetaType',
     'Address', 'AddressFactory',
     'ID', 'ANYONE', 'EVERYONE', 'ANYWHERE', 'EVERYWHERE',

@@ -30,6 +30,8 @@
     Crypto Keys: SymmetricKey, PrivateKey, PublicKey
 """
 
+from .types import SOMap, Dictionary
+
 from .format import DataCoder, Base64, Base58, Hex
 from .format import base64_encode, base64_decode, base58_encode, base58_decode, hex_encode, hex_decode
 from .format import DataParser, JSON, UTF8
@@ -45,6 +47,9 @@ from .symmetric import SymmetricKey, SymmetricKeyFactory
 
 
 __all__ = [
+
+    # Types
+    'SOMap', 'Dictionary',
 
     # Data
     'DataCoder', 'Base64', 'Base58', 'Hex',

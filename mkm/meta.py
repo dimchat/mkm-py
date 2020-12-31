@@ -31,6 +31,7 @@
 from abc import abstractmethod
 from typing import Optional, Union
 
+from .crypto import SOMap, Dictionary
 from .crypto import VerifyKey, SignKey, PublicKey
 from .crypto import base64_decode, utf8_encode
 
@@ -39,7 +40,7 @@ from .address import Address
 from .identifier import ID
 
 
-class Meta:
+class Meta(SOMap):
     """This class is used to generate entity ID
 
         User/Group Meta data
@@ -168,6 +169,12 @@ class Meta:
 
     @classmethod
     def parse(cls, meta: dict):  # -> Optional[Meta]:
+        if meta is None:
+            return None
+        elif isinstance(meta, Meta):
+            return meta
+        elif isinstance(meta, SOMap):
+            meta = meta.dictionary
         version = meta_type(meta=meta)
         factory = cls.factory(version=version)
         assert isinstance(factory, MetaFactory), 'meta type not found: %d' % version
@@ -184,6 +191,12 @@ class Meta:
         if isinstance(version, MetaType):
             version = version.value
         s_factories[version] = factory
+
+
+"""
+    Implements
+    ~~~~~~~~~~
+"""
 
 
 def meta_type(meta: dict) -> int:
@@ -208,7 +221,7 @@ def meta_fingerprint(meta: dict) -> Optional[bytes]:
         return base64_decode(string=fingerprint)
 
 
-class BaseMeta(dict, Meta):
+class BaseMeta(Dictionary, Meta):
 
     def __init__(self, meta: dict, version: int=0, key: VerifyKey=None, seed: str=None, fingerprint: bytes=None):
         super().__init__(meta)
@@ -226,25 +239,25 @@ class BaseMeta(dict, Meta):
     @property
     def type(self) -> int:
         if self.__type is 0:
-            self.__type = meta_type(meta=self)
+            self.__type = meta_type(meta=self.dictionary)
         return self.__type
 
     @property
     def key(self) -> VerifyKey:
         if self.__key is None:
-            self.__key = meta_key(meta=self)
+            self.__key = meta_key(meta=self.dictionary)
         return self.__key
 
     @property
     def seed(self) -> Optional[str]:
         if self.__seed is None and self.has_seed:
-            self.__seed = meta_seed(meta=self)
+            self.__seed = meta_seed(meta=self.dictionary)
         return self.__seed
 
     @property
     def fingerprint(self) -> Optional[bytes]:
         if self.__fingerprint is None and self.has_seed:
-            self.__fingerprint = meta_fingerprint(meta=self)
+            self.__fingerprint = meta_fingerprint(meta=self.dictionary)
         return self.__fingerprint
 
     @property

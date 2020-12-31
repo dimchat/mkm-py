@@ -82,13 +82,13 @@ class Address:
 
     @classmethod
     def factory(cls):  # -> Factory:
-        return cls.s_factory
+        return cls.__factory
 
     @classmethod
     def register(cls, factory):
-        cls.s_factory = factory
+        cls.__factory = factory
 
-    s_factory = None
+    __factory = None
 
 
 """
@@ -112,8 +112,8 @@ class BroadcastAddress(str, Address):
         return True
 
 
-ANYWHERE = BroadcastAddress(address="anywhere", network=NetworkType.Main)
-EVERYWHERE = BroadcastAddress(address="everywhere", network=NetworkType.Group)
+ANYWHERE = BroadcastAddress(address="anywhere", network=NetworkType.MAIN)
+EVERYWHERE = BroadcastAddress(address="everywhere", network=NetworkType.GROUP)
 
 
 """

@@ -26,6 +26,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
+from .types import SOMap
 from .cryptography import key_algorithm
 from .asymmetric import VerifyKey, SignKey, asymmetric_keys_match
 
@@ -55,6 +56,8 @@ class PublicKey(VerifyKey, ABC):
             return None
         elif isinstance(key, cls):
             return key
+        elif isinstance(key, SOMap):
+            key = key.dictionary
         algorithm = key_algorithm(key=key)
         assert algorithm is not None, 'failed to get algorithm from key: %s' % key
         factory = cls.factory(algorithm=algorithm)
