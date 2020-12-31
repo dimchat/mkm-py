@@ -29,7 +29,7 @@
 # ==============================================================================
 
 from abc import abstractmethod
-from typing import Optional, Any
+from typing import Optional, Union, Any
 
 from .crypto import SOMap
 from .crypto import VerifyKey, SignKey
@@ -174,7 +174,7 @@ class Document(TAI, SOMap):
     #
     @classmethod
     def create_document(cls, doc_type: str, identifier: ID,
-                        data: Optional[bytes]=None, signature: Optional[bytes]=None):
+                        data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None):
         factory = cls.factory(doc_type=doc_type)
         assert isinstance(factory, Factory), 'document type not found: %s' % doc_type
         return factory.create_document(identifier=identifier, data=data, signature=signature)
@@ -217,7 +217,8 @@ s_factories = {}
 class Factory:
 
     @abstractmethod
-    def create_document(self, identifier: ID, data: Optional[bytes]=None, signature: Optional[bytes]=None) -> Document:
+    def create_document(self, identifier: ID,
+                        data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None) -> Document:
         """
         1. Create a new empty document with entity ID
 

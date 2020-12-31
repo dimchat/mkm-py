@@ -156,7 +156,7 @@ class Meta(SOMap):
     #
     @classmethod
     def create(cls, version: Union[MetaType, int], key: VerifyKey,
-               seed: Optional[str]=None, fingerprint: Optional[bytes]=None):  # -> Optional[Meta]:
+               seed: Optional[str]=None, fingerprint: Union[bytes, str, None]=None):  # -> Optional[Meta]:
         factory = cls.factory(version=version)
         assert isinstance(factory, MetaFactory), 'meta type not found: %d' % version
         return factory.create_meta(key=key, seed=seed, fingerprint=fingerprint)
@@ -227,37 +227,32 @@ class BaseMeta(Dictionary, Meta):
                  version: Union[MetaType, int]=0, key: Optional[VerifyKey]=None,
                  seed: Optional[str]=None, fingerprint: Union[bytes, str, None]=None):
         super().__init__(dictionary=meta)
-        # meta type
+        # pre-process
         if isinstance(version, MetaType):
             version = version.value
-        if version is 0:
-            self.__type = 0
+        if fingerprint is None:
+            base64 = None
+        elif isinstance(fingerprint, bytes):
+            base64 = base64_encode(data=fingerprint)
         else:
-            self.__type = version
-            self['version'] = version
-        # public key
-        if key is None:
-            self.__key = None
-        else:
-            self.__key = key
-            self['key'] = key.dictionary
-        # ID.name & signature
-        if seed is None or fingerprint is None:
-            self.__seed = None
-            self.__fingerprint = None
-        else:
-            if isinstance(fingerprint, bytes):
-                base64 = base64_encode(data=fingerprint)
-            else:
-                assert isinstance(fingerprint, str), 'meta.fingerprint error: %s' % fingerprint
-                base64 = fingerprint
-                fingerprint = base64_decode(string=base64)
-            self.__seed = seed
-            self.__fingerprint = fingerprint
-            self['seed'] = seed
-            self['fingerprint'] = base64
-        # meta.valid
+            assert isinstance(fingerprint, str), 'meta.fingerprint error: %s' % fingerprint
+            base64 = fingerprint
+            fingerprint = base64_decode(string=base64)
+        # set values
+        self.__type = version
+        self.__key = key
+        self.__seed = seed
+        self.__fingerprint = fingerprint
         self.__status = 0  # 1 for valid, -1 for invalid
+        # set values to inner dictionary
+        if version > 0:
+            self['version'] = version
+        if key is not None:
+            self['key'] = key.dictionary
+        if seed is not None:
+            self['seed'] = seed
+        if fingerprint is not None:
+            self['fingerprint'] = base64
 
     @property
     def has_seed(self) -> bool:
@@ -356,7 +351,7 @@ s_factories = {}
 class MetaFactory:
 
     @abstractmethod
-    def create_meta(self, key: VerifyKey, seed: Optional[str]=None, fingerprint: Optional[bytes]=None):
+    def create_meta(self, key: VerifyKey, seed: Optional[str]=None, fingerprint: Union[bytes, str, None]=None):
         """
         Create meta
 

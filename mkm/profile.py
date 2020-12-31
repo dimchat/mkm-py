@@ -140,49 +140,42 @@ class BaseDocument(Dictionary, Document):
                  doc_type: Optional[str]=None, identifier: Optional[ID]=None,
                  data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None):
         super().__init__(dictionary=document)
-        if identifier is None:
-            """ create document with dictionary info """
-            self.__identifier = None
-            self.__data = None
-            self.__signature = None
-            self.__properties = None
-            self.__status = 0  # 1 for valid, -1 for invalid
+        # pre-process
+        if data is None:
+            utf8 = None
+        elif isinstance(data, bytes):
+            utf8 = utf8_decode(data=data)
         else:
-            self.__identifier = identifier
-            self.__data = data              # JsON.encode(properties)
-            self.__signature = signature    # LocalUser(identifier).sign(data)
+            assert isinstance(data, str), 'document data error: %s' % data
+            utf8 = data
+            data = utf8_encode(string=utf8)
+        if signature is None:
+            base64 = None
+        elif isinstance(signature, bytes):
+            base64 = base64_encode(data=signature)
+        else:
+            assert isinstance(signature, str), 'document signature error: %s' % signature
+            base64 = signature
+            signature = base64_decode(string=base64)
+        # set values
+        self.__identifier = identifier
+        self.__data = data            # JsON.encode(properties)
+        self.__signature = signature  # LocalUser(identifier).sign(data)
+        self.__properties = None
+        self.__status = 0             # 1 for valid, -1 for invalid
+        # set values to inner dictionary
+        if identifier is not None:
             self['ID'] = identifier
             if data is None or signature is None:
                 """ Create a new empty document with ID and doc type """
-                self.__data = None
-                self.__signature = None
                 assert doc_type is not None, 'document type empty'
                 self.__properties = {
                     'type': doc_type,
                 }
-                self.__status = 0
             else:
                 """ Create entity document with ID, data and signature loaded from local storage """
-                # document data
-                if isinstance(data, bytes):
-                    utf8 = utf8_decode(data=data)
-                else:
-                    assert isinstance(data, str), 'document data error: %s' % data
-                    utf8 = data
-                    data = utf8_encode(string=utf8)
-                self.__data = data
                 self['data'] = utf8
-                # document signature
-                if isinstance(signature, bytes):
-                    base64 = base64_encode(data=signature)
-                else:
-                    assert isinstance(signature, str), 'document signature error: %s' % signature
-                    base64 = signature
-                    signature = base64_decode(string=base64)
-                self.__signature = signature
                 self['signature'] = base64
-                # inner values
-                self.__properties = None
                 self.__status = 1  # all documents must be verified before saving into local storage
 
     @property

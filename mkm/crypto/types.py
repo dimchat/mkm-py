@@ -49,7 +49,10 @@ class Dictionary(SOMap):
         super().__init__()
         if dictionary is None:
             self.__dictionary = {}
+        elif isinstance(dictionary, Dictionary):
+            self.__dictionary = dictionary.dictionary
         else:
+            assert isinstance(dictionary, dict), 'dictionary error: %s' % dictionary
             self.__dictionary = dictionary
 
     @property
