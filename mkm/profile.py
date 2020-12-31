@@ -136,28 +136,54 @@ def document_signature(document: dict) -> Optional[bytes]:
 
 class BaseDocument(Dictionary, Document):
 
-    def __init__(self, document: dict, doc_type: Optional[str]=None, identifier: Optional[ID]=None,
-                 data: Optional[bytes]=None, signature: Optional[bytes]=None):
-        super().__init__(document)
-        self.__identifier = identifier
-        self.__data = data              # JsON.encode(properties)
-        self.__signature = signature    # LocalUser(identifier).sign(data)
-        self.__properties = None
-        self.__status = 0               # 1 for valid, -1 for invalid
-        # set
-        if identifier is not None:
+    def __init__(self, document: Optional[dict]=None,
+                 doc_type: Optional[str]=None, identifier: Optional[ID]=None,
+                 data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None):
+        super().__init__(dictionary=document)
+        if identifier is None:
+            """ create document with dictionary info """
+            self.__identifier = None
+            self.__data = None
+            self.__signature = None
+            self.__properties = None
+            self.__status = 0  # 1 for valid, -1 for invalid
+        else:
+            self.__identifier = identifier
+            self.__data = data              # JsON.encode(properties)
+            self.__signature = signature    # LocalUser(identifier).sign(data)
             self['ID'] = identifier
             if data is None or signature is None:
-                """ Create a new empty document """
+                """ Create a new empty document with ID and doc type """
+                self.__data = None
+                self.__signature = None
                 assert doc_type is not None, 'document type empty'
                 self.__properties = {
                     'type': doc_type,
                 }
+                self.__status = 0
             else:
-                """ Create entity document with data and signature loaded from local storage """
+                """ Create entity document with ID, data and signature loaded from local storage """
+                # document data
+                if isinstance(data, bytes):
+                    utf8 = utf8_decode(data=data)
+                else:
+                    assert isinstance(data, str), 'document data error: %s' % data
+                    utf8 = data
+                    data = utf8_encode(string=utf8)
+                self.__data = data
+                self['data'] = utf8
+                # document signature
+                if isinstance(signature, bytes):
+                    base64 = base64_encode(data=signature)
+                else:
+                    assert isinstance(signature, str), 'document signature error: %s' % signature
+                    base64 = signature
+                    signature = base64_decode(string=base64)
+                self.__signature = signature
+                self['signature'] = base64
+                # inner values
+                self.__properties = None
                 self.__status = 1  # all documents must be verified before saving into local storage
-                self['data'] = utf8_decode(data=data)
-                self['signature'] = base64_encode(data=data)
 
     @property
     def type(self) -> str:
@@ -307,8 +333,8 @@ class BaseDocument(Dictionary, Document):
 
 class BaseVisa(BaseDocument, Visa):
 
-    def __init__(self, document: dict, identifier: Optional[ID]=None,
-                 data: Optional[bytes]=None, signature: Optional[bytes]=None):
+    def __init__(self, document: Optional[dict]=None, identifier: Optional[ID]=None,
+                 data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None):
         super().__init__(document, Document.VISA, identifier=identifier, data=data, signature=signature)
         self.__key = None
 
@@ -346,8 +372,8 @@ class BaseVisa(BaseDocument, Visa):
 
 class BaseBulletin(BaseDocument, Bulletin):
 
-    def __init__(self, document: dict, identifier: Optional[ID]=None,
-                 data: Optional[bytes]=None, signature: Optional[bytes]=None):
+    def __init__(self, document: Optional[dict]=None, identifier: Optional[ID]=None,
+                 data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None):
         super().__init__(document, Document.BULLETIN, identifier=identifier, data=data, signature=signature)
         self.__assistants = None
 
@@ -373,14 +399,14 @@ class BaseBulletin(BaseDocument, Bulletin):
 
 class DocumentFactory(Factory):
 
-    def create_document(self, identifier: ID, data: Optional[bytes]=None, signature: Optional[bytes]=None) -> Document:
+    def create_document(self, identifier: ID,
+                        data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None) -> Document:
         if identifier.is_group:
-            return BaseBulletin(document={}, identifier=identifier, data=data, signature=signature)
+            return BaseBulletin(identifier=identifier, data=data, signature=signature)
         elif identifier.is_user:
-            return BaseVisa(document={}, identifier=identifier, data=data, signature=signature)
+            return BaseVisa(identifier=identifier, data=data, signature=signature)
         else:
-            return BaseDocument(document={}, doc_type=Document.PROFILE, identifier=identifier,
-                                data=data, signature=signature)
+            return BaseDocument(doc_type=Document.PROFILE, identifier=identifier, data=data, signature=signature)
 
     def parse_document(self, document: dict) -> Optional[Document]:
         identifier = document_identifier(document=document)

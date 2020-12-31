@@ -33,7 +33,7 @@ from typing import Optional, Union
 
 from .crypto import SOMap, Dictionary
 from .crypto import VerifyKey, SignKey, PublicKey
-from .crypto import base64_decode, utf8_encode
+from .crypto import base64_encode, base64_decode, utf8_encode
 
 from .types import MetaType, meta_has_seed
 from .address import Address
@@ -223,13 +223,40 @@ def meta_fingerprint(meta: dict) -> Optional[bytes]:
 
 class BaseMeta(Dictionary, Meta):
 
-    def __init__(self, meta: dict, version: int=0, key: VerifyKey=None, seed: str=None, fingerprint: bytes=None):
-        super().__init__(meta)
-        # lazy
-        self.__type = version
-        self.__key = key
-        self.__seed = seed
-        self.__fingerprint = fingerprint
+    def __init__(self, meta: Optional[dict]=None,
+                 version: Union[MetaType, int]=0, key: Optional[VerifyKey]=None,
+                 seed: Optional[str]=None, fingerprint: Union[bytes, str, None]=None):
+        super().__init__(dictionary=meta)
+        # meta type
+        if isinstance(version, MetaType):
+            version = version.value
+        if version is 0:
+            self.__type = 0
+        else:
+            self.__type = version
+            self['version'] = version
+        # public key
+        if key is None:
+            self.__key = None
+        else:
+            self.__key = key
+            self['key'] = key.dictionary
+        # ID.name & signature
+        if seed is None or fingerprint is None:
+            self.__seed = None
+            self.__fingerprint = None
+        else:
+            if isinstance(fingerprint, bytes):
+                base64 = base64_encode(data=fingerprint)
+            else:
+                assert isinstance(fingerprint, str), 'meta.fingerprint error: %s' % fingerprint
+                base64 = fingerprint
+                fingerprint = base64_decode(string=base64)
+            self.__seed = seed
+            self.__fingerprint = fingerprint
+            self['seed'] = seed
+            self['fingerprint'] = base64
+        # meta.valid
         self.__status = 0  # 1 for valid, -1 for invalid
 
     @property

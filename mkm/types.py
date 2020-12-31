@@ -88,21 +88,21 @@ class NetworkType(IntEnum):
     ################################
     #  BTC Network
     ################################
-    BTC_MAIN = 0x00     # 0000 0000 (BitCoin Address)
-    # BTC_TEST = 0x6f   # 0110 1111 (BitCoin Test)
+    BTC_MAIN = 0x00         # 0000 0000 (BitCoin Address)
+    # BTC_TEST = 0x6f       # 0110 1111 (BitCoin Test)
 
     ################################
     #  Person Account
     ################################
-    MAIN = 0x08         # 0000 1000 (Person)
+    MAIN = 0x08             # 0000 1000 (Person)
 
     ################################
     #  Virtual Groups
     ################################
-    GROUP = 0x10        # 0001 0000 (Multi-Persons)
-    # MOMENTS = 0x18    # 0001 1000 (Twitter)
-    POLYLOGUE = 0x10    # 0001 0000 (Multi-Persons Chat, N < 100)
-    CHATROOM = 0x30     # 0011 0000 (Multi-Persons Chat, N >= 100)
+    GROUP = 0x10            # 0001 0000 (Multi-Persons)
+    # MOMENTS = 0x18        # 0001 1000 (Twitter)
+    POLYLOGUE = 0x10        # 0001 0000 (Multi-Persons Chat, N < 100)
+    CHATROOM = 0x30         # 0011 0000 (Multi-Persons Chat, N >= 100)
 
     ################################
     #  Social Entities in Reality
@@ -117,14 +117,14 @@ class NetworkType(IntEnum):
     ################################
     #  Network
     ################################
-    PROVIDER = 0x76        # 0111 0110 (Service Provider)
-    STATION = 0x88         # 1000 1000 (Server Node)
+    PROVIDER = 0x76         # 0111 0110 (Service Provider)
+    STATION = 0x88          # 1000 1000 (Server Node)
 
     ################################
     #  Internet of Things
     ################################
-    THING = 0x80           # 1000 0000 (IoT)
-    ROBOT = 0xC8           # 1100 1000
+    THING = 0x80            # 1000 0000 (IoT)
+    ROBOT = 0xC8            # 1100 1000
 
 
 def network_is_user(network: int) -> bool:

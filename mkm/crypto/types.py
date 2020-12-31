@@ -25,7 +25,7 @@
 
 import copy
 from abc import abstractmethod
-from typing import MutableMapping, Iterator
+from typing import MutableMapping, Iterator, Optional
 
 
 class SOMap(MutableMapping):
@@ -45,9 +45,12 @@ class Dictionary(SOMap):
         A container sharing the same inner dictionary
     """
 
-    def __init__(self, dictionary: dict):
+    def __init__(self, dictionary: Optional[dict]=None):
         super().__init__()
-        self.__dictionary = dictionary
+        if dictionary is None:
+            self.__dictionary = {}
+        else:
+            self.__dictionary = dictionary
 
     @property
     def dictionary(self) -> dict:
