@@ -104,50 +104,45 @@ class R160(DataDigester):
 
 
 class MD5:
-
-    coder: DataDigester = M5()
+    digester: DataDigester = M5()
 
     @staticmethod
     def digest(data: bytes) -> bytes:
-        assert MD5.coder is not None, 'MD5 coder not set yet'
-        return MD5.coder.digest(data=data)
+        assert MD5.digester is not None, 'MD5 coder not set yet'
+        return MD5.digester.digest(data=data)
 
 
 class SHA1:
-
-    coder: DataDigester = S1()
+    digester: DataDigester = S1()
 
     @staticmethod
     def digest(data: bytes) -> bytes:
-        assert SHA1.coder is not None, 'SHA1 coder not set yet'
-        return SHA1.coder.digest(data=data)
+        assert SHA1.digester is not None, 'SHA1 coder not set yet'
+        return SHA1.digester.digest(data=data)
 
 
 class SHA256:
-
-    coder: DataDigester = S256()
+    digester: DataDigester = S256()
 
     @staticmethod
     def digest(data: bytes) -> bytes:
-        assert SHA256.coder is not None, 'SHA256 coder not set yet'
-        return SHA256.coder.digest(data=data)
+        assert SHA256.digester is not None, 'SHA256 coder not set yet'
+        return SHA256.digester.digest(data=data)
 
 
 class KECCAK256:
-
-    coder: DataDigester = None
+    digester: DataDigester = None
 
     @staticmethod
     def digest(data: bytes) -> bytes:
-        assert KECCAK256.coder is not None, 'KECCAK256 coder not set yet'
-        return KECCAK256.coder.digest(data=data)
+        assert KECCAK256.digester is not None, 'KECCAK256 coder not set yet'
+        return KECCAK256.digester.digest(data=data)
 
 
 class RIPEMD160:
-
-    coder: DataDigester = R160()
+    digester: DataDigester = R160()
 
     @staticmethod
     def digest(data: bytes) -> bytes:
-        assert RIPEMD160.coder is not None, 'RIPEMD160 coder not set yet'
-        return RIPEMD160.coder.digest(data=data)
+        assert RIPEMD160.digester is not None, 'RIPEMD160 coder not set yet'
+        return RIPEMD160.digester.digest(data=data)

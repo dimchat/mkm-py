@@ -160,7 +160,6 @@ class H(DataCoder):
 
 
 class Base64:
-
     coder: DataCoder = B64()
 
     @staticmethod
@@ -175,7 +174,6 @@ class Base64:
 
 
 class Base58:
-
     coder: DataCoder = None
 
     @staticmethod
@@ -190,7 +188,6 @@ class Base58:
 
 
 class Hex:
-
     coder: DataCoder = H()
 
     @staticmethod
@@ -235,7 +232,6 @@ class U(DataParser):
 
 
 class JSON:
-
     parser: DataParser = J()
 
     @staticmethod
@@ -250,7 +246,6 @@ class JSON:
 
 
 class UTF8:
-
     parser: DataParser = U()
 
     @staticmethod
