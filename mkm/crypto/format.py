@@ -213,7 +213,7 @@ class J(DataParser):
 
     def encode(self, o: Union[dict, list]) -> bytes:
         """ JsON encode """
-        return bytes(json.dumps(o))
+        return bytes(json.dumps(o), encoding='utf-8')
 
     def decode(self, data: bytes) -> Union[dict, list, None]:
         """ JsON decode """

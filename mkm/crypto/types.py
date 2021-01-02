@@ -25,12 +25,12 @@
 
 import copy
 from abc import abstractmethod
-from typing import Optional, MutableMapping, Iterator, ItemsView, KeysView, ValuesView
+from typing import Optional, MutableMapping, Iterator, ItemsView, KeysView, ValuesView, Any
 
 
 class SOMap(MutableMapping):
     """
-        String -> Object Mapping
+        Mapping: str -> Any
     """
 
     @property
@@ -96,19 +96,19 @@ class Dictionary(SOMap):
             other = other.dictionary
         return self.__dictionary != other
 
-    def get(self, key) -> Optional[object]:
+    def get(self, key) -> Optional[Any]:
         return self.__dictionary.get(str(key))
 
-    def pop(self, key, default=None) -> Optional[object]:
+    def pop(self, key, default=None) -> Optional[Any]:
         return self.__dictionary.pop(str(key), default)
 
-    def items(self) -> ItemsView[str, object]:
+    def items(self) -> ItemsView[str, Any]:
         return self.__dictionary.items()
 
     def keys(self) -> KeysView[str]:
         return self.__dictionary.keys()
 
-    def values(self) -> ValuesView[object]:
+    def values(self) -> ValuesView[Any]:
         return self.__dictionary.values()
 
     def clear(self):

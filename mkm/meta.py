@@ -178,7 +178,7 @@ class Meta(SOMap):
         version = meta_type(meta=meta)
         factory = cls.factory(version=version)
         assert isinstance(factory, MetaFactory), 'meta type not found: %d' % version
-        factory.parse_meta(meta=meta)
+        return factory.parse_meta(meta=meta)
 
     @classmethod
     def factory(cls, version: Union[MetaType, int]):  # -> Optional[MetaFactory]:

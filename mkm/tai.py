@@ -173,14 +173,13 @@ class Document(TAI, SOMap):
     #  Factory methods
     #
     @classmethod
-    def create_document(cls, doc_type: str, identifier: ID,
-                        data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None):
+    def create(cls, doc_type: str, identifier: ID, data: Union[bytes, str]=None, signature: Union[bytes, str]=None):
         factory = cls.factory(doc_type=doc_type)
         assert isinstance(factory, DocumentFactory), 'document type not found: %s' % doc_type
         return factory.create_document(identifier=identifier, data=data, signature=signature)
 
     @classmethod
-    def parse_document(cls, document: dict):
+    def parse(cls, document: dict):
         if document is None:
             return None
         elif isinstance(document, Document):

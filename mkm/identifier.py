@@ -156,16 +156,6 @@ class ID:
     __factory = None
 
 
-"""
-    ID for broadcast
-    ~~~~~~~~~~~~~~~~
-"""
-
-
-ANYONE = ID.create(name='anyone', address=ANYWHERE)
-EVERYONE = ID.create(name='everyone', address=EVERYWHERE)
-
-
 class Identifier(String, ID):
 
     def __init__(self, identifier: str, address: Address, name: Optional[str]=None, terminal: Optional[str]=None):
@@ -280,4 +270,13 @@ def concat(address: Address, name: Optional[str] = None, terminal: Optional[str]
     return string
 
 
+# register ID factory
 ID.register(factory=IDFactory())
+
+
+"""
+    ID for broadcast
+    ~~~~~~~~~~~~~~~~
+"""
+ANYONE = ID.create(name='anyone', address=ANYWHERE)
+EVERYONE = ID.create(name='everyone', address=EVERYWHERE)

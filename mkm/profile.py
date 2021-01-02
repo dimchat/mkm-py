@@ -340,14 +340,14 @@ class BaseVisa(BaseDocument, Visa):
     @property
     def key(self) -> Union[PublicKey, EncryptKey, None]:
         if self.__key is None:
-            info = self.get_property('key')
+            info = self.get_property(key='key')
             if info is not None:
                 self.__key = PublicKey.parse(key=info)
         return self.__key
 
     @key.setter
     def key(self, value: Union[PublicKey, EncryptKey]):
-        self.set_property('key', value)
+        self.set_property(key='key', value=value.dictionary)
         self.__key = value
 
     """
@@ -373,12 +373,12 @@ class BaseBulletin(BaseDocument, Bulletin):
     @property
     def assistants(self) -> Optional[list]:
         if self.__assistants is None:
-            assistants = self.get_property('assistants')
+            assistants = self.get_property(key='assistants')
             if assistants is not None:
-                self.__assistants = ID.convert(assistants)
+                self.__assistants = ID.convert(members=assistants)
         return self.__assistants
 
     @assistants.setter
     def assistants(self, bots: list):
-        self.set_property('assistants', bots)
+        self.set_property(key='assistants', value=ID.revert(members=bots))
         self.__assistants = bots
