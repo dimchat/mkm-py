@@ -54,7 +54,7 @@ __all__ = [
     'md5', 'sha1', 'sha256', 'keccak256', 'ripemd160',
 
     # Types
-    'SOMap', 'Dictionary',
+    'SOMap', 'Dictionary', 'String',
 
     # Crypto
     'CryptographyKey', 'EncryptKey', 'DecryptKey',

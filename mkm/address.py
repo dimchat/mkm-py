@@ -31,6 +31,7 @@
 from abc import abstractmethod
 from typing import Optional
 
+from .crypto import String
 from .types import NetworkType, network_is_user, network_is_group
 
 
@@ -74,8 +75,10 @@ class Address:
     def parse(cls, address: str):  # -> Address:
         if address is None:
             return None
-        if isinstance(address, Address):
+        elif isinstance(address, Address):
             return address
+        elif isinstance(address, String):
+            address = address.string
         factory = cls.factory()
         assert isinstance(factory, Factory), 'address factory not found'
         return factory.parse_address(address=address)
@@ -97,10 +100,10 @@ class Address:
 """
 
 
-class BroadcastAddress(str, Address):
+class BroadcastAddress(String, Address):
 
     def __init__(self, address: str, network: NetworkType):
-        super().__init__(address)
+        super().__init__(string=address)
         self.__network = network.value
 
     @property

@@ -31,6 +31,7 @@
 from abc import abstractmethod
 from typing import Optional, Union
 
+from .crypto import String
 from .address import Address, ANYWHERE, EVERYWHERE
 
 
@@ -136,8 +137,10 @@ class ID:
     def parse(cls, identifier: str):  # -> Optional[ID]:
         if identifier is None:
             return None
-        if isinstance(identifier, ID):
+        elif isinstance(identifier, ID):
             return identifier
+        elif isinstance(identifier, String):
+            identifier = identifier.string
         factory = cls.factory()
         assert isinstance(factory, Factory), 'ID factory not found'
         return factory.parse_identifier(identifier=identifier)
@@ -163,10 +166,10 @@ ANYONE = ID.create(name='anyone', address=ANYWHERE)
 EVERYONE = ID.create(name='everyone', address=EVERYWHERE)
 
 
-class Identifier(str, ID):
+class Identifier(String, ID):
 
     def __init__(self, identifier: str, address: Address, name: Optional[str]=None, terminal: Optional[str]=None):
-        super().__init__(identifier)
+        super().__init__(string=identifier)
         self.__name = name
         self.__address = address
         self.__terminal = terminal

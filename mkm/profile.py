@@ -165,7 +165,7 @@ class BaseDocument(Dictionary, Document):
         self.__status = 0             # 1 for valid, -1 for invalid
         # set values to inner dictionary
         if identifier is not None:
-            self['ID'] = identifier
+            self['ID'] = str(identifier)
             if data is None or signature is None:
                 """ Create a new empty document with ID and doc type """
                 assert doc_type is not None, 'document type empty'
