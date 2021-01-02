@@ -176,7 +176,7 @@ class Document(TAI, SOMap):
     def create_document(cls, doc_type: str, identifier: ID,
                         data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None):
         factory = cls.factory(doc_type=doc_type)
-        assert isinstance(factory, Factory), 'document type not found: %s' % doc_type
+        assert isinstance(factory, DocumentFactory), 'document type not found: %s' % doc_type
         return factory.create_document(identifier=identifier, data=data, signature=signature)
 
     @classmethod
@@ -191,11 +191,11 @@ class Document(TAI, SOMap):
         factory = cls.factory(doc_type=doc_type)
         if factory is None:
             factory = cls.factory(doc_type='*')  # unknown
-            assert isinstance(factory, Factory), 'cannot parse document: %s' % document
+            assert isinstance(factory, DocumentFactory), 'cannot parse document: %s' % document
         return factory.parse_document(document=document)
 
     @classmethod
-    def factory(cls, doc_type: str):  # -> Factory:
+    def factory(cls, doc_type: str):  # -> DocumentFactory:
         return s_factories.get(doc_type)
 
     @classmethod
@@ -214,7 +214,7 @@ def document_type(document: dict) -> str:
 s_factories = {}
 
 
-class Factory:
+class DocumentFactory:
 
     @abstractmethod
     def create_document(self, identifier: ID,

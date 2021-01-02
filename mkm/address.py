@@ -112,8 +112,8 @@ class BroadcastAddress(str, Address):
         return True
 
 
-ANYWHERE = BroadcastAddress(address="anywhere", network=NetworkType.MAIN)
-EVERYWHERE = BroadcastAddress(address="everywhere", network=NetworkType.GROUP)
+ANYWHERE = BroadcastAddress(address='anywhere', network=NetworkType.MAIN)
+EVERYWHERE = BroadcastAddress(address='everywhere', network=NetworkType.GROUP)
 
 
 """

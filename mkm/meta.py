@@ -31,11 +31,11 @@
 from abc import abstractmethod
 from typing import Optional, Union
 
+from .crypto import base64_encode, base64_decode, utf8_encode
 from .crypto import SOMap, Dictionary
 from .crypto import VerifyKey, SignKey, PublicKey
-from .crypto import base64_encode, base64_decode, utf8_encode
 
-from .types import MetaType, meta_has_seed
+from .types import NetworkType, MetaType, meta_has_seed
 from .address import Address
 from .identifier import ID
 
@@ -120,7 +120,7 @@ class Meta(SOMap):
         raise NotImplemented
 
     @abstractmethod
-    def generate_identifier(self, network: int, terminal: Optional[str]=None) -> Optional[ID]:
+    def generate_identifier(self, network: Union[NetworkType, int], terminal: Optional[str]=None) -> Optional[ID]:
         """
         Generate ID with terminal
 
@@ -181,7 +181,7 @@ class Meta(SOMap):
         factory.parse_meta(meta=meta)
 
     @classmethod
-    def factory(cls, version: Union[MetaType, int]):  # -> Optional[Factory]:
+    def factory(cls, version: Union[MetaType, int]):  # -> Optional[MetaFactory]:
         if isinstance(version, MetaType):
             version = version.value
         return s_factories.get(version)
@@ -307,7 +307,7 @@ class BaseMeta(Dictionary, Meta):
         return self.__status == 1
 
     @abstractmethod
-    def generate_address(self, network: int) -> Address:
+    def generate_address(self, network: Union[NetworkType, int]) -> Address:
         """
         Generate address
 
@@ -316,7 +316,7 @@ class BaseMeta(Dictionary, Meta):
         """
         raise NotImplemented
 
-    def generate_identifier(self, network: int, terminal: Optional[str]=None) -> Optional[ID]:
+    def generate_identifier(self, network: Union[NetworkType, int], terminal: Optional[str]=None) -> Optional[ID]:
         address = self.generate_address(network=network)
         if address is not None:
             return ID.create(address=address, name=self.seed, terminal=terminal)
@@ -351,7 +351,7 @@ s_factories = {}
 class MetaFactory:
 
     @abstractmethod
-    def create_meta(self, key: VerifyKey, seed: Optional[str]=None, fingerprint: Union[bytes, str, None]=None):
+    def create_meta(self, key: VerifyKey, seed: Optional[str]=None, fingerprint: Union[bytes, str, None]=None) -> Meta:
         """
         Create meta
 
@@ -363,7 +363,7 @@ class MetaFactory:
         raise NotImplemented
 
     @abstractmethod
-    def generate_meta(self, key: SignKey, seed: Optional[str]=None):
+    def generate_meta(self, key: SignKey, seed: Optional[str]=None) -> Meta:
         """
         Generate meta
 
@@ -374,7 +374,7 @@ class MetaFactory:
         raise NotImplemented
 
     @abstractmethod
-    def parse_meta(self, meta: dict):
+    def parse_meta(self, meta: dict) -> Optional[Meta]:
         """
         Parse map object to meta
 

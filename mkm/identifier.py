@@ -159,8 +159,8 @@ class ID:
 """
 
 
-ANYONE = ID.create(name="anyone", address=ANYWHERE)
-EVERYONE = ID.create(name="everyone", address=EVERYWHERE)
+ANYONE = ID.create(name='anyone', address=ANYWHERE)
+EVERYONE = ID.create(name='everyone', address=EVERYWHERE)
 
 
 class Identifier(str, ID):

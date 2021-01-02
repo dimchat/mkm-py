@@ -31,12 +31,12 @@
 from abc import abstractmethod
 from typing import Optional, Union, Any
 
+from .crypto import json_encode, json_decode, utf8_encode, utf8_decode, base64_encode, base64_decode
 from .crypto import Dictionary
 from .crypto import PublicKey, EncryptKey, VerifyKey, SignKey
-from .crypto import json_encode, json_decode, utf8_encode, utf8_decode, base64_encode, base64_decode
 
 from .identifier import ID
-from .tai import Document, Factory, document_type
+from .tai import Document, document_type
 
 
 class Visa(Document):
@@ -382,37 +382,3 @@ class BaseBulletin(BaseDocument, Bulletin):
     def assistants(self, bots: list):
         self.set_property('assistants', bots)
         self.__assistants = bots
-
-
-"""
-    Factories
-    ~~~~~~~~~
-"""
-
-
-class DocumentFactory(Factory):
-
-    def create_document(self, identifier: ID,
-                        data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None) -> Document:
-        if identifier.is_group:
-            return BaseBulletin(identifier=identifier, data=data, signature=signature)
-        elif identifier.is_user:
-            return BaseVisa(identifier=identifier, data=data, signature=signature)
-        else:
-            return BaseDocument(doc_type=Document.PROFILE, identifier=identifier, data=data, signature=signature)
-
-    def parse_document(self, document: dict) -> Optional[Document]:
-        identifier = document_identifier(document=document)
-        if identifier.is_group:
-            return BaseBulletin(document=document)
-        elif identifier.is_user:
-            return BaseVisa(document=document)
-        else:
-            return BaseDocument(document=document)
-
-
-factory = DocumentFactory()
-Document.register('*', factory=factory)
-Document.register(Document.VISA, factory=factory)
-Document.register(Document.PROFILE, factory=factory)
-Document.register(Document.BULLETIN, factory=factory)
