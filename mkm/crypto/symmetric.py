@@ -26,7 +26,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from .types import SOMap
+from .dictionary import Map
 from .cryptography import EncryptKey, DecryptKey, key_algorithm
 
 
@@ -67,7 +67,7 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
             return None
         elif isinstance(key, cls):
             return key
-        elif isinstance(key, SOMap):
+        elif isinstance(key, Map):
             key = key.dictionary
         algorithm = key_algorithm(key=key)
         assert algorithm is not None, 'failed to get algorithm from key: %s' % key

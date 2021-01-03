@@ -60,8 +60,7 @@ class ID:
         return self.address == other.address and self.name == other.name
 
     def __hash__(self) -> int:
-        string = concat(address=self.address, name=self.name, terminal=self.terminal)
-        return hash(string)
+        return hash(self.address)
 
     @property
     @abstractmethod
@@ -156,6 +155,46 @@ class ID:
     __factory = None
 
 
+"""
+    Implements
+    ~~~~~~~~~~
+"""
+
+
+def create(string: str) -> Optional[ID]:
+    # split ID string
+    pair = string.split('/', 1)
+    # terminal
+    if len(pair) == 1:
+        # no terminal
+        terminal = None
+    else:
+        # got terminal
+        terminal = pair[1]
+    # name @ address
+    assert len(pair[0]) > 0, 'ID error: %s' % string
+    pair = pair[0].split('@', 1)
+    if len(pair) == 1:
+        # got address without name
+        name = None
+        address = Address.parse(address=pair[0])
+    else:
+        # got name & address
+        name = pair[0]
+        address = Address.parse(address=pair[1])
+    if address is not None:
+        return Identifier(identifier=string, address=address, name=name, terminal=terminal)
+
+
+def concat(address: Address, name: Optional[str] = None, terminal: Optional[str] = None) -> str:
+    string = str(address)
+    if name is not None and len(name) > 0:
+        string = name + '@' + string
+    if terminal is not None and len(terminal) > 0:
+        string = string + '/' + terminal
+    return string
+
+
 class Identifier(String, ID):
 
     def __init__(self, identifier: str, address: Address, name: Optional[str]=None, terminal: Optional[str]=None):
@@ -234,40 +273,6 @@ class IDFactory(Factory):
             if _id is not None:
                 self.__ids[identifier] = _id
         return _id
-
-
-def create(string: str) -> Optional[ID]:
-    # split ID string
-    pair = string.split('/', 1)
-    # terminal
-    if len(pair) == 1:
-        # no terminal
-        terminal = None
-    else:
-        # got terminal
-        terminal = pair[1]
-    # name @ address
-    assert len(pair[0]) > 0, 'ID error: %s' % string
-    pair = pair[0].split('@', 1)
-    if len(pair) == 1:
-        # got address without name
-        name = None
-        address = Address.parse(address=pair[0])
-    else:
-        # got name & address
-        name = pair[0]
-        address = Address.parse(address=pair[1])
-    if address is not None:
-        return Identifier(identifier=string, address=address, name=name, terminal=terminal)
-
-
-def concat(address: Address, name: Optional[str] = None, terminal: Optional[str] = None):
-    string = str(address)
-    if name is not None and len(name) > 0:
-        string = name + '@' + string
-    if terminal is not None and len(terminal) > 0:
-        string = string + '/' + terminal
-    return string
 
 
 # register ID factory

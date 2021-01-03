@@ -31,7 +31,7 @@
 from abc import abstractmethod
 from typing import Optional, Union, Any
 
-from .crypto import SOMap
+from .crypto import Map
 from .crypto import VerifyKey, SignKey
 
 from .identifier import ID
@@ -118,7 +118,7 @@ class TAI:
         raise NotImplemented
 
 
-class Document(TAI, SOMap):
+class Document(TAI, Map):
 
     #
     #  Document types
@@ -184,7 +184,7 @@ class Document(TAI, SOMap):
             return None
         elif isinstance(document, Document):
             return document
-        elif isinstance(document, SOMap):
+        elif isinstance(document, Map):
             document = document.dictionary
         doc_type = document_type(document=document)
         factory = cls.factory(doc_type=doc_type)

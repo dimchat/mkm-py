@@ -32,7 +32,9 @@
 
 from .format import *
 from .digest import *
-from .types import *
+
+from .dictionary import Map, Dictionary
+from .string import String
 
 from .cryptography import CryptographyKey, EncryptKey, DecryptKey
 from .asymmetric import AsymmetricKey, SignKey, VerifyKey
@@ -54,7 +56,7 @@ __all__ = [
     'md5', 'sha1', 'sha256', 'keccak256', 'ripemd160',
 
     # Types
-    'SOMap', 'Dictionary', 'String',
+    'Map', 'Dictionary', 'String',
 
     # Crypto
     'CryptographyKey', 'EncryptKey', 'DecryptKey',

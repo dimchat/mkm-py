@@ -49,7 +49,7 @@ class Visa(Document):
 
     @property
     @abstractmethod
-    def key(self) -> Union[PublicKey, EncryptKey, None]:
+    def key(self) -> Union[EncryptKey, VerifyKey, None]:
         """
         Get public key to encrypt message for user
 
@@ -59,7 +59,7 @@ class Visa(Document):
 
     @key.setter
     @abstractmethod
-    def key(self, value: Union[PublicKey, EncryptKey]):
+    def key(self, value: Union[EncryptKey, VerifyKey]):
         """
         Set public key for other user to encrypt message
 
@@ -338,7 +338,7 @@ class BaseVisa(BaseDocument, Visa):
         should be different with meta.key
     """
     @property
-    def key(self) -> Union[PublicKey, EncryptKey, None]:
+    def key(self) -> Union[EncryptKey, VerifyKey, None]:
         if self.__key is None:
             info = self.get_property(key='key')
             if info is not None:
@@ -346,7 +346,7 @@ class BaseVisa(BaseDocument, Visa):
         return self.__key
 
     @key.setter
-    def key(self, value: Union[PublicKey, EncryptKey]):
+    def key(self, value: Union[EncryptKey, VerifyKey]):
         self.set_property(key='key', value=value.dictionary)
         self.__key = value
 

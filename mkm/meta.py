@@ -32,7 +32,7 @@ from abc import abstractmethod
 from typing import Optional, Union
 
 from .crypto import base64_encode, base64_decode, utf8_encode
-from .crypto import SOMap, Dictionary
+from .crypto import Map, Dictionary
 from .crypto import VerifyKey, SignKey, PublicKey
 
 from .types import NetworkType, MetaType, meta_has_seed
@@ -40,7 +40,7 @@ from .address import Address
 from .identifier import ID
 
 
-class Meta(SOMap):
+class Meta(Map):
     """This class is used to generate entity ID
 
         User/Group Meta data
@@ -173,7 +173,7 @@ class Meta(SOMap):
             return None
         elif isinstance(meta, Meta):
             return meta
-        elif isinstance(meta, SOMap):
+        elif isinstance(meta, Map):
             meta = meta.dictionary
         version = meta_type(meta=meta)
         factory = cls.factory(version=version)
