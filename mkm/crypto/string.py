@@ -135,7 +135,7 @@ class String:
         """
         if isinstance(sub, String):
             sub = sub.string
-        return self.__string.find(sub=sub, __start=start, __end=end)
+        return self.__string.find(sub, start, end)
 
     def format(self, *args, **kwargs):
         """
@@ -534,7 +534,7 @@ class String:
         """ Return self+value. """
         if isinstance(other, String):
             other = other.string
-        string = self.__string + other
+        string = self.__string.__add__(s=other)
         return String(string=string)
 
     def __contains__(self, sub: str) -> bool:
@@ -547,7 +547,7 @@ class String:
         """ Return self==value. """
         if isinstance(other, String):
             other = other.string
-        return self.__string.__eq__(x=other)
+        return self.__string.__eq__(other)
 
     def __format__(self, format_spec: str):
         """ Return a formatted version of the string as described by format_spec. """
@@ -556,11 +556,11 @@ class String:
         string = self.__string.__format__(format_spec=format_spec)
         return String(string=string)
 
-    def __getattribute__(self, name: str) -> Any:
-        """ Return getattr(self, name). """
-        if isinstance(name, String):
-            name = name.string
-        return self.__string.__getattribute__(name=name)
+    # def __getattribute__(self, name: str) -> Any:
+    #     """ Return getattr(self, name). """
+    #     if isinstance(name, String):
+    #         name = name.string
+    #     return self.__string.__getattribute__(name=name)
 
     def __getitem__(self, i: Union[int, slice]) -> str:
         """ Return self[key]. """
@@ -619,7 +619,7 @@ class String:
         """ Return self!=value. """
         if isinstance(other, String):
             other = other.string
-        return self.__string.__ne__(x=other)
+        return self.__string.__ne__(other)
 
     def __repr__(self) -> str:
         """ Return repr(self). """

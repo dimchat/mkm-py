@@ -89,7 +89,7 @@ class Dictionary(Map):
 
     def get(self, key: str, default: Optional[Any]=None) -> Optional[Any]:
         """ Return the value for key if key is in the dictionary, else default. """
-        return self.__dictionary.get(k=key, default=default)
+        return self.__dictionary.get(key, default)
 
     def items(self) -> ItemsView[str, Any]:
         """ D.items() -> a set-like object providing a view on D's items """
@@ -104,7 +104,7 @@ class Dictionary(Map):
         D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
         If key is not found, d is returned if given, otherwise KeyError is raised
         """
-        return self.__dictionary.pop(k=key, default=default)
+        return self.__dictionary.pop(key, default)
 
     def popitem(self) -> Tuple[str, Any]:
         """
@@ -130,7 +130,7 @@ class Dictionary(Map):
 
     def __contains__(self, o) -> bool:
         """ True if the dictionary has the specified key, else False. """
-        return self.__dictionary.__contains__(o=o)
+        return self.__dictionary.__contains__(o)
 
     def __delitem__(self, key: str):
         """ Delete self[key]. """
@@ -142,13 +142,15 @@ class Dictionary(Map):
             other = other.dictionary
         return self.__dictionary.__eq__(o=other)
 
-    def __getattribute__(self, name: str) -> Any:
-        """ Return getattr(self, name). """
-        return self.__dictionary.__getattribute__(name=name)
+    # def __getattribute__(self, name: str) -> Any:
+    #     """ Return getattr(self, name). """
+    #     if isinstance(name, String):
+    #         name = name.string
+    #     return self.__dictionary.__getattribute__(name=name)
 
     def __getitem__(self, key: str) -> Any:
         """ x.__getitem__(y) <==> x[y] """
-        return self.__dictionary.__getitem__(k=key)
+        return self.__dictionary.__getitem__(key)
 
     def __ge__(self, other) -> bool:
         """ Return self>=value. """
@@ -164,7 +166,7 @@ class Dictionary(Map):
 
     def __len__(self) -> int:
         """ Return len(self). """
-        return len(self.__dictionary)
+        return self.__dictionary.__len__()
 
     def __le__(self, other) -> bool:
         """ Return self<=value. """
@@ -186,7 +188,7 @@ class Dictionary(Map):
 
     def __setitem__(self, key: str, value: Optional[Any]):
         """ Set self[key] to value. """
-        self.__dictionary.__setitem__(k=key, v=value)
+        self.__dictionary.__setitem__(key, value)
 
     def __sizeof__(self) -> int:
         """ D.__sizeof__() -> size of D in memory, in bytes """
