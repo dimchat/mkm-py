@@ -62,12 +62,43 @@ class PrivateKey(SignKey):
         raise NotImplemented
 
     #
-    #   Factory methods
+    #   PrivateKey factory
     #
+    class Factory:
+
+        @abstractmethod
+        def generate_private_key(self):  # -> Optional[PrivateKey]:
+            """
+            Generate key
+
+            :return: PrivateKey
+            """
+            raise NotImplemented
+
+        @abstractmethod
+        def parse_private_key(self, key: dict):  # -> Optional[PrivateKey]:
+            """
+            Parse map object to key
+
+            :param key: key info
+            :return: PrivateKey
+            """
+            raise NotImplemented
+
+    __factories = {}
+
+    @classmethod
+    def register(cls, algorithm: str, factory: Factory):
+        cls.__factories[algorithm] = factory
+
+    @classmethod
+    def factory(cls, algorithm: str) -> Optional[Factory]:
+        return cls.__factories.get(algorithm)
+
     @classmethod
     def generate(cls, algorithm: str):  # -> Optional[PrivateKey]:
         factory = cls.factory(algorithm=algorithm)
-        assert factory is not None, 'key algorithm not found: %s' % algorithm
+        assert factory is not None, 'key algorithm not support: %s' % algorithm
         return factory.generate_private_key()
 
     @classmethod
@@ -79,46 +110,8 @@ class PrivateKey(SignKey):
         elif isinstance(key, Map):
             key = key.dictionary
         algorithm = key_algorithm(key=key)
-        assert algorithm is not None, 'failed to get algorithm from key: %s' % key
         factory = cls.factory(algorithm=algorithm)
         if factory is None:
             factory = cls.factory(algorithm='*')  # unknown
             assert factory is not None, 'cannot parse key: %s' % key
         return factory.parse_private_key(key=key)
-
-    @classmethod
-    def factory(cls, algorithm: str):  # -> Optional[PrivateKeyFactory]:
-        return s_factories.get(algorithm)
-
-    @classmethod
-    def register(cls, algorithm: str, factory):
-        s_factories[algorithm] = factory
-
-
-"""
-    Key Factory
-    ~~~~~~~~~~~
-"""
-s_factories = {}
-
-
-class PrivateKeyFactory:
-
-    @abstractmethod
-    def generate_private_key(self) -> Optional[PrivateKey]:
-        """
-        Generate key
-
-        :return: PrivateKey
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def parse_private_key(self, key: dict) -> Optional[PrivateKey]:
-        """
-        Parse map object to key
-
-        :param key: key info
-        :return: PrivateKey
-        """
-        raise NotImplemented

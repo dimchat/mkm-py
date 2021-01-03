@@ -170,12 +170,50 @@ class Document(TAI, Map):
         raise NotImplemented
 
     #
-    #  Factory methods
+    #   Document factory
     #
+    class Factory:
+
+        @abstractmethod
+        def create_document(self, identifier: ID,
+                            data: Union[bytes, str, None]=None,
+                            signature: Union[bytes, str, None]=None):  # -> Document:
+            """
+            1. Create a new empty document with entity ID
+
+            2. Create document with data & signature loaded from local storage
+
+            :param identifier: entity ID
+            :param data:       document data
+            :param signature:  document signature
+            :return: Document
+            """
+            raise NotImplemented
+
+        @abstractmethod
+        def parse_document(self, document: dict):  # -> Optional[Document]:
+            """
+            Parse map object to entity document
+
+            :param document:
+            :return:
+            """
+            raise NotImplemented
+
+    __factories = {}
+
+    @classmethod
+    def register(cls, doc_type: str, factory: Factory):
+        cls.__factories[doc_type] = factory
+
+    @classmethod
+    def factory(cls, doc_type: str) -> Optional[Factory]:
+        return cls.__factories.get(doc_type)
+
     @classmethod
     def create(cls, doc_type: str, identifier: ID, data: Union[bytes, str]=None, signature: Union[bytes, str]=None):
         factory = cls.factory(doc_type=doc_type)
-        assert isinstance(factory, DocumentFactory), 'document type not found: %s' % doc_type
+        assert factory is not None, 'doc_type not support: %s' % doc_type
         return factory.create_document(identifier=identifier, data=data, signature=signature)
 
     @classmethod
@@ -190,52 +228,9 @@ class Document(TAI, Map):
         factory = cls.factory(doc_type=doc_type)
         if factory is None:
             factory = cls.factory(doc_type='*')  # unknown
-            assert isinstance(factory, DocumentFactory), 'cannot parse document: %s' % document
+            assert factory is not None, 'cannot parse document: %s' % document
         return factory.parse_document(document=document)
-
-    @classmethod
-    def factory(cls, doc_type: str):  # -> DocumentFactory:
-        return s_factories.get(doc_type)
-
-    @classmethod
-    def register(cls, doc_type: str, factory):
-        s_factories[doc_type] = factory
 
 
 def document_type(document: dict) -> str:
     return document.get('type')
-
-
-"""
-    Document Factory
-    ~~~~~~~~~~~~~~~~
-"""
-s_factories = {}
-
-
-class DocumentFactory:
-
-    @abstractmethod
-    def create_document(self, identifier: ID,
-                        data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None) -> Document:
-        """
-        1. Create a new empty document with entity ID
-
-        2. Create document with data & signature loaded from local storage
-
-        :param identifier: entity ID
-        :param data:       document data
-        :param signature:  document signature
-        :return: Document
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def parse_document(self, document: dict) -> Optional[Document]:
-        """
-        Parse map object to entity document
-
-        :param document:
-        :return:
-        """
-        raise NotImplemented

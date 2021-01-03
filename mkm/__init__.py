@@ -33,8 +33,8 @@ from .crypto import *
 from .types import NetworkType, MetaType
 from .address import Address, AddressFactory, ANYWHERE, EVERYWHERE
 from .identifier import ID, ANYONE, EVERYONE
-from .meta import Meta, BaseMeta, MetaFactory
-from .tai import Document, DocumentFactory
+from .meta import Meta, BaseMeta
+from .tai import Document
 from .profile import Visa, Bulletin, BaseDocument, BaseVisa, BaseBulletin
 
 name = "MingKeMing"
@@ -46,7 +46,7 @@ __all__ = [
     'NetworkType', 'MetaType',
     'Address', 'AddressFactory',
     'ID', 'ANYONE', 'EVERYONE', 'ANYWHERE', 'EVERYWHERE',
-    'Meta', 'BaseMeta', 'MetaFactory',
-    'Document', 'BaseDocument', 'DocumentFactory',
+    'Meta', 'BaseMeta',
+    'Document', 'BaseDocument',
     'Visa', 'BaseVisa', 'Bulletin', 'BaseBulletin',
 ]

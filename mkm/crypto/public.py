@@ -48,8 +48,30 @@ class PublicKey(VerifyKey, ABC):
         return asymmetric_keys_match(private_key=private_key, public_key=self)
 
     #
-    #  Factory method
+    #   PublicKey factory
     #
+    class Factory:
+
+        @abstractmethod
+        def parse_public_key(self, key: dict):  # -> Optional[PublicKey]:
+            """
+            Parse map object to key
+
+            :param key: key info
+            :return: PublicKey
+            """
+            raise NotImplemented
+
+    __factories = {}
+
+    @classmethod
+    def register(cls, algorithm: str, factory: Factory):
+        cls.__factories[algorithm] = factory
+
+    @classmethod
+    def factory(cls, algorithm: str) -> Optional[Factory]:
+        return cls.__factories.get(algorithm)
+
     @classmethod
     def parse(cls, key: dict):  # -> Optional[PublicKey]:
         if key is None:
@@ -59,37 +81,8 @@ class PublicKey(VerifyKey, ABC):
         elif isinstance(key, Map):
             key = key.dictionary
         algorithm = key_algorithm(key=key)
-        assert algorithm is not None, 'failed to get algorithm from key: %s' % key
         factory = cls.factory(algorithm=algorithm)
         if factory is None:
             factory = cls.factory(algorithm='*')  # unknown
             assert factory is not None, 'cannot parse key: %s' % key
         return factory.parse_public_key(key=key)
-
-    @classmethod
-    def factory(cls, algorithm: str):  # -> Optional[PublicKeyFactory]:
-        return s_factories.get(algorithm)
-
-    @classmethod
-    def register(cls, algorithm: str, factory):
-        s_factories[algorithm] = factory
-
-
-"""
-    Key Factory
-    ~~~~~~~~~~~
-"""
-s_factories = {}
-
-
-class PublicKeyFactory:
-
-    @abstractmethod
-    def parse_public_key(self, key: dict) -> Optional[PublicKey]:
-        """
-        Parse map object to key
-
-        :param key: key info
-        :return: PublicKey
-        """
-        raise NotImplemented

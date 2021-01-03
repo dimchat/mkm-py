@@ -69,8 +69,30 @@ class Address:
         return network_is_group(network=self.network)
 
     #
-    #  Factory method
+    #   Address factory
     #
+    class Factory:
+
+        @abstractmethod
+        def parse_address(self, address: str):  # -> Optional[Address]:
+            """
+            Parse string object to address
+
+            :param address: address string
+            :return: Address
+            """
+            raise NotImplemented
+
+    __factory = None
+
+    @classmethod
+    def register(cls, factory: Factory):
+        cls.__factory = factory
+
+    @classmethod
+    def factory(cls) -> Factory:
+        return cls.__factory
+
     @classmethod
     def parse(cls, address: str):  # -> Address:
         if address is None:
@@ -80,18 +102,8 @@ class Address:
         elif isinstance(address, String):
             address = address.string
         factory = cls.factory()
-        assert isinstance(factory, Factory), 'address factory not found'
+        assert factory is not None, 'address factory not ready'
         return factory.parse_address(address=address)
-
-    @classmethod
-    def factory(cls):  # -> Factory:
-        return cls.__factory
-
-    @classmethod
-    def register(cls, factory):
-        cls.__factory = factory
-
-    __factory = None
 
 
 """
@@ -125,20 +137,7 @@ EVERYWHERE = BroadcastAddress(address='everywhere', network=NetworkType.GROUP)
 """
 
 
-class Factory:
-
-    @abstractmethod
-    def parse_address(self, address: str) -> Optional[Address]:
-        """
-        Parse string object to address
-
-        :param address: address string
-        :return: Address
-        """
-        raise NotImplemented
-
-
-class AddressFactory(Factory):
+class AddressFactory(Address.Factory):
 
     def __init__(self):
         super().__init__()

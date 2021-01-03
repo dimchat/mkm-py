@@ -124,12 +124,46 @@ class ID:
         return array
 
     #
-    #   Factory methods
+    #   ID factory
     #
+    class Factory:
+
+        @abstractmethod
+        def create_identifier(self, address: Address, name: Optional[str]=None, terminal: Optional[str]=None):  # -> ID:
+            """
+            Create ID
+
+            :param address:  ID.address
+            :param name:     ID.name
+            :param terminal: ID.terminal
+            :return: ID
+            """
+            raise NotImplemented
+
+        @abstractmethod
+        def parse_identifier(self, identifier: str):  # -> Optional[ID]:
+            """
+            Parse string object to ID
+
+            :param identifier: ID string
+            :return: ID
+            """
+            raise NotImplemented
+
+    __factory = None
+
+    @classmethod
+    def register(cls, factory: Factory):
+        cls.__factory = factory
+
+    @classmethod
+    def factory(cls) -> Factory:
+        return cls.__factory
+
     @classmethod
     def create(cls, address: Address, name: Optional[str]=None, terminal: Optional[str]=None):  # -> Optional[ID]:
         factory = cls.factory()
-        assert isinstance(factory, Factory), 'ID factory not found'
+        assert factory is not None, 'ID factory not ready'
         return factory.create_identifier(address=address, name=name, terminal=terminal)
 
     @classmethod
@@ -141,18 +175,8 @@ class ID:
         elif isinstance(identifier, String):
             identifier = identifier.string
         factory = cls.factory()
-        assert isinstance(factory, Factory), 'ID factory not found'
+        assert factory is not None, 'ID factory not ready'
         return factory.parse_identifier(identifier=identifier)
-
-    @classmethod
-    def factory(cls):  # -> Factory:
-        return cls.__factory
-
-    @classmethod
-    def register(cls, factory):
-        cls.__factory = factory
-
-    __factory = None
 
 
 """
@@ -222,32 +246,7 @@ class Identifier(String, ID):
 """
 
 
-class Factory:
-
-    @abstractmethod
-    def create_identifier(self, address: Address, name: Optional[str]=None, terminal: Optional[str]=None) -> ID:
-        """
-        Create ID
-
-        :param address:  ID.address
-        :param name:     ID.name
-        :param terminal: ID.terminal
-        :return: ID
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def parse_identifier(self, identifier: str) -> Optional[ID]:
-        """
-        Parse string object to ID
-
-        :param identifier: ID string
-        :return: ID
-        """
-        raise NotImplemented
-
-
-class IDFactory(Factory):
+class IDFactory(ID.Factory):
 
     def __init__(self):
         super().__init__()
@@ -275,13 +274,13 @@ class IDFactory(Factory):
         return _id
 
 
-# register ID factory
-ID.register(factory=IDFactory())
-
-
 """
     ID for broadcast
     ~~~~~~~~~~~~~~~~
 """
+
+# register ID factory
+ID.register(factory=IDFactory())
+
 ANYONE = ID.create(name='anyone', address=ANYWHERE)
 EVERYONE = ID.create(name='everyone', address=EVERYWHERE)

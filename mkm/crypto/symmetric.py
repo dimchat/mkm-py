@@ -53,12 +53,43 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
             return symmetric_keys_equal(key1=self, key2=other)
 
     #
-    #   Factory methods
+    #   SymmetricKey factory
     #
+    class Factory:
+
+        @abstractmethod
+        def generate_symmetric_key(self):  # -> Optional[SymmetricKey]:
+            """
+            Generate key
+
+            :return: SymmetricKey
+            """
+            raise NotImplemented
+
+        @abstractmethod
+        def parse_symmetric_key(self, key: dict):  # -> Optional[SymmetricKey]:
+            """
+            Parse map object to key
+
+            :param key: key info
+            :return: SymmetricKey
+            """
+            raise NotImplemented
+
+    __factories = {}
+
+    @classmethod
+    def register(cls, algorithm: str, factory: Factory):
+        cls.__factories[algorithm] = factory
+
+    @classmethod
+    def factory(cls, algorithm: str) -> Optional[Factory]:
+        return cls.__factories.get(algorithm)
+
     @classmethod
     def generate(cls, algorithm: str):  # -> Optional[SymmetricKey]:
         factory = cls.factory(algorithm=algorithm)
-        assert factory is not None, 'key algorithm not found: %s' % algorithm
+        assert factory is not None, 'key algorithm not support: %s' % algorithm
         return factory.generate_symmetric_key()
 
     @classmethod
@@ -70,20 +101,11 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
         elif isinstance(key, Map):
             key = key.dictionary
         algorithm = key_algorithm(key=key)
-        assert algorithm is not None, 'failed to get algorithm from key: %s' % key
         factory = cls.factory(algorithm=algorithm)
         if factory is None:
             factory = cls.factory(algorithm='*')  # unknown
             assert factory is not None, 'cannot parse key: %s' % key
         return factory.parse_symmetric_key(key=key)
-
-    @classmethod
-    def factory(cls, algorithm: str):  # -> Optional[SymmetricKeyFactory]:
-        return s_factories.get(algorithm)
-
-    @classmethod
-    def register(cls, algorithm: str, factory):
-        s_factories[algorithm] = factory
 
 
 promise = 'Moky loves May Lee forever!'.encode('utf-8')
@@ -91,32 +113,3 @@ promise = 'Moky loves May Lee forever!'.encode('utf-8')
 
 def symmetric_keys_equal(key1: SymmetricKey, key2: SymmetricKey) -> bool:
     return key1.decrypt(key2.encrypt(promise)) == promise
-
-
-"""
-    Key Factory
-    ~~~~~~~~~~~
-"""
-s_factories = {}
-
-
-class SymmetricKeyFactory:
-
-    @abstractmethod
-    def generate_symmetric_key(self) -> Optional[SymmetricKey]:
-        """
-        Generate key
-
-        :return: SymmetricKey
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def parse_symmetric_key(self, key: dict) -> Optional[SymmetricKey]:
-        """
-        Parse map object to key
-
-        :param key: key info
-        :return: SymmetricKey
-        """
-        raise NotImplemented

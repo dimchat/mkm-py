@@ -29,7 +29,7 @@
 # ==============================================================================
 
 from abc import abstractmethod
-from typing import Optional, Union, Any
+from typing import Optional, Union, Any, List
 
 from .crypto import json_encode, json_decode, utf8_encode, utf8_decode, base64_encode, base64_decode
 from .crypto import Dictionary
@@ -94,7 +94,7 @@ class Bulletin(Document):
 
     @property
     @abstractmethod
-    def assistants(self) -> Optional[list]:
+    def assistants(self) -> Optional[List[ID]]:
         """
         Get group assistants
 
@@ -103,7 +103,7 @@ class Bulletin(Document):
         raise NotImplemented
 
     @assistants.setter
-    def assistants(self, bots: list):
+    def assistants(self, bots: List[ID]):
         """
         Set group assistants
 
@@ -371,7 +371,7 @@ class BaseBulletin(BaseDocument, Bulletin):
         self.__assistants = None
 
     @property
-    def assistants(self) -> Optional[list]:
+    def assistants(self) -> Optional[List[ID]]:
         if self.__assistants is None:
             assistants = self.get_property(key='assistants')
             if assistants is not None:
@@ -379,6 +379,6 @@ class BaseBulletin(BaseDocument, Bulletin):
         return self.__assistants
 
     @assistants.setter
-    def assistants(self, bots: list):
+    def assistants(self, bots: List[ID]):
         self.set_property(key='assistants', value=ID.revert(members=bots))
         self.__assistants = bots

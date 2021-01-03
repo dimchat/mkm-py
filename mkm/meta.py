@@ -152,19 +152,69 @@ class Meta(Map):
         raise NotImplemented
 
     #
-    #  Factory methods
+    #   Meta factory
     #
+    class Factory:
+
+        @abstractmethod
+        def create_meta(self, key: VerifyKey, seed: Optional[str] = None,
+                        fingerprint: Union[bytes, str, None] = None):  # -> Meta:
+            """
+            Create meta
+
+            :param key:         public key
+            :param seed:        ID.name
+            :param fingerprint: sKey.sign(seed)
+            :return: Meta
+            """
+            raise NotImplemented
+
+        @abstractmethod
+        def generate_meta(self, key: SignKey, seed: Optional[str] = None):  # -> Meta:
+            """
+            Generate meta
+
+            :param key:  private key
+            :param seed: ID.name
+            :return: Meta
+            """
+            raise NotImplemented
+
+        @abstractmethod
+        def parse_meta(self, meta: dict):  # -> Optional[Meta]:
+            """
+            Parse map object to meta
+
+            :param meta: meta info
+            :return: Meta
+            """
+            raise NotImplemented
+
+    __factories = {}
+
+    @classmethod
+    def register(cls, version: Union[MetaType, int], factory: Factory):
+        if isinstance(version, MetaType):
+            version = version.value
+        cls.__factories[version] = factory
+
+    @classmethod
+    def factory(cls, version: Union[MetaType, int]) -> Optional[Factory]:
+        if isinstance(version, MetaType):
+            version = version.value
+        return cls.__factories.get(version)
+
     @classmethod
     def create(cls, version: Union[MetaType, int], key: VerifyKey,
                seed: Optional[str]=None, fingerprint: Union[bytes, str, None]=None):  # -> Optional[Meta]:
         factory = cls.factory(version=version)
-        assert isinstance(factory, MetaFactory), 'meta type not found: %d' % version
+        assert factory is not None, 'meta type not support: %d' % version
         return factory.create_meta(key=key, seed=seed, fingerprint=fingerprint)
 
     @classmethod
     def generate(cls, version: Union[MetaType, int], key: SignKey, seed: Optional[str]=None):  # -> Optional[Meta]:
         factory = cls.factory(version=version)
-        assert isinstance(factory, MetaFactory), 'meta type not found: %d' % version
+        assert factory is not None, 'meta type not support: %d' % version
         return factory.generate_meta(key=key, seed=seed)
 
     @classmethod
@@ -177,20 +227,10 @@ class Meta(Map):
             meta = meta.dictionary
         version = meta_type(meta=meta)
         factory = cls.factory(version=version)
-        assert isinstance(factory, MetaFactory), 'meta type not found: %d' % version
+        if factory is None:
+            factory = cls.factory(version=0)  # unknown
+            assert factory is not None, 'cannot parse meta: %s' % meta
         return factory.parse_meta(meta=meta)
-
-    @classmethod
-    def factory(cls, version: Union[MetaType, int]):  # -> Optional[MetaFactory]:
-        if isinstance(version, MetaType):
-            version = version.value
-        return s_factories.get(version)
-
-    @classmethod
-    def register_factory(cls, version: Union[MetaType, int], factory):
-        if isinstance(version, MetaType):
-            version = version.value
-        s_factories[version] = factory
 
 
 """
@@ -339,46 +379,3 @@ class BaseMeta(Dictionary, Meta):
             # NOTICE: ID with BTC/ETH address has no username, so
             #         just compare the key.data to check matching
             return False
-
-
-"""
-    Meta Factory
-    ~~~~~~~~~~~~
-"""
-s_factories = {}
-
-
-class MetaFactory:
-
-    @abstractmethod
-    def create_meta(self, key: VerifyKey, seed: Optional[str]=None, fingerprint: Union[bytes, str, None]=None) -> Meta:
-        """
-        Create meta
-
-        :param key:         public key
-        :param seed:        ID.name
-        :param fingerprint: sKey.sign(seed)
-        :return: Meta
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def generate_meta(self, key: SignKey, seed: Optional[str]=None) -> Meta:
-        """
-        Generate meta
-
-        :param key:  private key
-        :param seed: ID.name
-        :return: Meta
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def parse_meta(self, meta: dict) -> Optional[Meta]:
-        """
-        Parse map object to meta
-
-        :param meta: meta info
-        :return: Meta
-        """
-        raise NotImplemented
