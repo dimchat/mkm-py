@@ -50,7 +50,7 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
         if super().__eq__(other):
             return True
         if isinstance(other, SymmetricKey):
-            return symmetric_keys_equal(key1=self, key2=other)
+            return keys_match(encrypt_key=other, decrypt_key=self)
 
     #
     #   SymmetricKey factory
@@ -106,7 +106,3 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
             factory = cls.factory(algorithm='*')  # unknown
             assert factory is not None, 'cannot parse key: %s' % key
         return factory.parse_symmetric_key(key=key)
-
-
-def symmetric_keys_equal(key1: SymmetricKey, key2: SymmetricKey) -> bool:
-    return keys_match(encrypt_key=key1, decrypt_key=key2)

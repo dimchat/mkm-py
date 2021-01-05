@@ -97,7 +97,7 @@ class Address:
     def parse(cls, address: str):  # -> Address:
         if address is None:
             return None
-        elif isinstance(address, Address):
+        elif isinstance(address, cls):
             return address
         elif isinstance(address, String):
             address = address.string
@@ -144,11 +144,10 @@ class AddressFactory(Address.Factory):
         self.__addresses = {}
 
     def parse_address(self, address: str) -> Optional[Address]:
-        lower = address.lower()
-        if ANYWHERE == lower:
-            return ANYWHERE
-        if EVERYWHERE == lower:
+        if EVERYWHERE == address:
             return EVERYWHERE
+        elif ANYWHERE == address:
+            return ANYWHERE
         add = self.__addresses.get(address)
         if add is None:
             add = self.create_address(address=address)

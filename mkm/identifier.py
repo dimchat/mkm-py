@@ -52,9 +52,13 @@ class ID:
         if other is None:
             return False
         if not isinstance(other, ID):
+            if isinstance(other, String):
+                other = other.string
             assert isinstance(other, str), 'ID error: %s' % other
             other = ID.parse(identifier=other)
-        if super().__eq__(other):
+            if other is None:
+                return False
+        if self is other:
             # same object
             return True
         return self.address == other.address and self.name == other.name
@@ -170,7 +174,7 @@ class ID:
     def parse(cls, identifier: str):  # -> Optional[ID]:
         if identifier is None:
             return None
-        elif isinstance(identifier, ID):
+        elif isinstance(identifier, cls):
             return identifier
         elif isinstance(identifier, String):
             identifier = identifier.string
@@ -185,7 +189,7 @@ class ID:
 """
 
 
-def create(string: str) -> Optional[ID]:
+def parse(string: str) -> Optional[ID]:
     # split ID string
     pair = string.split('/', 1)
     # terminal
@@ -268,7 +272,7 @@ class IDFactory(ID.Factory):
         assert isinstance(identifier, str), 'ID error: %s' % identifier
         _id = self.__ids.get(identifier)
         if _id is None:
-            _id = create(string=identifier)
+            _id = parse(string=identifier)
             if _id is not None:
                 self.__ids[identifier] = _id
         return _id

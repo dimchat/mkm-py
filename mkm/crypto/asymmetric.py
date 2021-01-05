@@ -25,7 +25,7 @@
 
 from abc import ABC, abstractmethod
 
-from .cryptography import CryptographyKey
+from .cryptography import CryptographyKey, promise
 
 
 class AsymmetricKey(CryptographyKey, ABC):
@@ -68,9 +68,6 @@ class VerifyKey(AsymmetricKey):
         :return:    True on signature matched
         """
         return asymmetric_keys_match(sign_key=key, verify_key=self)
-
-
-promise = 'Moky loves May Lee forever!'.encode('utf-8')
 
 
 def asymmetric_keys_match(sign_key: SignKey, verify_key: VerifyKey) -> bool:

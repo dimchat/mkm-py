@@ -220,7 +220,7 @@ class Document(TAI, Map):
     def parse(cls, document: dict):
         if document is None:
             return None
-        elif isinstance(document, Document):
+        elif isinstance(document, cls):
             return document
         elif isinstance(document, Map):
             document = document.dictionary
