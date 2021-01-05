@@ -128,11 +128,11 @@ class NetworkType(IntEnum):
 
 
 def network_is_user(network: int) -> bool:
-    return (network & NetworkType.MAIN.value) == NetworkType.MAIN.value or network == NetworkType.BTC_MAIN.value
+    return (network & NetworkType.MAIN) == NetworkType.MAIN or network == NetworkType.BTC_MAIN
 
 
 def network_is_group(network: int) -> bool:
-    return (network & NetworkType.GROUP.value) == NetworkType.GROUP.value
+    return (network & NetworkType.GROUP) == NetworkType.GROUP
 
 
 class MetaType(IntEnum):
@@ -171,4 +171,4 @@ class MetaType(IntEnum):
 
 
 def meta_has_seed(version: int) -> bool:
-    return (version & MetaType.MKM.value) == MetaType.MKM.value
+    return (version & MetaType.MKM) == MetaType.MKM

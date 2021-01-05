@@ -28,7 +28,7 @@ from typing import Optional
 
 from .dictionary import Map
 from .cryptography import key_algorithm
-from .asymmetric import VerifyKey, SignKey, asymmetric_keys_match
+from .asymmetric import VerifyKey
 
 
 class PublicKey(VerifyKey, ABC):
@@ -43,9 +43,6 @@ class PublicKey(VerifyKey, ABC):
             ...
         }
     """
-
-    def match(self, private_key: SignKey):
-        return asymmetric_keys_match(private_key=private_key, public_key=self)
 
     #
     #   PublicKey factory

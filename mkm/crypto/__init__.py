@@ -33,14 +33,14 @@
 from .format import *
 from .digest import *
 
-from .dictionary import Map, Dictionary
+from .dictionary import Wrapper, Array, Map, Dictionary
 from .string import String
 
-from .cryptography import CryptographyKey, EncryptKey, DecryptKey
+from .cryptography import CryptographyKey
+from .symmetric import SymmetricKey, EncryptKey, DecryptKey
 from .asymmetric import AsymmetricKey, SignKey, VerifyKey
 from .public import PublicKey
 from .private import PrivateKey
-from .symmetric import SymmetricKey
 
 
 __all__ = [
@@ -56,12 +56,11 @@ __all__ = [
     'md5', 'sha1', 'sha256', 'keccak256', 'ripemd160',
 
     # Types
-    'Map', 'Dictionary', 'String',
+    'Wrapper', 'Array', 'Map', 'Dictionary', 'String',
 
     # Crypto
-    'CryptographyKey', 'EncryptKey', 'DecryptKey',
+    'CryptographyKey',
+    'SymmetricKey', 'EncryptKey', 'DecryptKey',
     'AsymmetricKey', 'SignKey', 'VerifyKey',
-    'PublicKey',
-    'PrivateKey',
-    'SymmetricKey',
+    'PublicKey', 'PrivateKey',
 ]

@@ -25,13 +25,19 @@
 
 from typing import Optional, Union, Any, Tuple, Mapping, List, Iterable, Iterator
 
-from .dictionary import Map
-
 
 class String:
     """
         A container with inner string
     """
+
+    @classmethod
+    def unwrap(cls, s: str) -> str:
+        # unwrap string container
+        if isinstance(s, String):
+            return s.string
+        # assert isinstance(s, str)
+        return s
 
     # def __new__(cls, string: Optional[str]=None):
     #     return super().__new__(cls, string=string)
@@ -71,10 +77,12 @@ class String:
 
         Padding is done using the specified fill character (default is a space).
         """
-        string = self.__string.center(width=width, fillchar=fillchar)
+        if isinstance(fillchar, String):
+            fillchar = fillchar.string
+        string = self.__string.center(width, fillchar)
         return String(string=string)
 
-    def count(self, sub: str, start: Optional[int]=None, end: Optional[int]=None) -> int:
+    def count(self, x: str, __start: Optional[int]=None, __end: Optional[int]=None) -> int:
         """
         S.count(sub[, start[, end]]) -> int
 
@@ -82,9 +90,9 @@ class String:
         string S[start:end].  Optional arguments start and end are
         interpreted as in slice notation.
         """
-        if isinstance(sub, String):
-            sub = sub.string
-        return self.__string.count(x=sub, __start=start, __end=end)
+        if isinstance(x, String):
+            x = x.string
+        return self.__string.count(x, __start, __end)
 
     def encode(self, encoding: str='utf-8', errors: str='strict') -> bytes:
         """
@@ -99,7 +107,7 @@ class String:
             'xmlcharrefreplace' as well as any other name registered with
             codecs.register_error that can handle UnicodeEncodeErrors.
         """
-        return self.__string.encode(encoding=encoding, errors=errors)
+        return self.__string.encode(encoding, errors)
 
     def endswith(self, suffix: str, start: Optional[int]=None, end: Optional[int]=None) -> bool:
         """
@@ -112,7 +120,7 @@ class String:
         """
         if isinstance(suffix, String):
             suffix = suffix.string
-        return self.__string.endswith(suffix=suffix, start=start, end=end)
+        return self.__string.endswith(suffix, start, end)
 
     def expandtabs(self, tabsize: int=8):
         """
@@ -120,10 +128,10 @@ class String:
 
         If tabsize is not given, a tab size of 8 characters is assumed.
         """
-        string = self.__string.expandtabs(tabsize=tabsize)
+        string = self.__string.expandtabs(tabsize)
         return String(string=string)
 
-    def find(self, sub: str, start: Optional[int]=None, end: Optional[int]=None) -> int:
+    def find(self, sub: str, __start: Optional[int]=None, __end: Optional[int]=None) -> int:
         """
         S.find(sub[, start[, end]]) -> int
 
@@ -135,7 +143,7 @@ class String:
         """
         if isinstance(sub, String):
             sub = sub.string
-        return self.__string.find(sub, start, end)
+        return self.__string.find(sub, __start, __end)
 
     def format(self, *args, **kwargs):
         """
@@ -147,19 +155,20 @@ class String:
         string = self.__string.format(args, kwargs)
         return String(string=string)
 
-    def format_map(self, dictionary: Mapping[str, Any]):
+    def format_map(self, mapping: Mapping[str, Any]):
         """
         S.format_map(mapping) -> str
 
         Return a formatted version of S, using substitutions from mapping.
         The substitutions are identified by braces ('{' and '}').
         """
-        if isinstance(dictionary, Map):
-            dictionary = dictionary.dictionary
-        string = self.__string.format_map(map=dictionary)
+        from .dictionary import Map
+        if isinstance(mapping, Map):
+            mapping = mapping.dictionary
+        string = self.__string.format_map(map=mapping)
         return String(string=string)
 
-    def index(self, sub: str, start: Optional[int]=None, end: Optional[int]=None) -> int:
+    def index(self, sub: str, __start: Optional[int]=None, __end: Optional[int]=None) -> int:
         """
         S.index(sub[, start[, end]]) -> int
 
@@ -171,7 +180,7 @@ class String:
         """
         if isinstance(sub, String):
             sub = sub.string
-        return self.__string.index(sub=sub, __start=start, __end=end)
+        return self.__string.index(sub, __start, __end)
 
     def isalnum(self) -> bool:
         """
@@ -290,7 +299,7 @@ class String:
 
         Example: '.'.join(['ab', 'pq', 'rs']) -> 'ab.pq.rs'
         """
-        string = self.__string.join(iterable=iterable)
+        string = self.__string.join(iterable)
         return String(string=string)
 
     def ljust(self, width: int, fillchar: str=' '):
@@ -299,7 +308,9 @@ class String:
 
         Padding is done using the specified fill character (default is a space).
         """
-        string = self.__string.ljust(width=width, fillchar=fillchar)
+        if isinstance(fillchar, String):
+            fillchar = fillchar.string
+        string = self.__string.ljust(width, fillchar)
         return String(string=string)
 
     def lower(self):
@@ -315,7 +326,7 @@ class String:
         """
         if isinstance(chars, String):
             chars = chars.string
-        string = self.__string.lstrip(chars=chars)
+        string = self.__string.lstrip(chars)
         return String(string=string)
 
     def maketrans(self, *args, **kwargs):
@@ -345,7 +356,7 @@ class String:
         """
         if isinstance(sep, String):
             sep = sep.string
-        return self.__string.partition(sep=sep)
+        return self.__string.partition(sep)
 
     def replace(self, old: str, new: str, count: int=-1):
         """
@@ -362,10 +373,10 @@ class String:
             old = old.string
         if isinstance(new, String):
             new = new.string
-        string = self.__string.replace(old=old, new=new, count=count)
+        string = self.__string.replace(old, new, count)
         return String(string=string)
 
-    def rfind(self, sub: str, start: Optional[int]=None, end: Optional[int]=None) -> int:
+    def rfind(self, sub: str, __start: Optional[int]=None, __end: Optional[int]=None) -> int:
         """
         S.rfind(sub[, start[, end]]) -> int
 
@@ -377,9 +388,9 @@ class String:
         """
         if isinstance(sub, String):
             sub = sub.string
-        return self.__string.rfind(sub=sub, __start=start, __end=end)
+        return self.__string.rfind(sub, __start, __end)
 
-    def rindex(self, sub: str, start: Optional[int]=None, end: Optional[int]=None) -> int:
+    def rindex(self, sub: str, __start: Optional[int]=None, __end: Optional[int]=None) -> int:
         """
         S.rindex(sub[, start[, end]]) -> int
 
@@ -389,7 +400,9 @@ class String:
 
         Raises ValueError when the substring is not found.
         """
-        return self.__string.rindex(sub=sub, __start=start, __end=end)
+        if isinstance(sub, String):
+            sub = sub.string
+        return self.__string.rindex(sub, __start, __end)
 
     def rjust(self, width: int, fillchar: str=' '):
         """
@@ -397,7 +410,9 @@ class String:
 
         Padding is done using the specified fill character (default is a space).
         """
-        string = self.__string.rjust(width=width, fillchar=fillchar)
+        if isinstance(fillchar, String):
+            fillchar = fillchar.string
+        string = self.__string.rjust(width, fillchar)
         return String(string=string)
 
     def rpartition(self, sep: str) -> Tuple[str, str, str]:
@@ -413,7 +428,7 @@ class String:
         """
         if isinstance(sep, String):
             sep = sep.string
-        return self.__string.rpartition(sep=sep)
+        return self.__string.rpartition(sep)
 
     def rsplit(self, sep: Optional[str]=None, maxsplit: int=-1) -> List[str]:
         """
@@ -429,7 +444,9 @@ class String:
 
         Splits are done starting at the end of the string and working to the front.
         """
-        return self.__string.rsplit(sep=sep, maxsplit=maxsplit)
+        if isinstance(sep, String):
+            sep = sep.string
+        return self.__string.rsplit(sep, maxsplit)
 
     def rstrip(self, chars: Optional[str]=None):
         """
@@ -439,7 +456,7 @@ class String:
         """
         if isinstance(chars, String):
             chars = chars.string
-        string = self.__string.rstrip(chars=chars)
+        string = self.__string.rstrip(chars)
         return String(string=string)
 
     def split(self, sep: Optional[str]=None, maxsplit: int=-1) -> List[str]:
@@ -454,7 +471,9 @@ class String:
             Maximum number of splits to do.
             -1 (the default value) means no limit.
         """
-        return self.__string.split(sep=sep, maxsplit=maxsplit)
+        if isinstance(sep, String):
+            sep = sep.string
+        return self.__string.split(sep, maxsplit)
 
     def splitlines(self, keepends: bool=False) -> List[str]:
         """
@@ -463,7 +482,7 @@ class String:
         Line breaks are not included in the resulting list unless keepends is given and
         true.
         """
-        return self.__string.splitlines(keepends=keepends)
+        return self.__string.splitlines(keepends)
 
     def startswith(self, prefix, start: Optional[int]=None, end: Optional[int]=None) -> bool:
         """
@@ -474,7 +493,9 @@ class String:
         With optional end, stop comparing S at that position.
         prefix can also be a tuple of strings to try.
         """
-        return self.__string.startswith(prefix=prefix, start=start, end=end)
+        if isinstance(prefix, String):
+            prefix = prefix.string
+        return self.__string.startswith(prefix, start, end)
 
     def strip(self, chars: Optional[str]=None):
         """
@@ -484,7 +505,7 @@ class String:
         """
         if isinstance(chars, String):
             chars = chars.string
-        string = self.__string.strip(chars=chars)
+        string = self.__string.strip(chars)
         return String(string=string)
 
     def swapcase(self):
@@ -527,33 +548,35 @@ class String:
 
         The string is never truncated.
         """
-        string = self.__string.zfill(width=width)
+        string = self.__string.zfill(width)
         return String(string=string)
 
-    def __add__(self, other: str):
+    def __add__(self, s: str):
         """ Return self+value. """
-        if isinstance(other, String):
-            other = other.string
-        string = self.__string.__add__(s=other)
+        if isinstance(s, String):
+            s = s.string
+        string = self.__string.__add__(s)
         return String(string=string)
 
-    def __contains__(self, sub: str) -> bool:
+    def __contains__(self, s: str) -> bool:
         """ Return key in self. """
-        if isinstance(sub, String):
-            sub = sub.string
-        return self.__string.__contains__(s=sub)
+        if isinstance(s, String):
+            s = s.string
+        return self.__string.__contains__(s)
 
-    def __eq__(self, other: str) -> bool:
+    def __eq__(self, x: str) -> bool:
         """ Return self==value. """
-        if isinstance(other, String):
-            other = other.string
-        return self.__string.__eq__(other)
+        if isinstance(x, String):
+            if self is x:
+                return True
+            x = x.string
+        return self.__string.__eq__(x)
 
     def __format__(self, format_spec: str):
         """ Return a formatted version of the string as described by format_spec. """
         if isinstance(format_spec, String):
             format_spec = format_spec.string
-        string = self.__string.__format__(format_spec=format_spec)
+        string = self.__string.__format__(format_spec)
         return String(string=string)
 
     # def __getattribute__(self, name: str) -> Any:
@@ -564,22 +587,26 @@ class String:
 
     def __getitem__(self, i: Union[int, slice]) -> str:
         """ Return self[key]. """
-        return self.__string.__getitem__(i=i)
+        return self.__string.__getitem__(i)
 
     def __getnewargs__(self):
         pass
 
-    def __ge__(self, other: str) -> bool:
+    def __ge__(self, x: str) -> bool:
         """ Return self>=value. """
-        if isinstance(other, String):
-            other = other.string
-        return self.__string.__ge__(x=other)
+        if isinstance(x, String):
+            if self is x:
+                return True
+            x = x.string
+        return self.__string.__ge__(x)
 
-    def __gt__(self, other: str) -> bool:
+    def __gt__(self, x: str) -> bool:
         """ Return self>value. """
-        if isinstance(other, String):
-            other = other.string
-        return self.__string.__gt__(x=other)
+        if isinstance(x, String):
+            if self is x:
+                return False
+            x = x.string
+        return self.__string.__gt__(x)
 
     def __hash__(self) -> int:
         """ Return hash(self). """
@@ -593,33 +620,39 @@ class String:
         """ Return len(self). """
         return self.__string.__len__()
 
-    def __le__(self, other: str) -> bool:
+    def __le__(self, x: str) -> bool:
         """ Return self<=value. """
-        if isinstance(other, String):
-            other = other.string
-        return self.__string.__le__(x=other)
+        if isinstance(x, String):
+            if self is x:
+                return True
+            x = x.string
+        return self.__string.__le__(x)
 
-    def __lt__(self, other: str) -> bool:
+    def __lt__(self, x: str) -> bool:
         """ Return self<value. """
-        if isinstance(other, String):
-            other = other.string
-        return self.__string.__lt__(x=other)
+        if isinstance(x, String):
+            if self is x:
+                return False
+            x = x.string
+        return self.__string.__lt__(x)
 
     def __mod__(self, value: Any):
         """ Return self%value. """
-        string = self.__string.__mod__(value=value)
+        string = self.__string.__mod__(value)
         return String(string=string)
 
     def __mul__(self, n: int):
         """ Return self*value. """
-        string = self.__string.__mul__(n=n)
+        string = self.__string.__mul__(n)
         return String(string=string)
 
-    def __ne__(self, other: str) -> bool:
+    def __ne__(self, x: str) -> bool:
         """ Return self!=value. """
-        if isinstance(other, String):
-            other = other.string
-        return self.__string.__ne__(other)
+        if isinstance(x, String):
+            if self is x:
+                return False
+            x = x.string
+        return self.__string.__ne__(x)
 
     def __repr__(self) -> str:
         """ Return repr(self). """
@@ -631,7 +664,7 @@ class String:
 
     def __rmul__(self, n: int):
         """ Return value*self. """
-        string = self.__string.__rmul__(n=n)
+        string = self.__string.__rmul__(n)
         return String(string=string)
 
     def __sizeof__(self) -> int:

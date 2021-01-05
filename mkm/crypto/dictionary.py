@@ -28,11 +28,94 @@ from abc import abstractmethod
 from typing import Any, Optional, Union, Tuple, Iterator, Iterable
 from typing import Mapping, MutableMapping, ItemsView, KeysView, ValuesView
 
+from .string import String
+
+
+class Wrapper:
+    """
+        Wrapper for dict, list, str
+    """
+
+    @classmethod
+    def unwrap(cls, o: Any, circularly: bool = False) -> Any:
+        # unwrap string
+        if isinstance(o, String):
+            return o.string
+        if isinstance(o, str):
+            return o
+        # unwrap container
+        if circularly:
+            # unwrap map circularly
+            if isinstance(o, Map):
+                return Map.unwrap(o.dictionary, circularly=True)
+            if isinstance(o, dict):
+                return Map.unwrap(o, circularly=True)
+            # unwrap list circularly
+            if isinstance(o, Array):
+                return Array.unwrap(o.array, circularly=True)
+            if isinstance(o, list):
+                return Array.unwrap(o, circularly=True)
+        else:
+            # unwrap map
+            if isinstance(o, Map):
+                return o.dictionary
+            # unwrap list
+            if isinstance(o, Array):
+                return o.array
+        # others
+        return o
+
+
+class Array:
+    """
+        List: Any
+    """
+
+    @classmethod
+    def unwrap(cls, a: list, circularly: bool=False) -> list:
+        # unwrap list container
+        if isinstance(a, Array):
+            a = a.array
+        if not circularly:
+            return a
+        # unwrap items circularly
+        t = []
+        for o in a:
+            item = Wrapper.unwrap(o, circularly=True)
+            t.append(item)
+        return t
+
+    @property
+    @abstractmethod
+    def array(self) -> list:
+        raise NotImplemented
+
+    @property
+    @abstractmethod
+    def copy_array(self, deep_copy: bool=False) -> list:
+        raise NotImplemented
+
 
 class Map(MutableMapping):
     """
         Mapping: str -> Any
     """
+
+    @classmethod
+    def unwrap(cls, d: dict, circularly: bool = False) -> dict:
+        # unwrap map container
+        if isinstance(d, Map):
+            d = d.dictionary
+        if not circularly:
+            return d
+        # unwrap keys, values circularly
+        t = {}
+        for k in d:
+            v = d[k]
+            key = String.unwrap(k)
+            value = Wrapper.unwrap(v, circularly=True)
+            t[key] = value
+        return t
 
     @property
     @abstractmethod
@@ -87,9 +170,9 @@ class Dictionary(Map):
         dictionary = dict.fromkeys(seq=seq, value=value)
         return Dictionary(dictionary=dictionary)
 
-    def get(self, key: str, default: Optional[Any]=None) -> Optional[Any]:
+    def get(self, k: str, default: Optional[Any]=None) -> Optional[Any]:
         """ Return the value for key if key is in the dictionary, else default. """
-        return self.__dictionary.get(key, default)
+        return self.__dictionary.get(k, default)
 
     def items(self) -> ItemsView[str, Any]:
         """ D.items() -> a set-like object providing a view on D's items """
@@ -99,12 +182,12 @@ class Dictionary(Map):
         """ D.keys() -> a set-like object providing a view on D's keys """
         return self.__dictionary.keys()
 
-    def pop(self, key: str, default: Optional[Any]=None) -> Optional[Any]:
+    def pop(self, k: str, default: Optional[Any]=None) -> Optional[Any]:
         """
         D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
         If key is not found, d is returned if given, otherwise KeyError is raised
         """
-        return self.__dictionary.pop(key, default)
+        return self.__dictionary.pop(k, default)
 
     def popitem(self) -> Tuple[str, Any]:
         """
@@ -113,13 +196,13 @@ class Dictionary(Map):
         """
         return self.__dictionary.popitem()
 
-    def setdefault(self, key: str, default: Optional[Any]=None) -> Any:
+    def setdefault(self, k: str, default: Optional[Any]=None) -> Any:
         """
         Insert key with a value of default if key is not in the dictionary.
 
         Return the value for key if key is in the dictionary, else default.
         """
-        self.__dictionary.setdefault(k=key, default=default)
+        self.__dictionary.setdefault(k, default)
 
     def update(self, __m: Mapping[str, Any], **kwargs: Any):
         self.__dictionary.update(__m)
@@ -132,15 +215,17 @@ class Dictionary(Map):
         """ True if the dictionary has the specified key, else False. """
         return self.__dictionary.__contains__(o)
 
-    def __delitem__(self, key: str):
+    def __delitem__(self, v: str):
         """ Delete self[key]. """
-        self.__dictionary.__delitem__(v=key)
+        self.__dictionary.__delitem__(v)
 
-    def __eq__(self, other: Union[dict, Map]) -> bool:
+    def __eq__(self, o: Union[dict, Map]) -> bool:
         """ Return self==value. """
-        if isinstance(other, Map):
-            other = other.dictionary
-        return self.__dictionary.__eq__(o=other)
+        if isinstance(o, Map):
+            if self is o:
+                return True
+            o = o.dictionary
+        return self.__dictionary.__eq__(o)
 
     # def __getattribute__(self, name: str) -> Any:
     #     """ Return getattr(self, name). """
@@ -148,9 +233,9 @@ class Dictionary(Map):
     #         name = name.string
     #     return self.__dictionary.__getattribute__(name=name)
 
-    def __getitem__(self, key: str) -> Any:
+    def __getitem__(self, k: str) -> Any:
         """ x.__getitem__(y) <==> x[y] """
-        return self.__dictionary.__getitem__(key)
+        return self.__dictionary.__getitem__(k)
 
     def __ge__(self, other) -> bool:
         """ Return self>=value. """
@@ -176,19 +261,21 @@ class Dictionary(Map):
         """ Return self<value. """
         pass
 
-    def __ne__(self, other: Union[dict, Map]) -> bool:
+    def __ne__(self, o: Union[dict, Map]) -> bool:
         """ Return self!=value. """
-        if isinstance(other, Map):
-            other = other.dictionary
-        return self.__dictionary.__ne__(o=other)
+        if isinstance(o, Map):
+            if self is o:
+                return False
+            o = o.dictionary
+        return self.__dictionary.__ne__(o)
 
     def __repr__(self) -> str:
         """ Return repr(self). """
         return self.__dictionary.__repr__()
 
-    def __setitem__(self, key: str, value: Optional[Any]):
+    def __setitem__(self, k: str, v: Optional[Any]):
         """ Set self[key] to value. """
-        self.__dictionary.__setitem__(key, value)
+        self.__dictionary.__setitem__(k, v)
 
     def __sizeof__(self) -> int:
         """ D.__sizeof__() -> size of D in memory, in bytes """

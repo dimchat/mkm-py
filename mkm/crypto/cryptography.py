@@ -89,6 +89,22 @@ class DecryptKey(CryptographyKey):
         """
         raise NotImplemented
 
+    def match(self, key: EncryptKey):
+        """
+        OK = decrypt(encrypt(data, SK), PK) == data
+
+        :param key: encrypt key
+        :return:    False on error
+        """
+        return keys_match(encrypt_key=key, decrypt_key=self)
+
 
 def key_algorithm(key: dict) -> str:
     return key.get('algorithm')
+
+
+promise = 'Moky loves May Lee forever!'.encode('utf-8')
+
+
+def keys_match(encrypt_key: EncryptKey, decrypt_key: DecryptKey) -> bool:
+    return decrypt_key.decrypt(encrypt_key.encrypt(promise)) == promise

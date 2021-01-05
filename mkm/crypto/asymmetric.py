@@ -34,20 +34,6 @@ class AsymmetricKey(CryptographyKey, ABC):
     ECC = 'ECC'
 
 
-class VerifyKey(AsymmetricKey):
-
-    @abstractmethod
-    def verify(self, data: bytes, signature: bytes) -> bool:
-        """
-        OK = verify(data, signature, PK)
-
-        :param data:      message data
-        :param signature: signature of message data
-        :return:          True on signature matched
-        """
-        raise NotImplemented
-
-
 class SignKey(AsymmetricKey):
 
     @abstractmethod
@@ -61,10 +47,33 @@ class SignKey(AsymmetricKey):
         raise NotImplemented
 
 
+class VerifyKey(AsymmetricKey):
+
+    @abstractmethod
+    def verify(self, data: bytes, signature: bytes) -> bool:
+        """
+        OK = verify(data, signature, PK)
+
+        :param data:      message data
+        :param signature: signature of message data
+        :return:          True on signature matched
+        """
+        raise NotImplemented
+
+    def match(self, key: SignKey):
+        """
+        OK = verify(data, sign(data, SK), PK)
+
+        :param key: private key
+        :return:    True on signature matched
+        """
+        return asymmetric_keys_match(sign_key=key, verify_key=self)
+
+
 promise = 'Moky loves May Lee forever!'.encode('utf-8')
 
 
-def asymmetric_keys_match(private_key: SignKey, public_key: VerifyKey) -> bool:
+def asymmetric_keys_match(sign_key: SignKey, verify_key: VerifyKey) -> bool:
     # try to verify with signature
-    signature = private_key.sign(data=promise)
-    return public_key.verify(data=promise, signature=signature)
+    signature = sign_key.sign(data=promise)
+    return verify_key.verify(data=promise, signature=signature)

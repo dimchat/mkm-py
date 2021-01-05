@@ -27,7 +27,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from .dictionary import Map
-from .cryptography import EncryptKey, DecryptKey, key_algorithm
+from .cryptography import EncryptKey, DecryptKey, key_algorithm, keys_match
 
 
 class SymmetricKey(EncryptKey, DecryptKey, ABC):
@@ -108,8 +108,5 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
         return factory.parse_symmetric_key(key=key)
 
 
-promise = 'Moky loves May Lee forever!'.encode('utf-8')
-
-
 def symmetric_keys_equal(key1: SymmetricKey, key2: SymmetricKey) -> bool:
-    return key1.decrypt(key2.encrypt(promise)) == promise
+    return keys_match(encrypt_key=key1, decrypt_key=key2)

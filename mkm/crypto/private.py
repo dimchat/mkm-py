@@ -28,7 +28,7 @@ from typing import Optional
 
 from .dictionary import Map
 from .cryptography import key_algorithm
-from .asymmetric import SignKey, asymmetric_keys_match
+from .asymmetric import SignKey
 from .public import PublicKey
 
 
@@ -49,7 +49,9 @@ class PrivateKey(SignKey):
         if super().__eq__(other):
             return True
         if isinstance(other, SignKey):
-            return asymmetric_keys_match(private_key=other, public_key=self.public_key)
+            verify_key = self.public_key
+            if verify_key is not None:
+                return verify_key.match(key=other)
 
     @property
     @abstractmethod
