@@ -29,7 +29,7 @@
 # ==============================================================================
 
 from abc import abstractmethod
-from typing import Optional, Union
+from typing import Optional
 
 from .crypto import String
 from .address import Address, ANYWHERE, EVERYWHERE
@@ -264,12 +264,7 @@ class IDFactory(ID.Factory):
             self.__ids[identifier] = _id
         return _id
 
-    def parse_identifier(self, identifier: Union[ID, str, None]) -> Optional[ID]:
-        if identifier is None:
-            return None
-        if isinstance(identifier, ID):
-            return identifier
-        assert isinstance(identifier, str), 'ID error: %s' % identifier
+    def parse_identifier(self, identifier: str) -> Optional[ID]:
         _id = self.__ids.get(identifier)
         if _id is None:
             _id = parse(string=identifier)

@@ -29,7 +29,7 @@
 # ==============================================================================
 
 from abc import abstractmethod
-from typing import Optional
+from typing import Optional, Dict
 
 from .crypto import String
 from .types import NetworkType, network_is_user, network_is_group
@@ -141,13 +141,13 @@ class AddressFactory(Address.Factory):
 
     def __init__(self):
         super().__init__()
-        self.__addresses = {}
+        # cache broadcast addresses
+        self.__addresses: Dict[str, Address] = {
+            str(ANYWHERE): ANYWHERE,
+            str(EVERYWHERE): EVERYWHERE,
+        }
 
     def parse_address(self, address: str) -> Optional[Address]:
-        if EVERYWHERE == address:
-            return EVERYWHERE
-        elif ANYWHERE == address:
-            return ANYWHERE
         add = self.__addresses.get(address)
         if add is None:
             add = self.create_address(address=address)
