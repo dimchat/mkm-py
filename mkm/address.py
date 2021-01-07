@@ -58,7 +58,8 @@ class Address:
 
     @property
     def is_broadcast(self) -> bool:
-        return isinstance(self, BroadcastAddress)
+        # return isinstance(self, BroadcastAddress)
+        return False
 
     @property
     def is_user(self) -> bool:

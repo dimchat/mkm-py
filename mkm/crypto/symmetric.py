@@ -27,7 +27,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from .dictionary import Map
-from .cryptography import EncryptKey, DecryptKey, key_algorithm, keys_match
+from .cryptography import EncryptKey, DecryptKey, key_algorithm
 
 
 class SymmetricKey(EncryptKey, DecryptKey, ABC):
@@ -50,7 +50,7 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
         if super().__eq__(other):
             return True
         if isinstance(other, SymmetricKey):
-            return keys_match(encrypt_key=other, decrypt_key=self)
+            return self.match(key=other)
 
     #
     #   SymmetricKey factory
