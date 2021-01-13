@@ -362,7 +362,7 @@ class BaseMeta(Dictionary, Meta):
             return ID.create(address=address, name=self.seed, terminal=terminal)
 
     def match_identifier(self, identifier: ID) -> bool:
-        if self.seed == identifier.name:
+        if self.valid and self.seed == identifier.name:
             return self.generate_address(network=identifier.type) == identifier.address
 
     def match_key(self, key: VerifyKey) -> bool:

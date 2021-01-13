@@ -32,7 +32,7 @@ from .crypto import *
 
 from .types import NetworkType, MetaType
 from .address import Address, AddressFactory, ANYWHERE, EVERYWHERE
-from .identifier import ID, ANYONE, EVERYONE
+from .identifier import ID, ANYONE, EVERYONE, FOUNDER
 from .meta import Meta, BaseMeta
 from .tai import Document
 from .profile import Visa, Bulletin, BaseDocument, BaseVisa, BaseBulletin
@@ -44,8 +44,8 @@ __author__ = 'Albert Moky'
 __all__ = [
 
     'NetworkType', 'MetaType',
-    'Address', 'AddressFactory',
-    'ID', 'ANYONE', 'EVERYONE', 'ANYWHERE', 'EVERYWHERE',
+    'Address', 'AddressFactory', 'ANYWHERE', 'EVERYWHERE',
+    'ID', 'ANYONE', 'EVERYONE', 'FOUNDER',
     'Meta', 'BaseMeta',
     'Document', 'BaseDocument',
     'Visa', 'BaseVisa', 'Bulletin', 'BaseBulletin',

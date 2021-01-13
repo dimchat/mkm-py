@@ -274,7 +274,7 @@ class IDFactory(ID.Factory):
 
 
 """
-    ID for broadcast
+    ID for Broadcast
     ~~~~~~~~~~~~~~~~
 """
 
@@ -283,3 +283,6 @@ ID.register(factory=IDFactory())
 
 ANYONE = ID.create(name='anyone', address=ANYWHERE)
 EVERYONE = ID.create(name='everyone', address=EVERYWHERE)
+
+# DIM Founder
+FOUNDER = ID.create(name='moky', address=ANYWHERE)
