@@ -25,7 +25,7 @@
 
 import copy
 from abc import abstractmethod
-from typing import Any, Optional, Union, Tuple, Iterator, Iterable
+from typing import Any, Optional, Union, Tuple, Iterator
 from typing import Mapping, MutableMapping, ItemsView, KeysView, ValuesView
 
 from .string import String
@@ -72,7 +72,7 @@ class Array:
     """
 
     @classmethod
-    def unwrap(cls, a: list, circularly: bool=False) -> list:
+    def unwrap(cls, a: list, circularly: bool = False) -> list:
         # unwrap list container
         if isinstance(a, Array):
             a = a.array
@@ -92,7 +92,7 @@ class Array:
 
     @property
     @abstractmethod
-    def copy_array(self, deep_copy: bool=False) -> list:
+    def copy_array(self, deep_copy: bool = False) -> list:
         raise NotImplemented
 
 
@@ -123,7 +123,7 @@ class Map(MutableMapping):
         raise NotImplemented
 
     @abstractmethod
-    def copy_dictionary(self, deep_copy: bool=False) -> dict:
+    def copy_dictionary(self, deep_copy: bool = False) -> dict:
         raise NotImplemented
 
 
@@ -135,7 +135,7 @@ class Dictionary(Map):
     # def __new__(cls, dictionary: Optional[dict]=None):
     #     return super().__new__(cls, dictionary=dictionary)
 
-    def __init__(self, dictionary: Optional[dict]=None):
+    def __init__(self, dictionary: Optional[dict] = None):
         super().__init__()
         if dictionary is None:
             self.__dictionary = {}
@@ -149,7 +149,7 @@ class Dictionary(Map):
     def dictionary(self) -> dict:
         return self.__dictionary
 
-    def copy_dictionary(self, deep_copy: bool=False) -> dict:
+    def copy_dictionary(self, deep_copy: bool = False) -> dict:
         if deep_copy:
             copy.deepcopy(self.__dictionary)
         else:
@@ -165,12 +165,12 @@ class Dictionary(Map):
         return Dictionary(dictionary=dictionary)
 
     @staticmethod
-    def fromkeys(seq: Iterable[str], value: Optional[Any]=None):
+    def fromkeys(*args, **kwargs):
         """ Create a new dictionary with keys from iterable and values set to value. """
-        dictionary = dict.fromkeys(seq=seq, value=value)
+        dictionary = dict.fromkeys(*args, **kwargs)
         return Dictionary(dictionary=dictionary)
 
-    def get(self, k: str, default: Optional[Any]=None) -> Optional[Any]:
+    def get(self, k: str, default: Optional[Any] = None) -> Optional[Any]:
         """ Return the value for key if key is in the dictionary, else default. """
         return self.__dictionary.get(k, default)
 
@@ -182,7 +182,7 @@ class Dictionary(Map):
         """ D.keys() -> a set-like object providing a view on D's keys """
         return self.__dictionary.keys()
 
-    def pop(self, k: str, default: Optional[Any]=None) -> Optional[Any]:
+    def pop(self, k: str, default: Optional[Any] = None) -> Optional[Any]:
         """
         D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
         If key is not found, d is returned if given, otherwise KeyError is raised
@@ -196,7 +196,7 @@ class Dictionary(Map):
         """
         return self.__dictionary.popitem()
 
-    def setdefault(self, k: str, default: Optional[Any]=None) -> Any:
+    def setdefault(self, k: str, default: Optional[Any] = None) -> Any:
         """
         Insert key with a value of default if key is not in the dictionary.
 

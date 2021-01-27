@@ -120,7 +120,7 @@ class Meta(Map):
         raise NotImplemented
 
     @abstractmethod
-    def generate_identifier(self, network: Union[NetworkType, int], terminal: Optional[str]=None) -> Optional[ID]:
+    def generate_identifier(self, network: Union[NetworkType, int], terminal: Optional[str] = None) -> Optional[ID]:
         """
         Generate ID with terminal
 
@@ -206,13 +206,13 @@ class Meta(Map):
 
     @classmethod
     def create(cls, version: Union[MetaType, int], key: VerifyKey,
-               seed: Optional[str]=None, fingerprint: Union[bytes, str, None]=None):  # -> Optional[Meta]:
+               seed: Optional[str] = None, fingerprint: Union[bytes, str, None] = None):  # -> Optional[Meta]:
         factory = cls.factory(version=version)
         assert factory is not None, 'meta type not support: %d' % version
         return factory.create_meta(key=key, seed=seed, fingerprint=fingerprint)
 
     @classmethod
-    def generate(cls, version: Union[MetaType, int], key: SignKey, seed: Optional[str]=None):  # -> Optional[Meta]:
+    def generate(cls, version: Union[MetaType, int], key: SignKey, seed: Optional[str] = None):  # -> Optional[Meta]:
         factory = cls.factory(version=version)
         assert factory is not None, 'meta type not support: %d' % version
         return factory.generate_meta(key=key, seed=seed)
@@ -263,9 +263,9 @@ def meta_fingerprint(meta: dict) -> Optional[bytes]:
 
 class BaseMeta(Dictionary, Meta):
 
-    def __init__(self, meta: Optional[dict]=None,
-                 version: Union[MetaType, int]=0, key: Optional[VerifyKey]=None,
-                 seed: Optional[str]=None, fingerprint: Union[bytes, str, None]=None):
+    def __init__(self, meta: Optional[dict] = None,
+                 version: Union[MetaType, int] = 0, key: Optional[VerifyKey] = None,
+                 seed: Optional[str] = None, fingerprint: Union[bytes, str, None] = None):
         super().__init__(dictionary=meta)
         # pre-process
         if isinstance(version, MetaType):
@@ -356,7 +356,7 @@ class BaseMeta(Dictionary, Meta):
         """
         raise NotImplemented
 
-    def generate_identifier(self, network: Union[NetworkType, int], terminal: Optional[str]=None) -> Optional[ID]:
+    def generate_identifier(self, network: Union[NetworkType, int], terminal: Optional[str] = None) -> Optional[ID]:
         address = self.generate_address(network=network)
         if address is not None:
             return ID.create(address=address, name=self.seed, terminal=terminal)

@@ -42,7 +42,7 @@ class String:
     # def __new__(cls, string: Optional[str]=None):
     #     return super().__new__(cls, string=string)
 
-    def __init__(self, string: Optional[str]=None):
+    def __init__(self, string: Optional[str] = None):
         super().__init__()
         if string is None:
             self.__string = ''
@@ -71,7 +71,7 @@ class String:
         string = self.__string.casefold()
         return String(string=string)
 
-    def center(self, width: int, fillchar: str=' '):
+    def center(self, width: int, fillchar: str = ' '):
         """
         Return a centered string of length width.
 
@@ -82,7 +82,7 @@ class String:
         string = self.__string.center(width, fillchar)
         return String(string=string)
 
-    def count(self, x: str, __start: Optional[int]=None, __end: Optional[int]=None) -> int:
+    def count(self, x: str, __start: Optional[int] = None, __end: Optional[int] = None) -> int:
         """
         S.count(sub[, start[, end]]) -> int
 
@@ -94,7 +94,7 @@ class String:
             x = x.string
         return self.__string.count(x, __start, __end)
 
-    def encode(self, encoding: str='utf-8', errors: str='strict') -> bytes:
+    def encode(self, encoding: str = 'utf-8', errors: str = 'strict') -> bytes:
         """
         Encode the string using the codec registered for encoding.
 
@@ -109,7 +109,7 @@ class String:
         """
         return self.__string.encode(encoding, errors)
 
-    def endswith(self, suffix: str, start: Optional[int]=None, end: Optional[int]=None) -> bool:
+    def endswith(self, suffix: str, start: Optional[int] = None, end: Optional[int] = None) -> bool:
         """
         S.endswith(suffix[, start[, end]]) -> bool
 
@@ -122,7 +122,7 @@ class String:
             suffix = suffix.string
         return self.__string.endswith(suffix, start, end)
 
-    def expandtabs(self, tabsize: int=8):
+    def expandtabs(self, tabsize: int = 8):
         """
         Return a copy where all tab characters are expanded using spaces.
 
@@ -131,7 +131,7 @@ class String:
         string = self.__string.expandtabs(tabsize)
         return String(string=string)
 
-    def find(self, sub: str, __start: Optional[int]=None, __end: Optional[int]=None) -> int:
+    def find(self, sub: str, __start: Optional[int] = None, __end: Optional[int] = None) -> int:
         """
         S.find(sub[, start[, end]]) -> int
 
@@ -168,7 +168,7 @@ class String:
         string = self.__string.format_map(map=mapping)
         return String(string=string)
 
-    def index(self, sub: str, __start: Optional[int]=None, __end: Optional[int]=None) -> int:
+    def index(self, sub: str, __start: Optional[int] = None, __end: Optional[int] = None) -> int:
         """
         S.index(sub[, start[, end]]) -> int
 
@@ -302,7 +302,7 @@ class String:
         string = self.__string.join(iterable)
         return String(string=string)
 
-    def ljust(self, width: int, fillchar: str=' '):
+    def ljust(self, width: int, fillchar: str = ' '):
         """
         Return a left-justified string of length width.
 
@@ -318,7 +318,7 @@ class String:
         string = self.__string.lower()
         return String(string=string)
 
-    def lstrip(self, chars: Optional[str]=None):
+    def lstrip(self, chars: Optional[str] = None):
         """
         Return a copy of the string with leading whitespace removed.
 
@@ -358,7 +358,7 @@ class String:
             sep = sep.string
         return self.__string.partition(sep)
 
-    def replace(self, old: str, new: str, count: int=-1):
+    def replace(self, old: str, new: str, count: int = -1):
         """
         Return a copy with all occurrences of substring old replaced by new.
 
@@ -376,7 +376,7 @@ class String:
         string = self.__string.replace(old, new, count)
         return String(string=string)
 
-    def rfind(self, sub: str, __start: Optional[int]=None, __end: Optional[int]=None) -> int:
+    def rfind(self, sub: str, __start: Optional[int] = None, __end: Optional[int] = None) -> int:
         """
         S.rfind(sub[, start[, end]]) -> int
 
@@ -390,7 +390,7 @@ class String:
             sub = sub.string
         return self.__string.rfind(sub, __start, __end)
 
-    def rindex(self, sub: str, __start: Optional[int]=None, __end: Optional[int]=None) -> int:
+    def rindex(self, sub: str, __start: Optional[int] = None, __end: Optional[int] = None) -> int:
         """
         S.rindex(sub[, start[, end]]) -> int
 
@@ -404,7 +404,7 @@ class String:
             sub = sub.string
         return self.__string.rindex(sub, __start, __end)
 
-    def rjust(self, width: int, fillchar: str=' '):
+    def rjust(self, width: int, fillchar: str = ' '):
         """
         Return a right-justified string of length width.
 
@@ -430,7 +430,7 @@ class String:
             sep = sep.string
         return self.__string.rpartition(sep)
 
-    def rsplit(self, sep: Optional[str]=None, maxsplit: int=-1) -> List[str]:
+    def rsplit(self, sep: Optional[str] = None, maxsplit: int = -1) -> List[str]:
         """
         Return a list of the words in the string, using sep as the delimiter string.
 
@@ -448,7 +448,7 @@ class String:
             sep = sep.string
         return self.__string.rsplit(sep, maxsplit)
 
-    def rstrip(self, chars: Optional[str]=None):
+    def rstrip(self, chars: Optional[str] = None):
         """
         Return a copy of the string with trailing whitespace removed.
 
@@ -459,7 +459,7 @@ class String:
         string = self.__string.rstrip(chars)
         return String(string=string)
 
-    def split(self, sep: Optional[str]=None, maxsplit: int=-1) -> List[str]:
+    def split(self, sep: Optional[str] = None, maxsplit: int = -1) -> List[str]:
         """
         Return a list of the words in the string, using sep as the delimiter string.
 
@@ -475,7 +475,7 @@ class String:
             sep = sep.string
         return self.__string.split(sep, maxsplit)
 
-    def splitlines(self, keepends: bool=False) -> List[str]:
+    def splitlines(self, keepends: bool = False) -> List[str]:
         """
         Return a list of the lines in the string, breaking at line boundaries.
 
@@ -484,7 +484,7 @@ class String:
         """
         return self.__string.splitlines(keepends)
 
-    def startswith(self, prefix, start: Optional[int]=None, end: Optional[int]=None) -> bool:
+    def startswith(self, prefix, start: Optional[int] = None, end: Optional[int] = None) -> bool:
         """
         S.startswith(prefix[, start[, end]]) -> bool
 
@@ -497,7 +497,7 @@ class String:
             prefix = prefix.string
         return self.__string.startswith(prefix, start, end)
 
-    def strip(self, chars: Optional[str]=None):
+    def strip(self, chars: Optional[str] = None):
         """
         Return a copy of the string with leading and trailing whitespace remove.
 

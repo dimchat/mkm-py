@@ -43,7 +43,6 @@ class Address:
 
         properties:
             network - address type
-            number  - search number
     """
 
     @property

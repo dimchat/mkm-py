@@ -1,7 +1,7 @@
 # Ming Ke Ming (名可名) -- Account Module (Python)
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/dimchat/mkm-py/blob/master/LICENSE)
-[![Version](https://img.shields.io/badge/alpha-0.7.8-red.svg)](https://github.com/dimchat/mkm-py/wiki)
+[![Version](https://img.shields.io/badge/alpha-0.10.12-red.svg)](https://github.com/dimchat/mkm-py/wiki)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/dimchat/mkm-py/pulls)
 [![Platform](https://img.shields.io/badge/Platform-Python%203-brightgreen.svg)](https://github.com/dimchat/mkm-py/wiki)
 
@@ -10,16 +10,15 @@ This [document](https://github.com/moky/DIMP/blob/master/MingKeMing-Identity.md)
 Copyright &copy; 2018-2019 Albert Moky
 
 - [Meta](#meta)
-    - [Version](#meta-version)
-    - [Seed](#meta-seed)
+    - [Type](#meta-type)
     - [Key](#meta-key)
+    - [Seed](#meta-seed)
     - [Fingerprint](#meta-fingerprint)
 - [ID](#id)
     - [Type](#id-type)
     - [Name](#id-name)
     - [Address](#id-address)
     - [Terminal](#id-terminal)
-    - [Number](#id-number)
 - [Samples](#samples)
 
 ## <span id="meta">0. Meta</span>
@@ -30,12 +29,12 @@ It consists of 4 fields:
 
 | Field       | Description                   |
 | ----------- | ----------------------------- |
-| version     | Meta Algorithm Version        |
-| seed        | Entity Name                   |
+| type        | Meta Algorithm Version        |
 | key         | Public Key                    |
+| seed        | Entity Name                   |
 | fingerprint | Signature to generate address |
 
-### <span id="meta-version">0.0. Version</span>
+### <span id="meta-type">0.0. Meta Type</span>
 
 * ```0x01``` **Default version**
 * ```0x02``` BTC version
@@ -43,13 +42,13 @@ It consists of 4 fields:
 * ```0x04``` ETH version
 * ```0x05``` Extended ETH version
 
-### <span id="meta-seed">0.1. Seed</span>
+### <span id="meta-key">0.1. Key</span>
+
+A **public key** (PK) was bound to an ID by the **Meta Algorithm**.
+
+### <span id="meta-seed">0.2. Seed</span>
 
 A string as same as **ID.name** for generate the fingerprint.
-
-### <span id="meta-key">0.2. Key</span>
-
-A **public key** (PK) was binded to an ID by the **Meta Algorithm**.
 
 ### <span id="meta-fingerprint">0.3. Fingerprint</span>
 
@@ -69,11 +68,10 @@ The **ID** is used to identify an **entity**(user/group). It consists of 3 field
 | address     | Unique Identification         |
 | terminal    | Login point, it's optional.   |
 | type        | Network type                  |
-| number      | Search Number                 |
 
 The ID format is ```name@address[/terminal]```.
 
-### <span id="id-type">1.0. Type</span>
+### <span id="id-type">1.0. ID Type</span>
 
 The **network type** of a person is ```8```, and group is ```16```:
 
@@ -140,10 +138,6 @@ you must verify it with the consensus algorithm before accept its **public key**
 ### <span id="id-terminal">1.3. Terminal</span>
 
 A resource identifier as **Login Point**.
-
-### <span id="id-number">1.4. Number</span>
-
-A **Search Number** is defined for easy remember. Its value is converted from the **check code** of the address. It's greater than **0** and smaller than **2<sup>32</sup> (4,294,967,296)**.
 
 ## <span id="samples">2. Samples</span>
 

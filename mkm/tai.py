@@ -107,7 +107,7 @@ class TAI:
         raise NotImplemented
 
     @abstractmethod
-    def set_property(self, key: str, value: Any=None):
+    def set_property(self, key: str, value: Any = None):
         """
         Update property with key and data
         (this will clear 'data' and 'signature')
@@ -176,8 +176,8 @@ class Document(TAI, Map):
 
         @abstractmethod
         def create_document(self, identifier: ID,
-                            data: Union[bytes, str, None]=None,
-                            signature: Union[bytes, str, None]=None):  # -> Document:
+                            data: Union[bytes, str, None] = None,
+                            signature: Union[bytes, str, None] = None):  # -> Document:
             """
             1. Create a new empty document with entity ID
 
@@ -211,7 +211,7 @@ class Document(TAI, Map):
         return cls.__factories.get(doc_type)
 
     @classmethod
-    def create(cls, doc_type: str, identifier: ID, data: Union[bytes, str]=None, signature: Union[bytes, str]=None):
+    def create(cls, doc_type: str, identifier: ID, data: Union[bytes, str] = None, signature: Union[bytes, str] = None):
         factory = cls.factory(doc_type=doc_type)
         assert factory is not None, 'doc_type not support: %s' % doc_type
         return factory.create_document(identifier=identifier, data=data, signature=signature)

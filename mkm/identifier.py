@@ -133,7 +133,7 @@ class ID:
     class Factory:
 
         @abstractmethod
-        def create_identifier(self, address: Address, name: Optional[str]=None, terminal: Optional[str]=None):  # -> ID:
+        def create_identifier(self, address: Address, name: Optional[str] = None, terminal: Optional[str] = None):
             """
             Create ID
 
@@ -165,7 +165,7 @@ class ID:
         return cls.__factory
 
     @classmethod
-    def create(cls, address: Address, name: Optional[str]=None, terminal: Optional[str]=None):  # -> Optional[ID]:
+    def create(cls, address: Address, name: Optional[str] = None, terminal: Optional[str] = None):  # -> Optional[ID]:
         factory = cls.factory()
         assert factory is not None, 'ID factory not ready'
         return factory.create_identifier(address=address, name=name, terminal=terminal)
@@ -225,7 +225,7 @@ def concat(address: Address, name: Optional[str] = None, terminal: Optional[str]
 
 class Identifier(String, ID):
 
-    def __init__(self, identifier: str, address: Address, name: Optional[str]=None, terminal: Optional[str]=None):
+    def __init__(self, identifier: str, address: Address, name: Optional[str] = None, terminal: Optional[str] = None):
         super().__init__(string=identifier)
         self.__name = name
         self.__address = address
@@ -256,7 +256,7 @@ class IDFactory(ID.Factory):
         super().__init__()
         self.__ids = {}
 
-    def create_identifier(self, address: Address, name: Optional[str]=None, terminal: Optional[str]=None) -> ID:
+    def create_identifier(self, address: Address, name: Optional[str] = None, terminal: Optional[str] = None) -> ID:
         identifier = concat(address=address, name=name, terminal=terminal)
         _id = self.__ids.get(identifier)
         if _id is None:

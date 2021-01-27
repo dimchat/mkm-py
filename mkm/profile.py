@@ -136,9 +136,9 @@ def document_signature(document: dict) -> Optional[bytes]:
 
 class BaseDocument(Dictionary, Document):
 
-    def __init__(self, document: Optional[dict]=None,
-                 doc_type: Optional[str]=None, identifier: Optional[ID]=None,
-                 data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None):
+    def __init__(self, document: Optional[dict] = None,
+                 doc_type: Optional[str] = None, identifier: Optional[ID] = None,
+                 data: Union[bytes, str, None] = None, signature: Union[bytes, str, None] = None):
         super().__init__(dictionary=document)
         # pre-process
         if data is None:
@@ -294,7 +294,7 @@ class BaseDocument(Dictionary, Document):
         if info is not None:
             return info.get(key)
 
-    def set_property(self, key: str, value: Any=None):
+    def set_property(self, key: str, value: Any = None):
         """ Update profile property with key and value """
         # 1. reset status
         self.__status = 0
@@ -326,8 +326,8 @@ class BaseDocument(Dictionary, Document):
 
 class BaseVisa(BaseDocument, Visa):
 
-    def __init__(self, document: Optional[dict]=None, identifier: Optional[ID]=None,
-                 data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None):
+    def __init__(self, document: Optional[dict] = None, identifier: Optional[ID] = None,
+                 data: Union[bytes, str, None] = None, signature: Union[bytes, str, None] = None):
         super().__init__(document, Document.VISA, identifier=identifier, data=data, signature=signature)
         self.__key = None
 
@@ -365,8 +365,8 @@ class BaseVisa(BaseDocument, Visa):
 
 class BaseBulletin(BaseDocument, Bulletin):
 
-    def __init__(self, document: Optional[dict]=None, identifier: Optional[ID]=None,
-                 data: Union[bytes, str, None]=None, signature: Union[bytes, str, None]=None):
+    def __init__(self, document: Optional[dict] = None, identifier: Optional[ID] = None,
+                 data: Union[bytes, str, None] = None, signature: Union[bytes, str, None] = None):
         super().__init__(document, Document.BULLETIN, identifier=identifier, data=data, signature=signature)
         self.__assistants = None
 
