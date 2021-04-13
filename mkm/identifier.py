@@ -63,9 +63,6 @@ class ID:
             return True
         return self.address == other.address and self.name == other.name
 
-    def __hash__(self) -> int:
-        return hash(self.address)
-
     @property
     @abstractmethod
     def name(self) -> Optional[str]:
