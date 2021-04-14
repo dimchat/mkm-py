@@ -147,6 +147,16 @@ class Document(TAI, Map):
         """
         raise NotImplemented
 
+    @property
+    @abstractmethod
+    def time(self) -> int:
+        """
+        Get sign time
+
+        :return: timestamp
+        """
+        raise NotImplemented
+
     #
     #  properties getter/setter
     #

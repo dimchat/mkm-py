@@ -28,6 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
+import time as time_lib
 from abc import abstractmethod
 from typing import Optional, Union, Any, List
 
@@ -259,9 +260,13 @@ class BaseDocument(Dictionary, Document):
         :return: signature
         """
         if self.__status > 0:
-            # already signed
+            # already signed/verified
             return self.__signature
+        # update sign time
+        self.set_property(key='time', value=int(time_lib.time()))
+        # update status
         self.__status = 1
+        # sign
         self.__data = json_encode(self.properties)
         self.__signature = private_key.sign(data=self.__data)
         self['data'] = utf8_decode(data=self.__data)  # JsON string
@@ -314,6 +319,14 @@ class BaseDocument(Dictionary, Document):
     #
     #  properties getter/setter
     #
+
+    @property
+    def time(self) -> int:
+        timestamp = self.get_property(key='time')
+        if timestamp is None:
+            return 0
+        else:
+            return int(timestamp)
 
     @property
     def name(self) -> Optional[str]:

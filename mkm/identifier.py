@@ -48,20 +48,27 @@ class ID:
             terminal - entity login resource(device), OPTIONAL
     """
 
-    def __eq__(self, other) -> bool:
-        if other is None:
-            return False
-        if not isinstance(other, ID):
-            if isinstance(other, String):
-                other = other.string
-            assert isinstance(other, str), 'ID error: %s' % other
-            other = ID.parse(identifier=other)
-            if other is None:
-                return False
-        if self is other:
-            # same object
-            return True
-        return self.address == other.address and self.name == other.name
+    # def __eq__(self, other) -> bool:
+    #     if other is None:
+    #         return False
+    #     if not isinstance(other, ID):
+    #         if isinstance(other, String):
+    #             other = other.string
+    #         assert isinstance(other, str), 'ID error: %s' % other
+    #         other = ID.parse(identifier=other)
+    #         if other is None:
+    #             return False
+    #     return ID.equals(id1=self, id2=other)
+    #
+    # @classmethod
+    # def equals(cls, id1, id2) -> bool:
+    #     # assert isinstance(id1, ID)
+    #     # assert isinstance(id2, ID)
+    #     if id1 is id2:
+    #         # same object
+    #         return True
+    #     else:
+    #         return id1.address == id2.address and id1.name == id2.name
 
     @property
     @abstractmethod
