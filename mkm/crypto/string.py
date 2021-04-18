@@ -566,9 +566,9 @@ class String:
 
     def __eq__(self, x: str) -> bool:
         """ Return self==value. """
+        if self is x:
+            return True
         if isinstance(x, String):
-            if self is x:
-                return True
             x = x.string
         return self.__string.__eq__(x)
 

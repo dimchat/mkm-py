@@ -300,7 +300,7 @@ class BaseMeta(Dictionary, Meta):
 
     @property
     def type(self) -> int:
-        if self.__type is 0:
+        if self.__type == 0:
             self.__type = meta_type(meta=self.dictionary)
         return self.__type
 
@@ -324,7 +324,7 @@ class BaseMeta(Dictionary, Meta):
 
     @property
     def valid(self) -> bool:
-        if self.__status is 0:
+        if self.__status == 0:
             key = self.key
             if key is None:
                 # meta.key should not be empty

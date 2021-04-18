@@ -46,7 +46,7 @@ class PrivateKey(SignKey):
     """
 
     def __eq__(self, other) -> bool:
-        if super().__eq__(other):
+        if self is other:
             return True
         if isinstance(other, SignKey):
             verify_key = self.public_key

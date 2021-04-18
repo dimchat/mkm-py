@@ -221,9 +221,9 @@ class Dictionary(Map):
 
     def __eq__(self, o: Union[dict, Map]) -> bool:
         """ Return self==value. """
+        if self is o:
+            return True
         if isinstance(o, Map):
-            if self is o:
-                return True
             o = o.dictionary
         return self.__dictionary.__eq__(o)
 

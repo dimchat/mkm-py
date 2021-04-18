@@ -47,7 +47,7 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
     DES = 'DES'
 
     def __eq__(self, other) -> bool:
-        if super().__eq__(other):
+        if self is other:
             return True
         if isinstance(other, SymmetricKey):
             return self.match(key=other)
