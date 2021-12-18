@@ -31,10 +31,10 @@
 """
 
 import hashlib
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 
-class DataDigester:
+class DataDigester(ABC):
 
     @abstractmethod
     def digest(self, data: bytes) -> bytes:
@@ -73,6 +73,7 @@ def ripemd160(data: bytes) -> bytes:
 
 class M5(DataDigester):
 
+    # Override
     def digest(self, data: bytes) -> bytes:
         """ MD5 digest """
         hash_obj = hashlib.md5()
@@ -82,6 +83,7 @@ class M5(DataDigester):
 
 class S1(DataDigester):
 
+    # Override
     def digest(self, data: bytes) -> bytes:
         """ SHA1 Digest """
         return hashlib.sha1(data).digest()
@@ -89,6 +91,7 @@ class S1(DataDigester):
 
 class S256(DataDigester):
 
+    # Override
     def digest(self, data: bytes) -> bytes:
         """ SHA-256 """
         return hashlib.sha256(data).digest()
@@ -96,6 +99,7 @@ class S256(DataDigester):
 
 class R160(DataDigester):
 
+    # Override
     def digest(self, data: bytes) -> bytes:
         """ RIPEMD-160 """
         hash_obj = hashlib.new('ripemd160')

@@ -28,14 +28,15 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import abstractmethod
-from typing import Optional
+from abc import ABC, abstractmethod
+from typing import Optional, List, Any
 
 from .crypto import String
 from .address import Address, ANYWHERE, EVERYWHERE
+from .factories import Factories
 
 
-class ID:
+class ID(ABC):
     """
         ID for entity (User/Group)
         ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -48,40 +49,15 @@ class ID:
             terminal - entity login resource(device), OPTIONAL
     """
 
-    # def __eq__(self, other) -> bool:
-    #     if other is None:
-    #         return False
-    #     if not isinstance(other, ID):
-    #         if isinstance(other, String):
-    #             other = other.string
-    #         assert isinstance(other, str), 'ID error: %s' % other
-    #         other = ID.parse(identifier=other)
-    #         if other is None:
-    #             return False
-    #     return ID.equals(id1=self, id2=other)
-    #
-    # @classmethod
-    # def equals(cls, id1, id2) -> bool:
-    #     # assert isinstance(id1, ID)
-    #     # assert isinstance(id2, ID)
-    #     if id1 is id2:
-    #         # same object
-    #         return True
-    #     else:
-    #         return id1.address == id2.address and id1.name == id2.name
-
     @property
-    @abstractmethod
     def name(self) -> Optional[str]:
         raise NotImplemented
 
     @property
-    @abstractmethod
     def address(self) -> Address:
         raise NotImplemented
 
     @property
-    @abstractmethod
     def terminal(self) -> Optional[str]:
         raise NotImplemented
 
@@ -103,14 +79,14 @@ class ID:
         return self.address.is_group
 
     @classmethod
-    def convert(cls, members: list) -> list:
+    def convert(cls, members: List[str]):  # -> List[ID]:
         """
         Convert ID list from string array
 
         :param members: string array
         :return: ID list
         """
-        array = []
+        array: List[ID] = []
         for item in members:
             identifier = cls.parse(identifier=item)
             if identifier is None:
@@ -119,7 +95,7 @@ class ID:
         return array
 
     @classmethod
-    def revert(cls, members: list) -> list:
+    def revert(cls, members) -> List[str]:
         """
         Revert ID list to string array
 
@@ -134,10 +110,22 @@ class ID:
     #
     #   ID factory
     #
-    class Factory:
+    class Factory(ABC):
 
         @abstractmethod
-        def create_identifier(self, address: Address, name: Optional[str] = None, terminal: Optional[str] = None):
+        def generate_identifier(self, meta, network: int, terminal: Optional[str]):
+            """
+            Generate ID
+
+            :param meta:     meta info
+            :param network:  ID.type
+            :param terminal: ID.terminal
+            :return: ID
+            """
+            raise NotImplemented
+
+        @abstractmethod
+        def create_identifier(self, address: Address, name: Optional[str], terminal: Optional[str]):
             """
             Create ID
 
@@ -158,30 +146,39 @@ class ID:
             """
             raise NotImplemented
 
-    __factory = None
-
     @classmethod
     def register(cls, factory: Factory):
-        cls.__factory = factory
+        Factories.id_factory = factory
 
     @classmethod
     def factory(cls) -> Factory:
-        return cls.__factory
+        return Factories.id_factory
+
+    #
+    #   Factory methods
+    #
 
     @classmethod
-    def create(cls, address: Address, name: Optional[str] = None, terminal: Optional[str] = None):  # -> Optional[ID]:
+    def generate(cls, meta, network: int, terminal: Optional[str] = None):  # -> ID:
+        factory = cls.factory()
+        assert factory is not None, 'ID factory not ready'
+        return factory.generate_identifier(meta=meta, network=network, terminal=terminal)
+
+    @classmethod
+    def create(cls, address: Address, name: Optional[str] = None, terminal: Optional[str] = None):  # -> ID:
         factory = cls.factory()
         assert factory is not None, 'ID factory not ready'
         return factory.create_identifier(address=address, name=name, terminal=terminal)
 
     @classmethod
-    def parse(cls, identifier: str):  # -> Optional[ID]:
+    def parse(cls, identifier: Any):  # -> Optional[ID]:
         if identifier is None:
             return None
-        elif isinstance(identifier, cls):
+        elif isinstance(identifier, ID):
             return identifier
         elif isinstance(identifier, String):
             identifier = identifier.string
+        # assert isinstance(identifier, str), 'ID error: %s' % identifier
         factory = cls.factory()
         assert factory is not None, 'ID factory not ready'
         return factory.parse_identifier(identifier=identifier)
@@ -235,15 +232,15 @@ class Identifier(String, ID):
         self.__address = address
         self.__terminal = terminal
 
-    @property
+    @property  # Override
     def name(self) -> Optional[str]:
         return self.__name
 
-    @property
+    @property  # Override
     def address(self) -> Address:
         return self.__address
 
-    @property
+    @property  # Override
     def terminal(self) -> Optional[str]:
         return self.__terminal
 
@@ -260,21 +257,29 @@ class IDFactory(ID.Factory):
         super().__init__()
         self.__ids = {}
 
+    # Override
+    def generate_identifier(self, meta, network: int, terminal: Optional[str]) -> ID:
+        address = Address.generate(meta=meta, network=network)
+        assert address is not None, 'failed to generate ID with meta: %s' % meta
+        return ID.create(address=address, name=meta.seed, terminal=terminal)
+
+    # Override
     def create_identifier(self, address: Address, name: Optional[str] = None, terminal: Optional[str] = None) -> ID:
         identifier = concat(address=address, name=name, terminal=terminal)
-        _id = self.__ids.get(identifier)
-        if _id is None:
-            _id = Identifier(identifier=identifier, address=address, name=name, terminal=terminal)
-            self.__ids[identifier] = _id
-        return _id
+        cid = self.__ids.get(identifier)
+        if cid is None:
+            cid = Identifier(identifier=identifier, address=address, name=name, terminal=terminal)
+            self.__ids[identifier] = cid
+        return cid
 
+    # Override
     def parse_identifier(self, identifier: str) -> Optional[ID]:
-        _id = self.__ids.get(identifier)
-        if _id is None:
-            _id = parse(string=identifier)
-            if _id is not None:
-                self.__ids[identifier] = _id
-        return _id
+        cid = self.__ids.get(identifier)
+        if cid is None:
+            cid = parse(string=identifier)
+            if cid is not None:
+                self.__ids[identifier] = cid
+        return cid
 
 
 """

@@ -28,16 +28,17 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Optional, Union, Any
 
 from .crypto import Map
 from .crypto import VerifyKey, SignKey
 
 from .identifier import ID
+from .factories import Factories
 
 
-class TAI:
+class TAI(ABC):
     """
         The Additional Information
         ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -49,7 +50,6 @@ class TAI:
     """
 
     @property
-    @abstractmethod
     def valid(self) -> bool:
         """
         Check if signature matched
@@ -87,7 +87,6 @@ class TAI:
     #
 
     @property
-    @abstractmethod
     def properties(self) -> Optional[dict]:
         """
         Get all properties when valid
@@ -107,7 +106,7 @@ class TAI:
         raise NotImplemented
 
     @abstractmethod
-    def set_property(self, key: str, value: Any = None):
+    def set_property(self, key: str, value: Optional[Any]):
         """
         Update property with key and data
         (this will clear 'data' and 'signature')
@@ -118,7 +117,7 @@ class TAI:
         raise NotImplemented
 
 
-class Document(TAI, Map):
+class Document(TAI, Map, ABC):
 
     #
     #  Document types
@@ -128,7 +127,6 @@ class Document(TAI, Map):
     BULLETIN = 'bulletin'  # for group info
 
     @property
-    @abstractmethod
     def type(self) -> str:
         """
         Get document type
@@ -138,7 +136,6 @@ class Document(TAI, Map):
         raise NotImplemented
 
     @property
-    @abstractmethod
     def identifier(self) -> ID:
         """
         Get entity ID
@@ -148,7 +145,6 @@ class Document(TAI, Map):
         raise NotImplemented
 
     @property
-    @abstractmethod
     def time(self) -> int:
         """
         Get sign time
@@ -182,12 +178,10 @@ class Document(TAI, Map):
     #
     #   Document factory
     #
-    class Factory:
+    class Factory(ABC):
 
         @abstractmethod
-        def create_document(self, identifier: ID,
-                            data: Union[bytes, str, None] = None,
-                            signature: Union[bytes, str, None] = None):  # -> Document:
+        def create_document(self, identifier: ID, data: Union[bytes, str, None], signature: Union[bytes, str, None]):
             """
             1. Create a new empty document with entity ID
 
@@ -210,15 +204,13 @@ class Document(TAI, Map):
             """
             raise NotImplemented
 
-    __factories = {}
-
     @classmethod
     def register(cls, doc_type: str, factory: Factory):
-        cls.__factories[doc_type] = factory
+        Factories.document_factories[doc_type] = factory
 
     @classmethod
     def factory(cls, doc_type: str) -> Optional[Factory]:
-        return cls.__factories.get(doc_type)
+        return Factories.document_factories.get(doc_type)
 
     @classmethod
     def create(cls, doc_type: str, identifier: ID, data: Union[bytes, str] = None, signature: Union[bytes, str] = None):
@@ -230,10 +222,11 @@ class Document(TAI, Map):
     def parse(cls, document: dict):
         if document is None:
             return None
-        elif isinstance(document, cls):
+        elif isinstance(document, Document):
             return document
         elif isinstance(document, Map):
             document = document.dictionary
+        # assert isinstance(document, dict), 'document error: %s' % document
         doc_type = document_type(document=document)
         factory = cls.factory(doc_type=doc_type)
         if factory is None:

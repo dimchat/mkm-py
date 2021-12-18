@@ -23,13 +23,13 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Optional
 
 from .dictionary import Map
 
 
-class CryptographyKey(Map):
+class CryptographyKey(Map, ABC):
     """Cryptography key with designated algorithm
 
         Cryptography Key
@@ -52,7 +52,6 @@ class CryptographyKey(Map):
         raise NotImplemented
 
     @property
-    @abstractmethod
     def data(self) -> bytes:
         """
         Get key data
@@ -62,7 +61,7 @@ class CryptographyKey(Map):
         raise NotImplemented
 
 
-class EncryptKey(CryptographyKey):
+class EncryptKey(CryptographyKey, ABC):
 
     @abstractmethod
     def encrypt(self, data: bytes) -> bytes:
@@ -76,7 +75,7 @@ class EncryptKey(CryptographyKey):
         raise NotImplemented
 
 
-class DecryptKey(CryptographyKey):
+class DecryptKey(CryptographyKey, ABC):
 
     @abstractmethod
     def decrypt(self, data: bytes) -> Optional[bytes]:

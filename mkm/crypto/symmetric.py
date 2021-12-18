@@ -28,6 +28,7 @@ from typing import Optional
 
 from .dictionary import Map
 from .cryptography import EncryptKey, DecryptKey, key_algorithm
+from .factories import Factories
 
 
 class SymmetricKey(EncryptKey, DecryptKey, ABC):
@@ -55,7 +56,7 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
     #
     #   SymmetricKey factory
     #
-    class Factory:
+    class Factory(ABC):
 
         @abstractmethod
         def generate_symmetric_key(self):  # -> Optional[SymmetricKey]:
@@ -76,15 +77,13 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
             """
             raise NotImplemented
 
-    __factories = {}
-
     @classmethod
     def register(cls, algorithm: str, factory: Factory):
-        cls.__factories[algorithm] = factory
+        Factories.symmetric_key_factories[algorithm] = factory
 
     @classmethod
     def factory(cls, algorithm: str) -> Optional[Factory]:
-        return cls.__factories.get(algorithm)
+        return Factories.symmetric_key_factories.get(algorithm)
 
     @classmethod
     def generate(cls, algorithm: str):  # -> Optional[SymmetricKey]:

@@ -23,16 +23,17 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Optional
 
 from .dictionary import Map
 from .cryptography import key_algorithm
 from .asymmetric import SignKey
 from .public import PublicKey
+from .factories import Factories
 
 
-class PrivateKey(SignKey):
+class PrivateKey(SignKey, ABC):
     """This class is used to decrypt symmetric key or sign message data
 
         Asymmetric Cryptography Private Key
@@ -54,7 +55,6 @@ class PrivateKey(SignKey):
                 return verify_key.match(key=other)
 
     @property
-    @abstractmethod
     def public_key(self) -> Optional[PublicKey]:
         """
         Get public key from private key
@@ -66,7 +66,7 @@ class PrivateKey(SignKey):
     #
     #   PrivateKey factory
     #
-    class Factory:
+    class Factory(ABC):
 
         @abstractmethod
         def generate_private_key(self):  # -> Optional[PrivateKey]:
@@ -87,15 +87,13 @@ class PrivateKey(SignKey):
             """
             raise NotImplemented
 
-    __factories = {}
-
     @classmethod
     def register(cls, algorithm: str, factory: Factory):
-        cls.__factories[algorithm] = factory
+        Factories.private_key_factories[algorithm] = factory
 
     @classmethod
     def factory(cls, algorithm: str) -> Optional[Factory]:
-        return cls.__factories.get(algorithm)
+        return Factories.private_key_factories.get(algorithm)
 
     @classmethod
     def generate(cls, algorithm: str):  # -> Optional[PrivateKey]:

@@ -28,26 +28,27 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import abstractmethod
-from typing import Optional, Union
+from abc import ABC, abstractmethod
+from typing import Optional, Union, Any
 
 from .crypto import base64_encode, base64_decode, utf8_encode
 from .crypto import Map, Dictionary
 from .crypto import VerifyKey, SignKey, PublicKey
 
-from .types import NetworkType, MetaType, meta_has_seed
+from .types import MetaType, meta_has_seed
 from .address import Address
 from .identifier import ID
+from .factories import Factories
 
 
-class Meta(Map):
+class Meta(Map, ABC):
     """This class is used to generate entity ID
 
         User/Group Meta data
         ~~~~~~~~~~~~~~~~~~~~
 
         data format: {
-            version: 1,          // meta version
+            type: 1,             // meta version
             seed: "moKy",        // user/group name
             key: "{public key}", // PK = secp256k1(SK);
             fingerprint: "..."   // CT = sign(seed, SK);
@@ -58,7 +59,6 @@ class Meta(Map):
     """
 
     @property
-    @abstractmethod
     def type(self) -> int:
         """
         Meta algorithm version
@@ -73,7 +73,6 @@ class Meta(Map):
         raise NotImplemented
 
     @property
-    @abstractmethod
     def key(self) -> VerifyKey:
         """
         Public key (used for signature)
@@ -86,7 +85,6 @@ class Meta(Map):
         raise NotImplemented
 
     @property
-    @abstractmethod
     def seed(self) -> Optional[str]:
         """
         Seed to generate fingerprint
@@ -96,7 +94,6 @@ class Meta(Map):
         raise NotImplemented
 
     @property
-    @abstractmethod
     def fingerprint(self) -> Optional[bytes]:
         """
         Fingerprint to verify ID and public key
@@ -108,57 +105,23 @@ class Meta(Map):
         """
         raise NotImplemented
 
-    @property
     @abstractmethod
-    def valid(self) -> bool:
+    def generate_address(self, network: int) -> Optional[Address]:
         """
-        Check meta valid
-        (must call this when received a new meta from network)
+        Generate Address with network type
 
-        :return: True on valid
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def generate_identifier(self, network: Union[NetworkType, int], terminal: Optional[str] = None) -> Optional[ID]:
-        """
-        Generate ID with terminal
-
-        :param network:  ID.type
-        :param terminal: ID.terminal
-        :return: ID
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def match_identifier(self, identifier: ID) -> bool:
-        """
-        Check whether meta match with entity ID
-        (must call this when received a new meta from network)
-
-        :param identifier: entity ID
-        :return: True on matched
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def match_key(self, key: VerifyKey) -> bool:
-        """
-        Check whether meta match with public key
-
-        :param key: public key
-        :return: True on matched
+        :param network:  Address.network
+        :return: Address
         """
         raise NotImplemented
 
     #
     #   Meta factory
     #
-    class Factory:
+    class Factory(ABC):
 
         @abstractmethod
-        def create_meta(self, key: VerifyKey, seed: Optional[str] = None,
-                        fingerprint: Union[bytes, str, None] = None):  # -> Meta:
+        def create_meta(self, key: VerifyKey, seed: Optional[str], fingerprint: Union[bytes, str, None]):  # -> Meta:
             """
             Create meta
 
@@ -170,7 +133,7 @@ class Meta(Map):
             raise NotImplemented
 
         @abstractmethod
-        def generate_meta(self, key: SignKey, seed: Optional[str] = None):  # -> Meta:
+        def generate_meta(self, key: SignKey, seed: Optional[str]):  # -> Meta:
             """
             Generate meta
 
@@ -190,19 +153,21 @@ class Meta(Map):
             """
             raise NotImplemented
 
-    __factories = {}
-
     @classmethod
     def register(cls, version: Union[MetaType, int], factory: Factory):
         if isinstance(version, MetaType):
             version = version.value
-        cls.__factories[version] = factory
+        Factories.meta_factories[version] = factory
 
     @classmethod
     def factory(cls, version: Union[MetaType, int]) -> Optional[Factory]:
         if isinstance(version, MetaType):
             version = version.value
-        return cls.__factories.get(version)
+        return Factories.meta_factories.get(version)
+
+    #
+    #   Factory methods
+    #
 
     @classmethod
     def create(cls, version: Union[MetaType, int], key: VerifyKey,
@@ -218,13 +183,14 @@ class Meta(Map):
         return factory.generate_meta(key=key, seed=seed)
 
     @classmethod
-    def parse(cls, meta: dict):  # -> Optional[Meta]:
+    def parse(cls, meta: Any):  # -> Optional[Meta]:
         if meta is None:
             return None
-        elif isinstance(meta, cls):
+        elif isinstance(meta, Meta):
             return meta
         elif isinstance(meta, Map):
             meta = meta.dictionary
+        # assert isinstance(meta, dict), 'meta error: %s' % meta
         version = meta_type(meta=meta)
         factory = cls.factory(version=version)
         if factory is None:
@@ -246,28 +212,69 @@ def meta_type(meta: dict) -> int:
     return int(version)
 
 
-def meta_key(meta: dict) -> VerifyKey:
-    key = meta.get('key')
-    return PublicKey.parse(key=key)
+def check_meta(meta: Meta) -> bool:
+    key = meta.key
+    if key is None:
+        # meta.key should not be empty
+        return False
+    if not meta_has_seed(version=meta.type):
+        # this meta has no seed, so no signature too
+        return True
+    # check seed with signature
+    seed = meta.seed
+    fingerprint = meta.fingerprint
+    if seed is None or fingerprint is None:
+        # seed and fingerprint should not be empty
+        return False
+    # verify fingerprint
+    return key.verify(data=utf8_encode(string=seed), signature=fingerprint)
 
 
-def meta_seed(meta: dict) -> Optional[str]:
-    return meta.get('seed')
+def meta_match_id(identifier: ID, meta: Meta) -> bool:
+    """
+    Check whether meta match with entity ID
+    (must call this when received a new meta from network)
+
+    :param identifier: entity ID
+    :param meta:       meta info
+    :return: True on matched
+    """
+    # check ID.name
+    if meta.seed != identifier.name:
+        return False
+    # check ID.address
+    address = Address.generate(meta=meta, network=identifier.type)
+    return address == identifier.address
 
 
-def meta_fingerprint(meta: dict) -> Optional[bytes]:
-    fingerprint = meta.get('fingerprint')
-    if fingerprint is not None:
-        return base64_decode(string=fingerprint)
+def meta_match_key(key: VerifyKey, meta: Meta) -> bool:
+    """
+    Check whether meta match with public key
+
+    :param key:  public key
+    :param meta: meta info
+    :return: True on matched
+    """
+    # check whether the public key equals to meta.key
+    if key == meta.key:
+        return True
+    # check with seed & fingerprint
+    if not meta_has_seed(version=meta.type):
+        # NOTICE: ID with BTC/ETH address has no username, so
+        #         just compare the key.data to check matching
+        return False
+    # check whether keys equal by verifying signature
+    seed = utf8_encode(string=meta.seed)
+    fingerprint = meta.fingerprint
+    return key.verify(data=seed, signature=fingerprint)
 
 
-class BaseMeta(Dictionary, Meta):
+class BaseMeta(Dictionary, Meta, ABC):
 
     def __init__(self, meta: Optional[dict] = None,
                  version: Union[MetaType, int] = 0, key: Optional[VerifyKey] = None,
                  seed: Optional[str] = None, fingerprint: Union[bytes, str, None] = None):
-        super().__init__(dictionary=meta)
-        # pre-process
+        # check parameters
         if isinstance(version, MetaType):
             version = version.value
         if fingerprint is None:
@@ -278,104 +285,52 @@ class BaseMeta(Dictionary, Meta):
             assert isinstance(fingerprint, str), 'meta.fingerprint error: %s' % fingerprint
             base64 = fingerprint
             fingerprint = base64_decode(string=base64)
-        # set values
+        if meta is None:
+            assert version > 0 and key is not None, 'meta error: %d, %s, %s, %s' % (version, key, seed, fingerprint)
+            # build meta info
+            if seed is None or base64 is None:
+                meta = {
+                    'type': version,
+                    'key': key.dictionary,
+                }
+            else:
+                meta = {
+                    'type': version,
+                    'key': key.dictionary,
+                    'seed': seed,
+                    'fingerprint': base64,
+                }
+        # initialize with meta info
+        super().__init__(dictionary=meta)
+        # lazy load
         self.__type = version
         self.__key = key
         self.__seed = seed
         self.__fingerprint = fingerprint
-        self.__status = 0  # 1 for valid, -1 for invalid
-        # set values to inner dictionary
-        if version > 0:
-            self['version'] = version
-        if key is not None:
-            self['key'] = key.dictionary
-        if seed is not None:
-            self['seed'] = seed
-        if fingerprint is not None:
-            self['fingerprint'] = base64
 
-    @property
-    def has_seed(self) -> bool:
-        return meta_has_seed(version=self.type)
-
-    @property
+    @property  # Override
     def type(self) -> int:
         if self.__type == 0:
             self.__type = meta_type(meta=self.dictionary)
         return self.__type
 
-    @property
+    @property  # Override
     def key(self) -> VerifyKey:
         if self.__key is None:
-            self.__key = meta_key(meta=self.dictionary)
+            key = self.get('key')
+            self.__key = PublicKey.parse(key=key)
         return self.__key
 
-    @property
+    @property  # Override
     def seed(self) -> Optional[str]:
-        if self.__seed is None and self.has_seed:
-            self.__seed = meta_seed(meta=self.dictionary)
+        if self.__seed is None and meta_has_seed(version=self.type):
+            self.__seed = self.get('seed')
         return self.__seed
 
-    @property
+    @property  # Override
     def fingerprint(self) -> Optional[bytes]:
-        if self.__fingerprint is None and self.has_seed:
-            self.__fingerprint = meta_fingerprint(meta=self.dictionary)
+        if self.__fingerprint is None and meta_has_seed(version=self.type):
+            fingerprint = self.get('fingerprint')
+            if fingerprint is not None:
+                self.__fingerprint = base64_decode(string=fingerprint)
         return self.__fingerprint
-
-    @property
-    def valid(self) -> bool:
-        if self.__status == 0:
-            key = self.key
-            if key is None:
-                # meta.key should not be empty
-                self.__status = -1
-            elif self.has_seed:
-                seed = self.seed
-                fingerprint = self.fingerprint
-                if seed is None or fingerprint is None:
-                    # seed and fingerprint should not be empty
-                    self.__status = -1
-                elif key.verify(data=utf8_encode(string=seed), signature=fingerprint):
-                    # fingerprint matched
-                    self.__status = 1
-                else:
-                    # fingerprint not matched
-                    self.__status = -1
-            else:
-                # BTC, ETH, ...
-                self.__status = 1
-        return self.__status == 1
-
-    @abstractmethod
-    def generate_address(self, network: Union[NetworkType, int]) -> Address:
-        """
-        Generate address
-
-        :param network: ID.type
-        :return: Address
-        """
-        raise NotImplemented
-
-    def generate_identifier(self, network: Union[NetworkType, int], terminal: Optional[str] = None) -> Optional[ID]:
-        address = self.generate_address(network=network)
-        if address is not None:
-            return ID.create(address=address, name=self.seed, terminal=terminal)
-
-    def match_identifier(self, identifier: ID) -> bool:
-        if self.valid and self.seed == identifier.name:
-            return self.generate_address(network=identifier.type) == identifier.address
-
-    def match_key(self, key: VerifyKey) -> bool:
-        if not self.valid:
-            return False
-        if self.key == key:
-            return True
-        if self.has_seed:
-            # check whether keys equal by verifying signature
-            seed = self.seed
-            fingerprint = self.fingerprint
-            return key.verify(data=utf8_encode(string=seed), signature=fingerprint)
-        else:
-            # NOTICE: ID with BTC/ETH address has no username, so
-            #         just compare the key.data to check matching
-            return False

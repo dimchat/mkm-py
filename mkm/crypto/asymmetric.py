@@ -34,7 +34,7 @@ class AsymmetricKey(CryptographyKey, ABC):
     ECC = 'ECC'
 
 
-class SignKey(AsymmetricKey):
+class SignKey(AsymmetricKey, ABC):
 
     @abstractmethod
     def sign(self, data: bytes) -> bytes:
@@ -47,7 +47,7 @@ class SignKey(AsymmetricKey):
         raise NotImplemented
 
 
-class VerifyKey(AsymmetricKey):
+class VerifyKey(AsymmetricKey, ABC):
 
     @abstractmethod
     def verify(self, data: bytes, signature: bytes) -> bool:

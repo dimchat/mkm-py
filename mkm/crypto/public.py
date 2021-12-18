@@ -29,6 +29,7 @@ from typing import Optional
 from .dictionary import Map
 from .cryptography import key_algorithm
 from .asymmetric import VerifyKey
+from .factories import Factories
 
 
 class PublicKey(VerifyKey, ABC):
@@ -47,7 +48,7 @@ class PublicKey(VerifyKey, ABC):
     #
     #   PublicKey factory
     #
-    class Factory:
+    class Factory(ABC):
 
         @abstractmethod
         def parse_public_key(self, key: dict):  # -> Optional[PublicKey]:
@@ -59,15 +60,13 @@ class PublicKey(VerifyKey, ABC):
             """
             raise NotImplemented
 
-    __factories = {}
-
     @classmethod
     def register(cls, algorithm: str, factory: Factory):
-        cls.__factories[algorithm] = factory
+        Factories.public_key_factories[algorithm] = factory
 
     @classmethod
     def factory(cls, algorithm: str) -> Optional[Factory]:
-        return cls.__factories.get(algorithm)
+        return Factories.public_key_factories.get(algorithm)
 
     @classmethod
     def parse(cls, key: dict):  # -> Optional[PublicKey]:

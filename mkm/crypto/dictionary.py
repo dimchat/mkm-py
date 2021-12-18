@@ -24,7 +24,7 @@
 # ==============================================================================
 
 import copy
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Any, Optional, Union, Tuple, Iterator
 from typing import Mapping, MutableMapping, ItemsView, KeysView, ValuesView
 
@@ -66,7 +66,7 @@ class Wrapper:
         return o
 
 
-class Array:
+class Array(ABC):
     """
         List: Any
     """
@@ -86,17 +86,15 @@ class Array:
         return t
 
     @property
-    @abstractmethod
     def array(self) -> list:
         raise NotImplemented
 
-    @property
     @abstractmethod
     def copy_array(self, deep_copy: bool = False) -> list:
         raise NotImplemented
 
 
-class Map(MutableMapping):
+class Map(MutableMapping, ABC):
     """
         Mapping: str -> Any
     """
@@ -118,7 +116,6 @@ class Map(MutableMapping):
         return t
 
     @property
-    @abstractmethod
     def dictionary(self) -> dict:
         raise NotImplemented
 
@@ -145,20 +142,23 @@ class Dictionary(Map):
             assert isinstance(dictionary, dict), 'dictionary error: %s' % dictionary
             self.__dictionary = dictionary
 
-    @property
+    @property  # Override
     def dictionary(self) -> dict:
         return self.__dictionary
 
+    # Override
     def copy_dictionary(self, deep_copy: bool = False) -> dict:
         if deep_copy:
             copy.deepcopy(self.__dictionary)
         else:
             return self.__dictionary.copy()
 
+    # Override
     def clear(self):
         """ D.clear() -> None.  Remove all items from D. """
         self.__dictionary.clear()
 
+    # Override
     def copy(self):
         """ D.copy() -> a shallow copy of D """
         dictionary = self.__dictionary.copy()
@@ -170,18 +170,22 @@ class Dictionary(Map):
         dictionary = dict.fromkeys(*args, **kwargs)
         return Dictionary(dictionary=dictionary)
 
+    # Override
     def get(self, k: str, default: Optional[Any] = None) -> Optional[Any]:
         """ Return the value for key if key is in the dictionary, else default. """
         return self.__dictionary.get(k, default)
 
+    # Override
     def items(self) -> ItemsView[str, Any]:
         """ D.items() -> a set-like object providing a view on D's items """
         return self.__dictionary.items()
 
+    # Override
     def keys(self) -> KeysView[str]:
         """ D.keys() -> a set-like object providing a view on D's keys """
         return self.__dictionary.keys()
 
+    # Override
     def pop(self, k: str, default: Optional[Any] = None) -> Optional[Any]:
         """
         D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
@@ -189,6 +193,7 @@ class Dictionary(Map):
         """
         return self.__dictionary.pop(k, default)
 
+    # Override
     def popitem(self) -> Tuple[str, Any]:
         """
         D.popitem() -> (k, v), remove and return some (key, value) pair as a
@@ -196,6 +201,7 @@ class Dictionary(Map):
         """
         return self.__dictionary.popitem()
 
+    # Override
     def setdefault(self, k: str, default: Optional[Any] = None) -> Any:
         """
         Insert key with a value of default if key is not in the dictionary.
@@ -204,9 +210,11 @@ class Dictionary(Map):
         """
         self.__dictionary.setdefault(k, default)
 
+    # Override
     def update(self, __m: Mapping[str, Any], **kwargs: Any):
         self.__dictionary.update(__m)
 
+    # Override
     def values(self) -> ValuesView[Any]:
         """ D.values() -> an object providing a view on D's values """
         return self.__dictionary.values()

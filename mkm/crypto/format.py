@@ -32,11 +32,11 @@
 
 import base64
 import json
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Optional, Union
 
 
-class DataCoder:
+class DataCoder(ABC):
 
     @abstractmethod
     def encode(self, data: bytes) -> str:
@@ -59,7 +59,7 @@ class DataCoder:
         raise NotImplemented
 
 
-class DataParser:
+class DataParser(ABC):
 
     @abstractmethod
     def encode(self, o: Union[str, dict, list]) -> bytes:
@@ -137,10 +137,12 @@ def utf8_decode(data: bytes) -> Optional[str]:
 
 class B64(DataCoder):
 
+    # Override
     def encode(self, data: bytes) -> str:
         """ BASE-64 Encode """
         return base64.b64encode(data).decode('utf-8')
 
+    # Override
     def decode(self, string: str) -> Optional[bytes]:
         """ BASE-64 Decode """
         return base64.b64decode(string)
@@ -148,11 +150,13 @@ class B64(DataCoder):
 
 class H(DataCoder):
 
+    # Override
     def encode(self, data: bytes) -> str:
         """ HEX Encode """
         # return binascii.b2a_hex(data).decode('utf-8')
         return data.hex()
 
+    # Override
     def decode(self, string: str) -> Optional[bytes]:
         """ HEX Decode """
         # return binascii.a2b_hex(string)
@@ -211,10 +215,12 @@ class Hex:
 
 class J(DataParser):
 
+    # Override
     def encode(self, o: Union[dict, list]) -> bytes:
         """ JsON encode """
         return bytes(json.dumps(o), encoding='utf-8')
 
+    # Override
     def decode(self, data: bytes) -> Union[dict, list, None]:
         """ JsON decode """
         return json.loads(data)
@@ -222,10 +228,12 @@ class J(DataParser):
 
 class U(DataParser):
 
+    # Override
     def encode(self, o: str) -> bytes:
         """ UTF-8 encode """
         return o.encode('utf-8')
 
+    # Override
     def decode(self, data: bytes) -> Optional[str]:
         """ UTF-8 decode """
         return data.decode('utf-8')

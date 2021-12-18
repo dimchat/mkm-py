@@ -29,7 +29,7 @@
 # ==============================================================================
 
 import time as time_lib
-from abc import abstractmethod
+from abc import ABC
 from typing import Optional, Union, Any, List
 
 from .crypto import json_encode, json_decode, utf8_encode, utf8_decode, base64_encode, base64_decode
@@ -40,7 +40,7 @@ from .identifier import ID
 from .tai import Document, document_type
 
 
-class Visa(Document):
+class Visa(Document, ABC):
     """
         User Document
         ~~~~~~~~~~~~~
@@ -49,7 +49,6 @@ class Visa(Document):
     """
 
     @property
-    @abstractmethod
     def key(self) -> Union[EncryptKey, VerifyKey, None]:
         """
         Get public key to encrypt message for user
@@ -59,7 +58,6 @@ class Visa(Document):
         raise NotImplemented
 
     @key.setter
-    @abstractmethod
     def key(self, value: Union[EncryptKey, VerifyKey]):
         """
         Set public key for other user to encrypt message
@@ -87,14 +85,13 @@ class Visa(Document):
         pass
 
 
-class Bulletin(Document):
+class Bulletin(Document, ABC):
     """
         Group Document
         ~~~~~~~~~~~~~~
     """
 
     @property
-    @abstractmethod
     def assistants(self) -> Optional[List[ID]]:
         """
         Get group assistants
@@ -120,19 +117,8 @@ class Bulletin(Document):
 
 
 def document_identifier(document: dict) -> ID:
-    return ID.parse(identifier=document.get('ID'))
-
-
-def document_data(document: dict) -> Optional[bytes]:
-    utf8 = document.get('data')
-    if utf8 is not None:
-        return utf8_encode(string=utf8)
-
-
-def document_signature(document: dict) -> Optional[bytes]:
-    base64 = document.get('signature')
-    if base64 is not None:
-        return base64_decode(string=base64)
+    identifier = document.get('ID')
+    return ID.parse(identifier=identifier)
 
 
 class BaseDocument(Dictionary, Document):
@@ -140,8 +126,7 @@ class BaseDocument(Dictionary, Document):
     def __init__(self, document: Optional[dict] = None,
                  doc_type: Optional[str] = None, identifier: Optional[ID] = None,
                  data: Union[bytes, str, None] = None, signature: Union[bytes, str, None] = None):
-        super().__init__(dictionary=document)
-        # pre-process
+        # check parameters
         if data is None:
             utf8 = None
         elif isinstance(data, bytes):
@@ -158,35 +143,45 @@ class BaseDocument(Dictionary, Document):
             assert isinstance(signature, str), 'document signature error: %s' % signature
             base64 = signature
             signature = base64_decode(string=base64)
-        # set values
+        properties = None
+        status = 0
+        if document is None:
+            assert identifier is not None, 'doc ID should not be empty'
+            if utf8 is None or base64 is None:
+                """ Create a new empty document with ID and doc type """
+                document = {
+                    'ID': str(identifier),
+                }
+                if doc_type is not None:
+                    properties = {
+                        'type': doc_type,
+                    }
+            else:
+                """ Create document with ID, data and signature loaded from local storage """
+                document = {
+                    'ID': str(identifier),
+                    'data': utf8,
+                    'signature': base64
+                }
+                # all documents must be verified before saving into local storage
+                status = 1
+        # initialize with document info
+        super().__init__(dictionary=document)
+        # lazy load
         self.__identifier = identifier
         self.__data = data            # JsON.encode(properties)
         self.__signature = signature  # LocalUser(identifier).sign(data)
-        self.__properties = None
-        self.__status = 0             # 1 for valid, -1 for invalid
-        # set values to inner dictionary
-        if identifier is not None:
-            self['ID'] = str(identifier)
-            if data is None or signature is None:
-                """ Create a new empty document with ID and doc type """
-                assert doc_type is not None, 'document type empty'
-                self.__properties = {
-                    'type': doc_type,
-                }
-            else:
-                """ Create entity document with ID, data and signature loaded from local storage """
-                self['data'] = utf8
-                self['signature'] = base64
-                self.__status = 1  # all documents must be verified before saving into local storage
+        self.__properties = properties
+        self.__status = status        # 1 for valid, -1 for invalid
 
-    @property
+    @property  # Override
     def type(self) -> str:
         doc_type = self.get_property(key='type')
         if doc_type is None:
             doc_type = document_type(document=self.dictionary)
         return doc_type
 
-    @property
+    @property  # Override
     def identifier(self) -> ID:
         if self.__identifier is None:
             self.__identifier = document_identifier(document=self.dictionary)
@@ -200,7 +195,9 @@ class BaseDocument(Dictionary, Document):
         :return: JsON string
         """
         if self.__data is None:
-            self.__data = document_data(document=self.dictionary)
+            utf8 = self.get('data')
+            if utf8 is not None:
+                self.__data = utf8_encode(string=utf8)
         return self.__data
 
     @property
@@ -211,10 +208,12 @@ class BaseDocument(Dictionary, Document):
         :return: signature data
         """
         if self.__signature is None:
-            self.__signature = document_signature(document=self.dictionary)
+            base64 = self.get('signature')
+            if base64 is not None:
+                self.__signature = base64_decode(string=base64)
         return self.__signature
 
-    @property
+    @property  # Override
     def valid(self) -> bool:
         return self.__status > 0
 
@@ -222,6 +221,7 @@ class BaseDocument(Dictionary, Document):
     #  signature
     #
 
+    # Override
     def verify(self, public_key: VerifyKey) -> bool:
         """
         Verify 'data' and 'signature' with public key
@@ -252,6 +252,7 @@ class BaseDocument(Dictionary, Document):
         #         try another key
         return self.__status == 1
 
+    # Override
     def sign(self, private_key: SignKey) -> bytes:
         """
         Encode properties to 'data' and sign it to 'signature'
@@ -277,7 +278,7 @@ class BaseDocument(Dictionary, Document):
     #  properties
     #
 
-    @property
+    @property  # Override
     def properties(self) -> Optional[dict]:
         """ Load properties from data """
         if self.__status < 0:
@@ -294,14 +295,17 @@ class BaseDocument(Dictionary, Document):
                 assert isinstance(self.__properties, dict), 'document data error: %s' % self
         return self.__properties
 
+    # Override
     def get_property(self, key: str) -> Optional[Any]:
         info = self.properties
         if info is not None:
             return info.get(key)
 
-    def set_property(self, key: str, value: Any = None):
+    # Override
+    def set_property(self, key: str, value: Optional[Any]):
         """ Update profile property with key and value """
         # 1. reset status
+        assert self.__status >= 0, 'status error: %s' % self
         self.__status = 0
         # 2. update property value with name
         info = self.properties
@@ -320,7 +324,7 @@ class BaseDocument(Dictionary, Document):
     #  properties getter/setter
     #
 
-    @property
+    @property  # Override
     def time(self) -> int:
         timestamp = self.get_property(key='time')
         if timestamp is None:
@@ -328,11 +332,11 @@ class BaseDocument(Dictionary, Document):
         else:
             return int(timestamp)
 
-    @property
+    @property  # Override
     def name(self) -> Optional[str]:
         return self.get_property(key='name')
 
-    @name.setter
+    @name.setter  # Override
     def name(self, value: str):
         self.set_property(key='name', value=value)
 
@@ -341,7 +345,7 @@ class BaseVisa(BaseDocument, Visa):
 
     def __init__(self, document: Optional[dict] = None, identifier: Optional[ID] = None,
                  data: Union[bytes, str, None] = None, signature: Union[bytes, str, None] = None):
-        super().__init__(document, Document.VISA, identifier=identifier, data=data, signature=signature)
+        super().__init__(document, doc_type=Document.VISA, identifier=identifier, data=data, signature=signature)
         self.__key = None
 
     """
@@ -350,7 +354,7 @@ class BaseVisa(BaseDocument, Visa):
         For safety considerations, the profile.key which used to encrypt message data
         should be different with meta.key
     """
-    @property
+    @property  # Override
     def key(self) -> Union[EncryptKey, VerifyKey, None]:
         if self.__key is None:
             info = self.get_property(key='key')
@@ -358,7 +362,7 @@ class BaseVisa(BaseDocument, Visa):
                 self.__key = PublicKey.parse(key=info)
         return self.__key
 
-    @key.setter
+    @key.setter  # Override
     def key(self, value: Union[EncryptKey, VerifyKey]):
         self.set_property(key='key', value=value.dictionary)
         self.__key = value
@@ -367,11 +371,11 @@ class BaseVisa(BaseDocument, Visa):
         Avatar
         ~~~~~~
     """
-    @property
+    @property  # Override
     def avatar(self) -> Optional[str]:
         return self.get_property(key='avatar')
 
-    @avatar.setter
+    @avatar.setter  # Override
     def avatar(self, value: str):
         self.set_property(key='avatar', value=value)
 
@@ -380,10 +384,10 @@ class BaseBulletin(BaseDocument, Bulletin):
 
     def __init__(self, document: Optional[dict] = None, identifier: Optional[ID] = None,
                  data: Union[bytes, str, None] = None, signature: Union[bytes, str, None] = None):
-        super().__init__(document, Document.BULLETIN, identifier=identifier, data=data, signature=signature)
+        super().__init__(document, doc_type=Document.BULLETIN, identifier=identifier, data=data, signature=signature)
         self.__assistants = None
 
-    @property
+    @property  # Override
     def assistants(self) -> Optional[List[ID]]:
         if self.__assistants is None:
             assistants = self.get_property(key='assistants')
@@ -391,7 +395,7 @@ class BaseBulletin(BaseDocument, Bulletin):
                 self.__assistants = ID.convert(members=assistants)
         return self.__assistants
 
-    @assistants.setter
+    @assistants.setter  # Override
     def assistants(self, bots: List[ID]):
         self.set_property(key='assistants', value=ID.revert(members=bots))
         self.__assistants = bots
