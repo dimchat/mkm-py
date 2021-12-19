@@ -54,41 +54,13 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
             return self.match(key=other)
 
     #
-    #   SymmetricKey factory
+    #  Factory methods
     #
-    class Factory(ABC):
-
-        @abstractmethod
-        def generate_symmetric_key(self):  # -> Optional[SymmetricKey]:
-            """
-            Generate key
-
-            :return: SymmetricKey
-            """
-            raise NotImplemented
-
-        @abstractmethod
-        def parse_symmetric_key(self, key: dict):  # -> Optional[SymmetricKey]:
-            """
-            Parse map object to key
-
-            :param key: key info
-            :return: SymmetricKey
-            """
-            raise NotImplemented
-
-    @classmethod
-    def register(cls, algorithm: str, factory: Factory):
-        Factories.symmetric_key_factories[algorithm] = factory
-
-    @classmethod
-    def factory(cls, algorithm: str) -> Optional[Factory]:
-        return Factories.symmetric_key_factories.get(algorithm)
 
     @classmethod
     def generate(cls, algorithm: str):  # -> Optional[SymmetricKey]:
         factory = cls.factory(algorithm=algorithm)
-        assert factory is not None, 'key algorithm not support: %s' % algorithm
+        assert isinstance(factory, SymmetricKeyFactory), 'key algorithm not support: %s' % algorithm
         return factory.generate_symmetric_key()
 
     @classmethod
@@ -104,4 +76,35 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
         if factory is None:
             factory = cls.factory(algorithm='*')  # unknown
             assert factory is not None, 'cannot parse key: %s' % key
+        assert isinstance(factory, SymmetricKeyFactory), 'key algorithm not support: %s' % algorithm
         return factory.parse_symmetric_key(key=key)
+
+    @classmethod
+    def factory(cls, algorithm: str):  # -> Optional[SymmetricKeyFactory]:
+        return Factories.symmetric_key_factories.get(algorithm)
+
+    @classmethod
+    def register(cls, algorithm: str, factory):
+        Factories.symmetric_key_factories[algorithm] = factory
+
+
+class SymmetricKeyFactory(ABC):
+
+    @abstractmethod
+    def generate_symmetric_key(self) -> Optional[SymmetricKey]:
+        """
+        Generate key
+
+        :return: SymmetricKey
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def parse_symmetric_key(self, key: dict) -> Optional[SymmetricKey]:
+        """
+        Parse map object to key
+
+        :param key: key info
+        :return: SymmetricKey
+        """
+        raise NotImplemented

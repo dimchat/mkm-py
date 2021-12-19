@@ -38,9 +38,10 @@ from .string import String
 
 from .cryptography import CryptographyKey
 from .symmetric import SymmetricKey, EncryptKey, DecryptKey
+from .symmetric import SymmetricKeyFactory
 from .asymmetric import AsymmetricKey, SignKey, VerifyKey
-from .public import PublicKey
-from .private import PrivateKey
+from .public import PublicKey, PublicKeyFactory
+from .private import PrivateKey, PrivateKeyFactory
 
 
 __all__ = [
@@ -61,6 +62,8 @@ __all__ = [
     # Crypto
     'CryptographyKey',
     'SymmetricKey', 'EncryptKey', 'DecryptKey',
+    'SymmetricKeyFactory',
     'AsymmetricKey', 'SignKey', 'VerifyKey',
-    'PublicKey', 'PrivateKey',
+    'PublicKey', 'PublicKeyFactory',
+    'PrivateKey', 'PrivateKeyFactory',
 ]

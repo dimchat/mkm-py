@@ -64,41 +64,13 @@ class PrivateKey(SignKey, ABC):
         raise NotImplemented
 
     #
-    #   PrivateKey factory
+    #  Factory methods
     #
-    class Factory(ABC):
-
-        @abstractmethod
-        def generate_private_key(self):  # -> Optional[PrivateKey]:
-            """
-            Generate key
-
-            :return: PrivateKey
-            """
-            raise NotImplemented
-
-        @abstractmethod
-        def parse_private_key(self, key: dict):  # -> Optional[PrivateKey]:
-            """
-            Parse map object to key
-
-            :param key: key info
-            :return: PrivateKey
-            """
-            raise NotImplemented
-
-    @classmethod
-    def register(cls, algorithm: str, factory: Factory):
-        Factories.private_key_factories[algorithm] = factory
-
-    @classmethod
-    def factory(cls, algorithm: str) -> Optional[Factory]:
-        return Factories.private_key_factories.get(algorithm)
 
     @classmethod
     def generate(cls, algorithm: str):  # -> Optional[PrivateKey]:
         factory = cls.factory(algorithm=algorithm)
-        assert factory is not None, 'key algorithm not support: %s' % algorithm
+        assert isinstance(factory, PrivateKeyFactory), 'key algorithm not support: %s' % algorithm
         return factory.generate_private_key()
 
     @classmethod
@@ -114,4 +86,35 @@ class PrivateKey(SignKey, ABC):
         if factory is None:
             factory = cls.factory(algorithm='*')  # unknown
             assert factory is not None, 'cannot parse key: %s' % key
+        assert isinstance(factory, PrivateKeyFactory), 'key algorithm not support: %s' % algorithm
         return factory.parse_private_key(key=key)
+
+    @classmethod
+    def factory(cls, algorithm: str):  # -> Optional[PrivateKeyFactory]:
+        return Factories.private_key_factories.get(algorithm)
+
+    @classmethod
+    def register(cls, algorithm: str, factory):
+        Factories.private_key_factories[algorithm] = factory
+
+
+class PrivateKeyFactory(ABC):
+
+    @abstractmethod
+    def generate_private_key(self) -> Optional[PrivateKey]:
+        """
+        Generate key
+
+        :return: PrivateKey
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def parse_private_key(self, key: dict) -> Optional[PrivateKey]:
+        """
+        Parse map object to key
+
+        :param key: key info
+        :return: PrivateKey
+        """
+        raise NotImplemented

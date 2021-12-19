@@ -36,7 +36,7 @@ from .address_impl import BaseAddressFactory
 from .address_impl import ANYWHERE, EVERYWHERE
 from .identifier import ID
 from .id_impl import ANYONE, EVERYONE, FOUNDER
-from .meta import Meta
+from .meta import Meta, MetaFactory
 from .meta_impl import BaseMeta
 from .tai_doc import Document, DocumentFactory
 from .tai_docs import Visa, Bulletin
@@ -53,8 +53,9 @@ __all__ = [
     'ANYWHERE', 'EVERYWHERE',
     'ID', 'ANYONE', 'EVERYONE', 'FOUNDER',
     'Meta', 'BaseMeta',
+    'MetaFactory',
+    'DocumentFactory',
     'Document', 'BaseDocument',
     'Visa', 'BaseVisa',
     'Bulletin', 'BaseBulletin',
-    'DocumentFactory',
 ]

@@ -31,10 +31,10 @@
 
 class Factories:
 
-    address_factory = None   # Address.Factory
+    address_factory = None   # AddressFactory
 
-    id_factory = None        # ID.Factory
+    id_factory = None        # IDFactory
 
-    meta_factories = {}      # int(type) -> Meta.Factory
+    meta_factories = {}      # int(type) -> MetaFactory
 
-    document_factories = {}  # str(type) -> Document.Factory
+    document_factories = {}  # str(type) -> DocumentFactory
