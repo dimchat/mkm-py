@@ -28,8 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-import time as time_lib
-from abc import ABC
+import time
 from typing import Optional, Union, Any, List
 
 from .crypto import json_encode, json_decode, utf8_encode, utf8_decode, base64_encode, base64_decode
@@ -37,82 +36,15 @@ from .crypto import Dictionary
 from .crypto import PublicKey, EncryptKey, VerifyKey, SignKey
 
 from .identifier import ID
-from .tai import Document, document_type
-
-
-class Visa(Document, ABC):
-    """
-        User Document
-        ~~~~~~~~~~~~~
-        This interface is defined for authorizing other apps to login,
-        which can generate a temporary asymmetric key pair for messaging.
-    """
-
-    @property
-    def key(self) -> Union[EncryptKey, VerifyKey, None]:
-        """
-        Get public key to encrypt message for user
-
-        :return: public key
-        """
-        raise NotImplemented
-
-    @key.setter
-    def key(self, value: Union[EncryptKey, VerifyKey]):
-        """
-        Set public key for other user to encrypt message
-
-        :param value: public key as visa.key
-        """
-        raise NotImplemented
-
-    @property
-    def avatar(self) -> Optional[str]:
-        """
-        Get avatar URL
-
-        :return: URL string
-        """
-        return None
-
-    @avatar.setter
-    def avatar(self, url: str):
-        """
-        Set avatar URL
-
-        :param url: URL string
-        """
-        pass
-
-
-class Bulletin(Document, ABC):
-    """
-        Group Document
-        ~~~~~~~~~~~~~~
-    """
-
-    @property
-    def assistants(self) -> Optional[List[ID]]:
-        """
-        Get group assistants
-
-        :return: bot ID list
-        """
-        raise NotImplemented
-
-    @assistants.setter
-    def assistants(self, bots: List[ID]):
-        """
-        Set group assistants
-
-        :param bots: bot ID list
-        """
-        raise NotImplemented
+from .tai_doc import Document, document_type
+from .tai_docs import Visa, Bulletin
 
 
 """
-    Implements
-    ~~~~~~~~~~
+    Base Documents
+    ~~~~~~~~~~~~~~
+    
+    Implementations of Document/Visa/Bulletin
 """
 
 
@@ -264,7 +196,7 @@ class BaseDocument(Dictionary, Document):
             # already signed/verified
             return self.__signature
         # update sign time
-        self.set_property(key='time', value=int(time_lib.time()))
+        self.set_property(key='time', value=int(time.time()))
         # update status
         self.__status = 1
         # sign

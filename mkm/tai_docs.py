@@ -28,86 +28,80 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABC, abstractmethod
-from typing import Optional, Any
+from abc import ABC
+from typing import Optional, Union, List
 
-from .crypto import VerifyKey, SignKey
+from .crypto import EncryptKey, VerifyKey
+
+from .identifier import ID
+from .tai_doc import Document
 
 
-class TAI(ABC):
+class Visa(Document, ABC):
     """
-        The Additional Information
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        'Meta' is the information for entity which never changed,
-            which contains the key for verify signature;
-        'TAI' is the variable part,
-            which could contain a public key for asymmetric encryption.
+        User Document
+        ~~~~~~~~~~~~~
+        This interface is defined for authorizing other apps to login,
+        which can generate a temporary asymmetric key pair for messaging.
     """
 
     @property
-    def valid(self) -> bool:
+    def key(self) -> Union[EncryptKey, VerifyKey, None]:
         """
-        Check if signature matched
+        Get public key to encrypt message for user
 
-        :return: True on matched
-        """
-        raise NotImplemented
-
-    #
-    #  signature
-    #
-
-    @abstractmethod
-    def verify(self, public_key: VerifyKey) -> bool:
-        """
-        Verify 'data' and 'signature' with public key
-
-        :param public_key: public key in meta.key
-        :return: True on signature matched
+        :return: public key
         """
         raise NotImplemented
 
-    @abstractmethod
-    def sign(self, private_key: SignKey) -> bytes:
+    @key.setter
+    def key(self, value: Union[EncryptKey, VerifyKey]):
         """
-        Encode properties to 'data' and sign it to 'signature'
+        Set public key for other user to encrypt message
 
-        :param private_key: private key match meta.key
-        :return: signature
+        :param value: public key as visa.key
         """
         raise NotImplemented
-
-    #
-    #  properties
-    #
 
     @property
-    def properties(self) -> Optional[dict]:
+    def avatar(self) -> Optional[str]:
         """
-        Get all properties when valid
+        Get avatar URL
 
-        :return: inner dictionary
+        :return: URL string
+        """
+        return None
+
+    @avatar.setter
+    def avatar(self, url: str):
+        """
+        Set avatar URL
+
+        :param url: URL string
+        """
+        pass
+
+
+class Bulletin(Document, ABC):
+    """
+        Group Document
+        ~~~~~~~~~~~~~~
+    """
+
+    @property
+    def assistants(self) -> Optional[List[ID]]:
+        """
+        Get group assistants
+
+        :return: bot ID list
         """
         raise NotImplemented
 
-    @abstractmethod
-    def get_property(self, key: str) -> Optional[Any]:
+    @assistants.setter
+    def assistants(self, bots: List[ID]):
         """
-        Get property value with key
+        Set group assistants
 
-        :param key: property key
-        :return: property value
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def set_property(self, key: str, value: Optional[Any]):
-        """
-        Update property with key and data
-        (this will clear 'data' and 'signature')
-
-        :param key:   property key
-        :param value: property value
+        :param bots: bot ID list
         """
         raise NotImplemented

@@ -29,10 +29,10 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Dict, Any
+from typing import Any, Optional
 
 from .crypto import String
-from .types import NetworkType, network_is_user, network_is_group
+from .types import network_is_user, network_is_group
 from .factories import Factories
 
 
@@ -69,63 +69,19 @@ class Address(ABC):
         return network_is_group(network=self.network)
 
     #
-    #   Address factory
-    #
-    class Factory(ABC):
-
-        @abstractmethod
-        def generate_address(self, meta, network: int):  # -> Optional[Address]:
-            """
-            Generate address with meta & type
-
-            :param meta: meta info
-            :param network: address type
-            :return: Address
-            """
-            raise NotImplemented
-
-        @abstractmethod
-        def create_address(self, address: str):  # -> Optional[Address]:
-            """
-            Create address from string
-
-            :param address: address string
-            :return: Address
-            """
-            raise NotImplemented
-
-        @abstractmethod
-        def parse_address(self, address: str):  # -> Optional[Address]:
-            """
-            Parse string object to address
-
-            :param address: address string
-            :return: Address
-            """
-            raise NotImplemented
-
-    @classmethod
-    def register(cls, factory: Factory):
-        Factories.address_factory = factory
-
-    @classmethod
-    def factory(cls) -> Factory:
-        return Factories.address_factory
-
-    #
     #   Factory methods
     #
 
     @classmethod
     def generate(cls, meta, network: int):  # -> Address:
         factory = cls.factory()
-        assert factory is not None, 'address factory not ready'
+        assert isinstance(factory, AddressFactory), 'address factory error: %s' % factory
         return factory.generate_address(meta=meta, network=network)
 
     @classmethod
     def create(cls, address: str):  # -> Address:
         factory = cls.factory()
-        assert factory is not None, 'address factory not ready'
+        assert isinstance(factory, AddressFactory), 'address factory error: %s' % factory
         return factory.create_address(address=address)
 
     @classmethod
@@ -138,63 +94,47 @@ class Address(ABC):
             address = address.string
         # assert isinstance(address, str), 'address error: %s' % address
         factory = cls.factory()
-        assert factory is not None, 'address factory not ready'
+        assert isinstance(factory, AddressFactory), 'address factory error: %s' % factory
         return factory.parse_address(address=address)
 
+    @classmethod
+    def factory(cls):  # -> AddressFactory:
+        return Factories.address_factory
 
-"""
-    Address for broadcast
-    ~~~~~~~~~~~~~~~~~~~~~
-"""
-
-
-class BroadcastAddress(String, Address):
-
-    def __init__(self, address: str, network: NetworkType):
-        super().__init__(string=address)
-        self.__network = network.value
-
-    @property  # Override
-    def network(self) -> int:
-        return self.__network
-
-    @property  # Override
-    def is_broadcast(self) -> bool:
-        return True
+    @classmethod
+    def register(cls, factory):
+        Factories.address_factory = factory
 
 
-ANYWHERE = BroadcastAddress(address='anywhere', network=NetworkType.MAIN)
-EVERYWHERE = BroadcastAddress(address='everywhere', network=NetworkType.GROUP)
+class AddressFactory(ABC):
 
-
-"""
-    Address Factory
-    ~~~~~~~~~~~~~~~
-"""
-
-
-class AddressFactory(Address.Factory, ABC):
-
-    def __init__(self):
-        super().__init__()
-        # cache broadcast addresses
-        self.__addresses: Dict[str, Address] = {
-            str(ANYWHERE): ANYWHERE,
-            str(EVERYWHERE): EVERYWHERE,
-        }
-
-    # Override
+    @abstractmethod
     def generate_address(self, meta, network: int) -> Optional[Address]:
-        address = meta.generate_address(network=network)
-        if address is not None:
-            self.__addresses[str(address)] = address
-        return address
+        """
+        Generate address with meta & type
 
-    # Override
+        :param meta: meta info
+        :param network: address type
+        :return: Address
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def create_address(self, address: str) -> Optional[Address]:
+        """
+        Create address from string
+
+        :param address: address string
+        :return: Address
+        """
+        raise NotImplemented
+
+    @abstractmethod
     def parse_address(self, address: str) -> Optional[Address]:
-        add = self.__addresses.get(address)
-        if add is None:
-            add = Address.create(address=address)
-            if add is not None:
-                self.__addresses[address] = add
-        return add
+        """
+        Parse string object to address
+
+        :param address: address string
+        :return: Address
+        """
+        raise NotImplemented
