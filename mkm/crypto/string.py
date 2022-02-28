@@ -594,17 +594,17 @@ class String:
 
     def __ge__(self, x: str) -> bool:
         """ Return self>=value. """
+        if self is x:
+            return True
         if isinstance(x, String):
-            if self is x:
-                return True
             x = x.string
         return self.__string.__ge__(x)
 
     def __gt__(self, x: str) -> bool:
         """ Return self>value. """
+        if self is x:
+            return False
         if isinstance(x, String):
-            if self is x:
-                return False
             x = x.string
         return self.__string.__gt__(x)
 
@@ -622,17 +622,17 @@ class String:
 
     def __le__(self, x: str) -> bool:
         """ Return self<=value. """
+        if self is x:
+            return True
         if isinstance(x, String):
-            if self is x:
-                return True
             x = x.string
         return self.__string.__le__(x)
 
     def __lt__(self, x: str) -> bool:
         """ Return self<value. """
+        if self is x:
+            return False
         if isinstance(x, String):
-            if self is x:
-                return False
             x = x.string
         return self.__string.__lt__(x)
 
@@ -648,9 +648,9 @@ class String:
 
     def __ne__(self, x: str) -> bool:
         """ Return self!=value. """
+        if self is x:
+            return False
         if isinstance(x, String):
-            if self is x:
-                return False
             x = x.string
         return self.__string.__ne__(x)
 

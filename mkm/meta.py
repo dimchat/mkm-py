@@ -176,7 +176,7 @@ class Meta(Map, ABC):
     def parse(cls, meta: Any):  # -> Optional[Meta]:
         if meta is None:
             return None
-        elif isinstance(meta, Meta):
+        elif isinstance(meta, cls):
             return meta
         elif isinstance(meta, Map):
             meta = meta.dictionary

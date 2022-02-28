@@ -136,7 +136,7 @@ class Dictionary(Map):
         super().__init__()
         if dictionary is None:
             self.__dictionary = {}
-        elif isinstance(dictionary, Dictionary):
+        elif isinstance(dictionary, Map):
             self.__dictionary = dictionary.dictionary
         else:
             assert isinstance(dictionary, dict), 'dictionary error: %s' % dictionary

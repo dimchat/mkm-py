@@ -88,7 +88,7 @@ class Address(ABC):
     def parse(cls, address: Any):  # -> Optional[Address]:
         if address is None:
             return None
-        elif isinstance(address, Address):
+        elif isinstance(address, cls):
             return address
         elif isinstance(address, String):
             address = address.string

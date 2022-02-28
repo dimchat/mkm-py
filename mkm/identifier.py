@@ -127,7 +127,7 @@ class ID(ABC):
     def parse(cls, identifier: Any):  # -> Optional[ID]:
         if identifier is None:
             return None
-        elif isinstance(identifier, ID):
+        elif isinstance(identifier, cls):
             return identifier
         elif isinstance(identifier, String):
             identifier = identifier.string
