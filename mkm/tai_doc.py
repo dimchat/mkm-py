@@ -31,14 +31,14 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Union
 
-from .wrappers import Map
+from .wrappers import MapWrapper
 
 from .identifier import ID
 from .tai import TAI
 from .factories import Factories
 
 
-class Document(TAI, Map, ABC):
+class Document(TAI, MapWrapper, ABC):
 
     #
     #  Document types
@@ -112,7 +112,7 @@ class Document(TAI, Map, ABC):
             return None
         elif isinstance(document, cls):
             return document
-        elif isinstance(document, Map):
+        elif isinstance(document, MapWrapper):
             document = document.dictionary
         # assert isinstance(document, dict), 'document error: %s' % document
         doc_type = document_type(document=document)

@@ -26,7 +26,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from ..wrappers import Map
+from ..wrappers import MapWrapper
 
 from .cryptography import EncryptKey, DecryptKey, key_algorithm
 from .factories import Factories
@@ -70,7 +70,7 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
             return None
         elif isinstance(key, cls):
             return key
-        elif isinstance(key, Map):
+        elif isinstance(key, MapWrapper):
             key = key.dictionary
         algorithm = key_algorithm(key=key)
         factory = cls.factory(algorithm=algorithm)

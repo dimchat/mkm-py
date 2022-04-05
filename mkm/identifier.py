@@ -31,7 +31,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, List, Any
 
-from .wrappers import String
+from .wrappers import StringWrapper
 
 from .address import Address
 from .factories import Factories
@@ -130,7 +130,7 @@ class ID(ABC):
             return None
         elif isinstance(identifier, cls):
             return identifier
-        elif isinstance(identifier, String):
+        elif isinstance(identifier, StringWrapper):
             identifier = identifier.string
         # assert isinstance(identifier, str), 'ID error: %s' % identifier
         factory = cls.factory()

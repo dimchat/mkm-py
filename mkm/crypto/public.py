@@ -26,7 +26,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from ..wrappers import Map
+from ..wrappers import MapWrapper
 
 from .cryptography import key_algorithm
 from .asymmetric import VerifyKey
@@ -56,7 +56,7 @@ class PublicKey(VerifyKey, ABC):
             return None
         elif isinstance(key, cls):
             return key
-        elif isinstance(key, Map):
+        elif isinstance(key, MapWrapper):
             key = key.dictionary
         algorithm = key_algorithm(key=key)
         factory = cls.factory(algorithm=algorithm)

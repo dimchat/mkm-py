@@ -31,7 +31,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
-from .wrappers import String
+from .wrappers import StringWrapper
 
 from .types import network_is_user, network_is_group
 from .factories import Factories
@@ -91,7 +91,7 @@ class Address(ABC):
             return None
         elif isinstance(address, cls):
             return address
-        elif isinstance(address, String):
+        elif isinstance(address, StringWrapper):
             address = address.string
         # assert isinstance(address, str), 'address error: %s' % address
         factory = cls.factory()

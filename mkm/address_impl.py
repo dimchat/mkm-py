@@ -31,7 +31,7 @@
 from abc import ABC
 from typing import Optional, Dict
 
-from .wrappers import String
+from .wrappers import StringWrapper
 
 from .types import NetworkType
 from .address import Address, AddressFactory
@@ -43,7 +43,7 @@ from .address import Address, AddressFactory
 """
 
 
-class BroadcastAddress(String, Address):
+class BroadcastAddress(StringWrapper, Address):
 
     def __init__(self, address: str, network: NetworkType):
         super().__init__(string=address)

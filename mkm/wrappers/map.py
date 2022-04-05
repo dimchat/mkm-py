@@ -26,7 +26,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, MutableMapping
 
-from .string import String
+from .string import StringWrapper
 
 
 class Wrapper:
@@ -37,34 +37,34 @@ class Wrapper:
     @classmethod
     def unwrap(cls, o: Any, circularly: bool = False) -> Any:
         # unwrap string
-        if isinstance(o, String):
+        if isinstance(o, StringWrapper):
             return o.string
         if isinstance(o, str):
             return o
         # unwrap container
         if circularly:
             # unwrap map circularly
-            if isinstance(o, Map):
-                return Map.unwrap(o.dictionary, circularly=True)
+            if isinstance(o, MapWrapper):
+                return MapWrapper.unwrap(o.dictionary, circularly=True)
             if isinstance(o, dict):
-                return Map.unwrap(o, circularly=True)
+                return MapWrapper.unwrap(o, circularly=True)
             # unwrap list circularly
-            if isinstance(o, Array):
-                return Array.unwrap(o.array, circularly=True)
+            if isinstance(o, ArrayWrapper):
+                return ArrayWrapper.unwrap(o.array, circularly=True)
             if isinstance(o, list):
-                return Array.unwrap(o, circularly=True)
+                return ArrayWrapper.unwrap(o, circularly=True)
         else:
             # unwrap map
-            if isinstance(o, Map):
+            if isinstance(o, MapWrapper):
                 return o.dictionary
             # unwrap list
-            if isinstance(o, Array):
+            if isinstance(o, ArrayWrapper):
                 return o.array
         # others
         return o
 
 
-class Array(ABC):
+class ArrayWrapper(ABC):
     """
         List: Any
     """
@@ -72,7 +72,7 @@ class Array(ABC):
     @classmethod
     def unwrap(cls, a: list, circularly: bool = False) -> list:
         # unwrap list container
-        if isinstance(a, Array):
+        if isinstance(a, ArrayWrapper):
             a = a.array
         if not circularly:
             return a
@@ -92,7 +92,7 @@ class Array(ABC):
         raise NotImplemented
 
 
-class Map(MutableMapping, ABC):
+class MapWrapper(MutableMapping, ABC):
     """
         Mapping: str -> Any
     """
@@ -100,7 +100,7 @@ class Map(MutableMapping, ABC):
     @classmethod
     def unwrap(cls, d: dict, circularly: bool = False) -> dict:
         # unwrap map container
-        if isinstance(d, Map):
+        if isinstance(d, MapWrapper):
             d = d.dictionary
         if not circularly:
             return d
@@ -108,7 +108,7 @@ class Map(MutableMapping, ABC):
         t = {}
         for k in d:
             v = d[k]
-            key = String.unwrap(k)
+            key = StringWrapper.unwrap(k)
             value = Wrapper.unwrap(v, circularly=True)
             t[key] = value
         return t

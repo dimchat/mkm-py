@@ -28,8 +28,6 @@
 # SOFTWARE.
 # ==============================================================================
 
-from .crypto import *
-
 from .types import NetworkType, MetaType
 from .address import Address, AddressFactory
 from .address_impl import BaseAddressFactory

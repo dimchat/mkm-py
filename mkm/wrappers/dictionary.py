@@ -27,10 +27,10 @@ import copy
 from typing import Any, Optional, Union, Tuple, Iterator
 from typing import Mapping, ItemsView, KeysView, ValuesView
 
-from .map import Map
+from .map import MapWrapper
 
 
-class Dictionary(Map):
+class Dictionary(MapWrapper):
     """
         A container sharing the same inner dictionary
     """
@@ -42,7 +42,7 @@ class Dictionary(Map):
         super().__init__()
         if dictionary is None:
             self.__dictionary = {}
-        elif isinstance(dictionary, Map):
+        elif isinstance(dictionary, MapWrapper):
             self.__dictionary = dictionary.dictionary
         else:
             assert isinstance(dictionary, dict), 'dictionary error: %s' % dictionary
@@ -133,17 +133,17 @@ class Dictionary(Map):
         """ Delete self[key]. """
         self.__dictionary.__delitem__(v)
 
-    def __eq__(self, o: Union[dict, Map]) -> bool:
+    def __eq__(self, o: Union[dict, MapWrapper]) -> bool:
         """ Return self==value. """
         if self is o:
             return True
-        if isinstance(o, Map):
+        if isinstance(o, MapWrapper):
             o = o.dictionary
         return self.__dictionary.__eq__(o)
 
     # def __getattribute__(self, name: str) -> Any:
     #     """ Return getattr(self, name). """
-    #     if isinstance(name, String):
+    #     if isinstance(name, StringWrapper):
     #         name = name.string
     #     return self.__dictionary.__getattribute__(name=name)
 
@@ -175,9 +175,9 @@ class Dictionary(Map):
         """ Return self<value. """
         pass
 
-    def __ne__(self, o: Union[dict, Map]) -> bool:
+    def __ne__(self, o: Union[dict, MapWrapper]) -> bool:
         """ Return self!=value. """
-        if isinstance(o, Map):
+        if isinstance(o, MapWrapper):
             if self is o:
                 return False
             o = o.dictionary

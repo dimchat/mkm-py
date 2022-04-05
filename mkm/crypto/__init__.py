@@ -40,6 +40,9 @@ from .asymmetric import AsymmetricKey, SignKey, VerifyKey
 from .public import PublicKey, PublicKeyFactory
 from .private import PrivateKey, PrivateKeyFactory
 
+name = "Crypto"
+
+__author__ = 'Albert Moky'
 
 __all__ = [
 

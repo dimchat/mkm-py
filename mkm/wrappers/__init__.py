@@ -23,15 +23,14 @@
 # SOFTWARE.
 # ==============================================================================
 
-from .string import String
-from .map import Wrapper, Array, Map
+from .map import Wrapper, ArrayWrapper, MapWrapper
 from .dictionary import Dictionary
-
+from .string import StringWrapper
 
 __all__ = [
     'Wrapper',
-    'Array',
-    'Map',
+    'ArrayWrapper',
+    'MapWrapper',
     'Dictionary',
-    'String',
+    'StringWrapper',
 ]

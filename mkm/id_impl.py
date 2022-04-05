@@ -30,14 +30,14 @@
 
 from typing import Optional
 
-from .wrappers import String
+from .wrappers import StringWrapper
 
 from .address import Address
 from .address_impl import ANYWHERE, EVERYWHERE
 from .identifier import ID, IDFactory
 
 
-class Identifier(String, ID):
+class Identifier(StringWrapper, ID):
 
     def __init__(self, identifier: str, name: Optional[str], address: Address, terminal: Optional[str]):
         super().__init__(string=identifier)

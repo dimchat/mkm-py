@@ -162,8 +162,8 @@ class String:
         Return a formatted version of S, using substitutions from mapping.
         The substitutions are identified by braces ('{' and '}').
         """
-        from .dictionary import Map
-        if isinstance(mapping, Map):
+        from .map import MapWrapper
+        if isinstance(mapping, MapWrapper):
             mapping = mapping.dictionary
         string = self.__string.format_map(map=mapping)
         return String(string=string)
@@ -674,3 +674,6 @@ class String:
     def __str__(self) -> str:
         """ Return str(self). """
         return self.__string
+
+
+StringWrapper = String

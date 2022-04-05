@@ -31,7 +31,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Union, Any
 
-from .wrappers import Map
+from .wrappers import MapWrapper
 
 from .crypto import utf8_encode
 from .crypto import VerifyKey, SignKey
@@ -42,7 +42,7 @@ from .identifier import ID
 from .factories import Factories
 
 
-class Meta(Map, ABC):
+class Meta(MapWrapper, ABC):
     """This class is used to generate entity ID
 
         User/Group Meta data
@@ -179,7 +179,7 @@ class Meta(Map, ABC):
             return None
         elif isinstance(meta, cls):
             return meta
-        elif isinstance(meta, Map):
+        elif isinstance(meta, MapWrapper):
             meta = meta.dictionary
         # assert isinstance(meta, dict), 'meta error: %s' % meta
         version = meta_type(meta=meta)

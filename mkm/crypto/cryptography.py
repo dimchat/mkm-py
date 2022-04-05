@@ -26,10 +26,10 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from ..wrappers import Map
+from ..wrappers import MapWrapper
 
 
-class CryptographyKey(Map, ABC):
+class CryptographyKey(MapWrapper, ABC):
     """Cryptography key with designated algorithm
 
         Cryptography Key
