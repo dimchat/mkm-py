@@ -31,7 +31,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Union
 
-from .crypto import Map
+from .wrappers import Map
 
 from .identifier import ID
 from .tai import TAI

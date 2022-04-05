@@ -31,8 +31,9 @@
 from abc import ABC
 from typing import Optional, Union
 
+from .wrappers import Dictionary
+
 from .crypto import base64_encode, base64_decode
-from .crypto import Dictionary
 from .crypto import VerifyKey, PublicKey
 
 from .types import MetaType, meta_has_seed

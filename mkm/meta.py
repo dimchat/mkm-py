@@ -31,8 +31,9 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Union, Any
 
+from .wrappers import Map
+
 from .crypto import utf8_encode
-from .crypto import Map
 from .crypto import VerifyKey, SignKey
 
 from .types import MetaType, meta_has_seed

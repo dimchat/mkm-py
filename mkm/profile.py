@@ -31,8 +31,9 @@
 import time
 from typing import Optional, Union, Any, List
 
+from .wrappers import Dictionary
+
 from .crypto import json_encode, json_decode, utf8_encode, utf8_decode, base64_encode, base64_decode
-from .crypto import Dictionary
 from .crypto import PublicKey, EncryptKey, VerifyKey, SignKey
 
 from .identifier import ID

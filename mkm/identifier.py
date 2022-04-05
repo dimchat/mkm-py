@@ -31,7 +31,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional, List, Any
 
-from .crypto import String
+from .wrappers import String
+
 from .address import Address
 from .factories import Factories
 

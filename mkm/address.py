@@ -31,7 +31,8 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
-from .crypto import String
+from .wrappers import String
+
 from .types import network_is_user, network_is_group
 from .factories import Factories
 

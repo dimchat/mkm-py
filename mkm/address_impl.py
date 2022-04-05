@@ -31,7 +31,8 @@
 from abc import ABC
 from typing import Optional, Dict
 
-from .crypto import String
+from .wrappers import String
+
 from .types import NetworkType
 from .address import Address, AddressFactory
 

@@ -26,7 +26,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from .dictionary import Map
+from ..wrappers import Map
 
 
 class CryptographyKey(Map, ABC):

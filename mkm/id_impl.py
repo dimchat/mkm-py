@@ -30,7 +30,8 @@
 
 from typing import Optional
 
-from .crypto import String
+from .wrappers import String
+
 from .address import Address
 from .address_impl import ANYWHERE, EVERYWHERE
 from .identifier import ID, IDFactory

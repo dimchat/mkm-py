@@ -26,7 +26,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from .dictionary import Map
+from ..wrappers import Map
+
 from .cryptography import EncryptKey, DecryptKey, key_algorithm
 from .factories import Factories
 

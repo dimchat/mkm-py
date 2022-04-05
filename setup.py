@@ -14,7 +14,7 @@ __version__ = '0.11.2'
 __author__ = 'Albert Moky'
 __contact__ = 'albert.moky@gmail.com'
 
-with open('README.md', 'r') as fh:
+with open('README.md', 'r', encoding='utf-8') as fh:
     readme = fh.read()
 
 setup(
