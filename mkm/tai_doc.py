@@ -29,7 +29,7 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Union
+from typing import Optional, Union, Any
 
 from .wrappers import MapWrapper
 
@@ -107,7 +107,7 @@ class Document(TAI, MapWrapper, ABC):
         return factory.create_document(identifier=identifier, data=data, signature=signature)
 
     @classmethod
-    def parse(cls, document: dict):  # -> Optional[Document]:
+    def parse(cls, document: Any):  # -> Optional[Document]:
         if document is None:
             return None
         elif isinstance(document, cls):

@@ -24,7 +24,7 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Any
 
 from ..wrappers import MapWrapper
 
@@ -51,13 +51,14 @@ class PublicKey(VerifyKey, ABC):
     #
 
     @classmethod
-    def parse(cls, key: dict):  # -> Optional[PublicKey]:
+    def parse(cls, key: Any):  # -> Optional[PublicKey]:
         if key is None:
             return None
         elif isinstance(key, cls):
             return key
         elif isinstance(key, MapWrapper):
             key = key.dictionary
+        # assert isinstance(key, dict), 'key error: %s' % key
         algorithm = key_algorithm(key=key)
         factory = cls.factory(algorithm=algorithm)
         if factory is None:
