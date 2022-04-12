@@ -267,7 +267,7 @@ class BaseDocument(Dictionary, Document):
 class BaseVisa(BaseDocument, Visa):
 
     def __init__(self, document: Optional[dict] = None, identifier: Optional[ID] = None,
-                 data: Union[bytes, str, None] = None, signature: Union[bytes, str, None] = None):
+                 data: Optional[str] = None, signature: Union[bytes, str, None] = None):
         super().__init__(document, doc_type=Document.VISA, identifier=identifier, data=data, signature=signature)
         self.__key = None
 
@@ -306,7 +306,7 @@ class BaseVisa(BaseDocument, Visa):
 class BaseBulletin(BaseDocument, Bulletin):
 
     def __init__(self, document: Optional[dict] = None, identifier: Optional[ID] = None,
-                 data: Union[bytes, str, None] = None, signature: Union[bytes, str, None] = None):
+                 data: Optional[str] = None, signature: Union[bytes, str, None] = None):
         super().__init__(document, doc_type=Document.BULLETIN, identifier=identifier, data=data, signature=signature)
         self.__assistants = None
 
