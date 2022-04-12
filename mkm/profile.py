@@ -33,7 +33,7 @@ from typing import Optional, Union, Any, List
 
 from .wrappers import Dictionary
 
-from .crypto import json_encode, json_decode, utf8_encode, utf8_decode, base64_encode, base64_decode
+from .crypto import json_encode, json_decode, utf8_encode, base64_encode, base64_decode
 from .crypto import PublicKey, EncryptKey, VerifyKey, SignKey
 
 from .identifier import ID
@@ -58,16 +58,8 @@ class BaseDocument(Dictionary, Document):
 
     def __init__(self, document: Optional[dict] = None,
                  doc_type: Optional[str] = None, identifier: Optional[ID] = None,
-                 data: Union[bytes, str, None] = None, signature: Union[bytes, str, None] = None):
-        # check parameters
-        if data is None:
-            utf8 = None
-        elif isinstance(data, bytes):
-            utf8 = utf8_decode(data=data)
-        else:
-            assert isinstance(data, str), 'document data error: %s' % data
-            utf8 = data
-            data = utf8_encode(string=utf8)
+                 data: Optional[str] = None, signature: Union[bytes, str, None] = None):
+        # check signature
         if signature is None:
             base64 = None
         elif isinstance(signature, bytes):
@@ -80,7 +72,7 @@ class BaseDocument(Dictionary, Document):
         status = 0
         if document is None:
             assert identifier is not None, 'doc ID should not be empty'
-            if utf8 is None or base64 is None:
+            if data is None or base64 is None:
                 """ Create a new empty document with ID and doc type """
                 document = {
                     'ID': str(identifier),
@@ -93,7 +85,7 @@ class BaseDocument(Dictionary, Document):
                 """ Create document with ID, data and signature loaded from local storage """
                 document = {
                     'ID': str(identifier),
-                    'data': utf8,
+                    'data': data,
                     'signature': base64
                 }
                 # all documents must be verified before saving into local storage
@@ -121,16 +113,14 @@ class BaseDocument(Dictionary, Document):
         return self.__identifier
 
     @property
-    def data(self) -> Optional[bytes]:
+    def data(self) -> Optional[str]:
         """
         Get serialized properties
 
         :return: JsON string
         """
         if self.__data is None:
-            utf8 = self.get('data')
-            if utf8 is not None:
-                self.__data = utf8_encode(string=utf8)
+            self.__data = self.get('data')
         return self.__data
 
     @property
@@ -178,7 +168,7 @@ class BaseDocument(Dictionary, Document):
         elif signature is None:
             # signature error
             self.__status = -1
-        elif public_key.verify(data=data, signature=signature):
+        elif public_key.verify(data=utf8_encode(string=data), signature=signature):
             # signature matched
             self.__status = 1
         # NOTICE: if status is 0, it doesn't mean the profile is invalid,
@@ -197,13 +187,13 @@ class BaseDocument(Dictionary, Document):
             # already signed/verified
             return self.__signature
         # update sign time
-        self.set_property(key='time', value=int(time.time()))
+        self.set_property(key='time', value=time.time())
         # update status
         self.__status = 1
         # sign
         self.__data = json_encode(self.properties)
-        self.__signature = private_key.sign(data=self.__data)
-        self['data'] = utf8_decode(data=self.__data)  # JsON string
+        self.__signature = private_key.sign(data=utf8_encode(string=self.__data))
+        self['data'] = self.__data  # JsON string
         self['signature'] = base64_encode(data=self.__signature)
         return self.__signature
 
@@ -224,7 +214,7 @@ class BaseDocument(Dictionary, Document):
                 self.__properties = {}
             else:
                 # get properties from data
-                self.__properties = json_decode(data=data)
+                self.__properties = json_decode(string=data)
                 assert isinstance(self.__properties, dict), 'document data error: %s' % self
         return self.__properties
 
@@ -236,7 +226,7 @@ class BaseDocument(Dictionary, Document):
 
     # Override
     def set_property(self, key: str, value: Optional[Any]):
-        """ Update profile property with key and value """
+        """ Update property with key and value """
         # 1. reset status
         assert self.__status >= 0, 'status error: %s' % self
         self.__status = 0
@@ -258,12 +248,12 @@ class BaseDocument(Dictionary, Document):
     #
 
     @property  # Override
-    def time(self) -> int:
+    def time(self) -> float:
         timestamp = self.get_property(key='time')
         if timestamp is None:
             return 0
         else:
-            return int(timestamp)
+            return float(timestamp)
 
     @property  # Override
     def name(self) -> Optional[str]:
@@ -284,7 +274,7 @@ class BaseVisa(BaseDocument, Visa):
     """
         Public Key for encryption
         ~~~~~~~~~~~~~~~~~~~~~~~~~
-        For safety considerations, the profile.key which used to encrypt message data
+        For safety considerations, the visa.key which used to encrypt message data
         should be different with meta.key
     """
     @property  # Override

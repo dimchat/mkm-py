@@ -66,7 +66,7 @@ class Document(TAI, MapWrapper, ABC):
         raise NotImplemented
 
     @property
-    def time(self) -> int:
+    def time(self) -> float:
         """
         Get sign time
 
@@ -101,7 +101,7 @@ class Document(TAI, MapWrapper, ABC):
     #
 
     @classmethod
-    def create(cls, doc_type: str, identifier: ID, data: Union[bytes, str] = None, signature: Union[bytes, str] = None):
+    def create(cls, doc_type: str, identifier: ID, data: Optional[str] = None, signature: Union[bytes, str] = None):
         factory = cls.factory(doc_type=doc_type)
         assert isinstance(factory, DocumentFactory), 'doc_type not support: %s, %s' % (doc_type, factory)
         return factory.create_document(identifier=identifier, data=data, signature=signature)
@@ -139,8 +139,7 @@ def document_type(document: dict) -> str:
 class DocumentFactory(ABC):
 
     @abstractmethod
-    def create_document(self, identifier: ID,
-                        data: Union[bytes, str, None], signature: Union[bytes, str, None]) -> Document:
+    def create_document(self, identifier: ID, data: Optional[str], signature: Union[bytes, str, None]) -> Document:
         """
         1. Create a new empty document with entity ID
 

@@ -33,10 +33,18 @@
 import base64
 import json
 from abc import ABC, abstractmethod
-from typing import Optional, Union
+from typing import Optional, Union, Any
 
 
 class DataCoder(ABC):
+    """
+        Data Coder
+        ~~~~~~~~~~
+        Hex, Base58, Base64, ...
+
+        1. encode binary data to string;
+        2. decode string to binary data.
+    """
 
     @abstractmethod
     def encode(self, data: bytes) -> str:
@@ -59,25 +67,64 @@ class DataCoder(ABC):
         raise NotImplemented
 
 
-class DataParser(ABC):
+class ObjectCoder(ABC):
+    """
+        Object Coder
+        ~~~~~~~~~~~~
+        JsON, XML, ...
+
+        1. encode object to string;
+        2. decode string to object.
+    """
 
     @abstractmethod
-    def encode(self, o: Union[str, dict, list]) -> bytes:
+    def encode(self, obj: Any) -> str:
         """
-        Encode container/string object to bytes
+        Encode Map/List object to str
 
-        :param o: Map, List, or String
-        :return: JsON data or UTF-8 string bytes
+        :param obj: Map or List
+        :return: serialized string
         """
         raise NotImplemented
 
     @abstractmethod
-    def decode(self, data: bytes) -> Union[str, dict, list, None]:
+    def decode(self, string: str) -> Optional[Any]:
         """
-        Decode bytes to container/string object
+        Decode str to Map/List object
 
-        :param data: JsON data or UTF-8 string bytes
-        :return: Map, List, or String
+        :param string: serialized string
+        :return: Map or List
+        """
+        raise NotImplemented
+
+
+class StringCoder(ABC):
+    """
+        String Coder
+        ~~~~~~~~~~~~
+        UTF-8, UTF-16, GBK, GB2312, ...
+
+        1. encode string to binary data;
+        2. decode binary data to string.
+    """
+
+    @abstractmethod
+    def encode(self, string: str) -> bytes:
+        """
+        Encode local string to binary data
+
+        :param string: local string
+        :return: binary data
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def decode(self, data: bytes) -> Optional[str]:
+        """
+        Decode binary data to local string
+
+        :param data: binary data
+        :return: local string
         """
         raise NotImplemented
 
@@ -111,12 +158,12 @@ def hex_decode(string: str) -> Optional[bytes]:
     return Hex.decode(string)
 
 
-def json_encode(o: Union[dict, list]) -> bytes:
-    return JSON.encode(o=o)
+def json_encode(obj: Union[dict, list]) -> str:
+    return JSON.encode(obj=obj)
 
 
-def json_decode(data: bytes) -> Union[dict, list, None]:
-    return JSON.decode(data=data)
+def json_decode(string: str) -> Union[dict, list, None]:
+    return JSON.decode(string=string)
 
 
 def utf8_encode(string: str) -> bytes:
@@ -213,25 +260,25 @@ class Hex:
 """
 
 
-class J(DataParser):
+class J(ObjectCoder):
 
     # Override
-    def encode(self, o: Union[dict, list]) -> bytes:
+    def encode(self, obj: Any) -> str:
         """ JsON encode """
-        return bytes(json.dumps(o), encoding='utf-8')
+        return json.dumps(obj)
 
     # Override
-    def decode(self, data: bytes) -> Union[dict, list, None]:
+    def decode(self, string: str) -> Optional[Any]:
         """ JsON decode """
-        return json.loads(data)
+        return json.loads(string)
 
 
-class U(DataParser):
+class U(StringCoder):
 
     # Override
-    def encode(self, o: str) -> bytes:
+    def encode(self, string: str) -> bytes:
         """ UTF-8 encode """
-        return o.encode('utf-8')
+        return string.encode('utf-8')
 
     # Override
     def decode(self, data: bytes) -> Optional[str]:
@@ -240,28 +287,28 @@ class U(DataParser):
 
 
 class JSON:
-    parser: DataParser = J()
+    coder: ObjectCoder = J()
 
     @staticmethod
-    def encode(o: Union[dict, list]) -> bytes:
-        assert JSON.parser is not None, 'JSON parser not set yet'
-        return JSON.parser.encode(o=o)
+    def encode(obj: Any) -> str:
+        assert JSON.coder is not None, 'JSON parser not set yet'
+        return JSON.coder.encode(obj=obj)
 
     @staticmethod
-    def decode(data: bytes) -> Union[dict, list, None]:
-        assert JSON.parser is not None, 'JSON parser not set yet'
-        return JSON.parser.decode(data=data)
+    def decode(string: str) -> Optional[Any]:
+        assert JSON.coder is not None, 'JSON parser not set yet'
+        return JSON.coder.decode(string=string)
 
 
 class UTF8:
-    parser: DataParser = U()
+    coder: StringCoder = U()
 
     @staticmethod
     def encode(string: str) -> bytes:
-        assert UTF8.parser is not None, 'UTF8 parser not set yet'
-        return UTF8.parser.encode(o=string)
+        assert UTF8.coder is not None, 'UTF8 parser not set yet'
+        return UTF8.coder.encode(string=string)
 
     @staticmethod
     def decode(data: bytes) -> Optional[str]:
-        assert UTF8.parser is not None, 'UTF8 parser not set yet'
-        return UTF8.parser.decode(data=data)
+        assert UTF8.coder is not None, 'UTF8 parser not set yet'
+        return UTF8.coder.decode(data=data)

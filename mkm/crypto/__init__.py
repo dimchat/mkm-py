@@ -47,9 +47,10 @@ __author__ = 'Albert Moky'
 __all__ = [
 
     # Data Format
-    'DataCoder', 'Base64', 'Base58', 'Hex',
+    'DataCoder', 'ObjectCoder', 'StringCoder',
+    'Base64', 'Base58', 'Hex',
     'base64_encode', 'base64_decode', 'base58_encode', 'base58_decode', 'hex_encode', 'hex_decode',
-    'DataParser', 'JSON', 'UTF8',
+    'JSON', 'UTF8',
     'json_encode', 'json_decode', 'utf8_encode', 'utf8_decode',
 
     # Data Digest
