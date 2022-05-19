@@ -185,16 +185,22 @@ class BaseDocument(Dictionary, Document):
         """
         if self.__status > 0:
             # already signed/verified
+            assert len(self.__data) > 0, 'document data error'
+            assert len(self.__signature) > 0, 'document signature error'
             return self.__signature
         # update sign time
         self.set_property(key='time', value=time.time())
-        # update status
-        self.__status = 1
         # sign
         self.__data = json_encode(self.properties)
         self.__signature = private_key.sign(data=utf8_encode(string=self.__data))
+        assert len(self.__data) > 0, 'document data error'
+        assert len(self.__signature) > 0, 'document signature error'
+        # update 'data' & 'signature' fields
         self['data'] = self.__data  # JsON string
         self['signature'] = base64_encode(data=self.__signature)
+        # update status
+        if len(self.__signature) > 0:
+            self.__status = 1
         return self.__signature
 
     #
