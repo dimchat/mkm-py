@@ -24,13 +24,12 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 
-from ..wrappers import MapWrapper
-
+from ..types import Wrapper
+from .factories import Factories
 from .cryptography import key_algorithm
 from .asymmetric import VerifyKey
-from .factories import Factories
 
 
 class PublicKey(VerifyKey, ABC):
@@ -54,18 +53,16 @@ class PublicKey(VerifyKey, ABC):
     def parse(cls, key: Any):  # -> Optional[PublicKey]:
         if key is None:
             return None
-        elif isinstance(key, cls):
+        elif isinstance(key, PublicKey):
             return key
-        elif isinstance(key, MapWrapper):
-            key = key.dictionary
-        # assert isinstance(key, dict), 'key error: %s' % key
-        algorithm = key_algorithm(key=key)
+        info = Wrapper.get_dictionary(key)
+        # assert info is not None, 'key error: %s' % key
+        algorithm = key_algorithm(key=info)
         factory = cls.factory(algorithm=algorithm)
         if factory is None:
             factory = cls.factory(algorithm='*')  # unknown
-            assert factory is not None, 'cannot parse key: %s' % key
-        assert isinstance(factory, PublicKeyFactory), 'key algorithm not support: %s' % algorithm
-        return factory.parse_public_key(key=key)
+        # assert isinstance(factory, PublicKeyFactory), 'key algorithm not support: %s' % algorithm
+        return factory.parse_public_key(key=info)
 
     @classmethod
     def factory(cls, algorithm: str):  # -> Optional[PublicKeyFactory]:
@@ -79,7 +76,7 @@ class PublicKey(VerifyKey, ABC):
 class PublicKeyFactory(ABC):
 
     @abstractmethod
-    def parse_public_key(self, key: dict) -> Optional[PublicKey]:
+    def parse_public_key(self, key: Dict[str, Any]) -> Optional[PublicKey]:
         """
         Parse map object to key
 

@@ -24,12 +24,11 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 
-from ..wrappers import MapWrapper
-
-from .cryptography import EncryptKey, DecryptKey, key_algorithm
+from ..types import Wrapper
 from .factories import Factories
+from .cryptography import EncryptKey, DecryptKey, key_algorithm
 
 
 class SymmetricKey(EncryptKey, DecryptKey, ABC):
@@ -68,18 +67,16 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
     def parse(cls, key: Any):  # -> Optional[SymmetricKey]:
         if key is None:
             return None
-        elif isinstance(key, cls):
+        elif isinstance(key, SymmetricKey):
             return key
-        elif isinstance(key, MapWrapper):
-            key = key.dictionary
-        # assert isinstance(key, dict), 'key error: %s' % key
-        algorithm = key_algorithm(key=key)
+        info = Wrapper.get_dictionary(key)
+        # assert info is not None, 'key error: %s' % key
+        algorithm = key_algorithm(key=info)
         factory = cls.factory(algorithm=algorithm)
         if factory is None:
             factory = cls.factory(algorithm='*')  # unknown
-            assert factory is not None, 'cannot parse key: %s' % key
-        assert isinstance(factory, SymmetricKeyFactory), 'key algorithm not support: %s' % algorithm
-        return factory.parse_symmetric_key(key=key)
+        # assert isinstance(factory, SymmetricKeyFactory), 'key algorithm not support: %s' % algorithm
+        return factory.parse_symmetric_key(key=info)
 
     @classmethod
     def factory(cls, algorithm: str):  # -> Optional[SymmetricKeyFactory]:
@@ -102,7 +99,7 @@ class SymmetricKeyFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def parse_symmetric_key(self, key: dict) -> Optional[SymmetricKey]:
+    def parse_symmetric_key(self, key: Dict[str, Any]) -> Optional[SymmetricKey]:
         """
         Parse map object to key
 

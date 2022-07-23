@@ -31,13 +31,12 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
-from .wrappers import StringWrapper
+from .types import Stringer, Wrapper
 
-from .types import network_is_user, network_is_group
 from .factories import Factories
 
 
-class Address(ABC):
+class Address(Stringer, ABC):
     """This class is used to build address for ID
 
         Address for MKM ID
@@ -59,15 +58,17 @@ class Address(ABC):
     @property
     def is_broadcast(self) -> bool:
         # return isinstance(self, BroadcastAddress)
-        return False
+        raise NotImplemented
 
     @property
     def is_user(self) -> bool:
-        return network_is_user(network=self.network)
+        # return network_is_user(network=self.network)
+        raise NotImplemented
 
     @property
     def is_group(self) -> bool:
-        return network_is_group(network=self.network)
+        # return network_is_group(network=self.network)
+        raise NotImplemented
 
     #
     #   Factory methods
@@ -76,27 +77,26 @@ class Address(ABC):
     @classmethod
     def generate(cls, meta, network: int):  # -> Address:
         factory = cls.factory()
-        assert isinstance(factory, AddressFactory), 'address factory error: %s' % factory
+        # assert isinstance(factory, AddressFactory), 'address factory error: %s' % factory
         return factory.generate_address(meta=meta, network=network)
 
     @classmethod
     def create(cls, address: str):  # -> Address:
         factory = cls.factory()
-        assert isinstance(factory, AddressFactory), 'address factory error: %s' % factory
+        # assert isinstance(factory, AddressFactory), 'address factory error: %s' % factory
         return factory.create_address(address=address)
 
     @classmethod
     def parse(cls, address: Any):  # -> Optional[Address]:
         if address is None:
             return None
-        elif isinstance(address, cls):
+        elif isinstance(address, Address):
             return address
-        elif isinstance(address, StringWrapper):
-            address = address.string
-        # assert isinstance(address, str), 'address error: %s' % address
+        string = Wrapper.get_string(address)
+        # assert string is not None, 'address error: %s' % address
         factory = cls.factory()
-        assert isinstance(factory, AddressFactory), 'address factory error: %s' % factory
-        return factory.parse_address(address=address)
+        # assert factory is not None, 'address factory error: %s' % factory
+        return factory.parse_address(address=string)
 
     @classmethod
     def factory(cls):  # -> AddressFactory:

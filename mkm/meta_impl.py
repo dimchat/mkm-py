@@ -29,21 +29,20 @@
 # ==============================================================================
 
 from abc import ABC
-from typing import Optional, Union
-
-from .wrappers import Dictionary
+from typing import Optional, Union, Any, Dict
 
 from .crypto import base64_encode, base64_decode
 from .crypto import VerifyKey, PublicKey
-
+from .types import Dictionary
 from .types import MetaType, meta_has_seed
+
 from .meta import Meta
 from .meta import meta_type
 
 
 class BaseMeta(Dictionary, Meta, ABC):
 
-    def __init__(self, meta: Optional[dict] = None,
+    def __init__(self, meta: Optional[Dict[str, Any]] = None,
                  version: Union[MetaType, int] = 0, key: Optional[VerifyKey] = None,
                  seed: Optional[str] = None, fingerprint: Union[bytes, str, None] = None):
         # check parameters
@@ -54,7 +53,7 @@ class BaseMeta(Dictionary, Meta, ABC):
         elif isinstance(fingerprint, bytes):
             base64 = base64_encode(data=fingerprint)
         else:
-            assert isinstance(fingerprint, str), 'meta.fingerprint error: %s' % fingerprint
+            # assert isinstance(fingerprint, str), 'meta.fingerprint error: %s' % fingerprint
             base64 = fingerprint
             fingerprint = base64_decode(string=base64)
         if meta is None:

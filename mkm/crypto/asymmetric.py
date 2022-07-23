@@ -60,7 +60,7 @@ class VerifyKey(AsymmetricKey, ABC):
         """
         raise NotImplemented
 
-    def match(self, key: SignKey):
+    def match(self, key: SignKey) -> bool:
         """
         OK = verify(data, sign(data, SK), PK)
 

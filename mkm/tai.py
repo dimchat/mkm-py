@@ -29,7 +29,7 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 
 from .crypto import VerifyKey, SignKey
 
@@ -69,12 +69,12 @@ class TAI(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def sign(self, private_key: SignKey) -> bytes:
+    def sign(self, private_key: SignKey) -> Optional[bytes]:
         """
         Encode properties to 'data' and sign it to 'signature'
 
         :param private_key: private key match meta.key
-        :return: signature
+        :return: signature, None on error
         """
         raise NotImplemented
 
@@ -83,7 +83,7 @@ class TAI(ABC):
     #
 
     @property
-    def properties(self) -> Optional[dict]:
+    def properties(self) -> Optional[Dict[str, Any]]:
         """
         Get all properties when valid
 

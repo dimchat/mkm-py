@@ -30,14 +30,14 @@
 
 from typing import Optional
 
-from .wrappers import StringWrapper
+from .types import ConstantString
 
 from .address import Address
 from .address_impl import ANYWHERE, EVERYWHERE
 from .identifier import ID, IDFactory
 
 
-class Identifier(StringWrapper, ID):
+class Identifier(ConstantString, ID):
 
     def __init__(self, identifier: str, name: Optional[str], address: Address, terminal: Optional[str]):
         super().__init__(string=identifier)
@@ -56,6 +56,22 @@ class Identifier(StringWrapper, ID):
     @property  # Override
     def terminal(self) -> Optional[str]:
         return self.__terminal
+
+    @property  # Override
+    def type(self) -> int:
+        return self.address.network
+
+    @property  # Override
+    def is_broadcast(self) -> bool:
+        return self.address.is_broadcast
+
+    @property  # Override
+    def is_user(self) -> bool:
+        return self.address.is_user
+
+    @property  # Override
+    def is_group(self) -> bool:
+        return self.address.is_group
 
 
 class IdentifierFactory(IDFactory):

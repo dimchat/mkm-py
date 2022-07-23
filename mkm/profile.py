@@ -29,9 +29,9 @@
 # ==============================================================================
 
 import time
-from typing import Optional, Union, Any, List
+from typing import Optional, Union, Any, Dict, List
 
-from .wrappers import Dictionary
+from .types import Dictionary
 
 from .crypto import json_encode, json_decode, utf8_encode, base64_encode, base64_decode
 from .crypto import PublicKey, EncryptKey, VerifyKey, SignKey
@@ -49,14 +49,14 @@ from .tai_docs import Visa, Bulletin
 """
 
 
-def document_identifier(document: dict) -> ID:
+def document_identifier(document: Dict[str, Any]) -> ID:
     identifier = document.get('ID')
     return ID.parse(identifier=identifier)
 
 
 class BaseDocument(Dictionary, Document):
 
-    def __init__(self, document: Optional[dict] = None,
+    def __init__(self, document: Optional[Dict[str, Any]] = None,
                  doc_type: Optional[str] = None, identifier: Optional[ID] = None,
                  data: Optional[str] = None, signature: Union[bytes, str, None] = None):
         # check signature
@@ -65,7 +65,7 @@ class BaseDocument(Dictionary, Document):
         elif isinstance(signature, bytes):
             base64 = base64_encode(data=signature)
         else:
-            assert isinstance(signature, str), 'document signature error: %s' % signature
+            # assert isinstance(signature, str), 'document signature error: %s' % signature
             base64 = signature
             signature = base64_decode(string=base64)
         properties = None
@@ -176,39 +176,43 @@ class BaseDocument(Dictionary, Document):
         return self.__status == 1
 
     # Override
-    def sign(self, private_key: SignKey) -> bytes:
+    def sign(self, private_key: SignKey) -> Optional[bytes]:
         """
         Encode properties to 'data' and sign it to 'signature'
 
         :param private_key: private key match meta.key
-        :return: signature
+        :return: signature, None on error
         """
         if self.__status > 0:
             # already signed/verified
             assert len(self.__data) > 0, 'document data error'
-            assert len(self.__signature) > 0, 'document signature error'
-            return self.__signature
-        # update sign time
+            return self.signature
+        # 1. update sign time
         self.set_property(key='time', value=time.time())
-        # sign
-        self.__data = json_encode(self.properties)
-        self.__signature = private_key.sign(data=utf8_encode(string=self.__data))
-        assert len(self.__data) > 0, 'document data error'
-        assert len(self.__signature) > 0, 'document signature error'
-        # update 'data' & 'signature' fields
-        self['data'] = self.__data  # JsON string
-        self['signature'] = base64_encode(data=self.__signature)
-        # update status
-        if len(self.__signature) > 0:
-            self.__status = 1
-        return self.__signature
+        # 2. encode & sign
+        data = json_encode(self.properties)
+        if data is None or len(data) == 0:
+            # properties error
+            return None
+        signature = private_key.sign(data=utf8_encode(string=data))
+        if signature is None or len(signature) == 0:
+            # signature error
+            return None
+        # 3. update 'data' & 'signature' fields
+        self['data'] = data  # JsON string
+        self['signature'] = base64_encode(data=signature)
+        self.__data = data
+        self.__signature = signature
+        # 4. update status
+        self.__status = 1
+        return signature
 
     #
     #  properties
     #
 
     @property  # Override
-    def properties(self) -> Optional[dict]:
+    def properties(self) -> Optional[Dict[str, Any]]:
         """ Load properties from data """
         if self.__status < 0:
             # invalid
@@ -221,7 +225,7 @@ class BaseDocument(Dictionary, Document):
             else:
                 # get properties from data
                 self.__properties = json_decode(string=data)
-                assert isinstance(self.__properties, dict), 'document data error: %s' % self
+                assert isinstance(self.__properties, Dict), 'document data error: %s' % self
         return self.__properties
 
     # Override
@@ -238,7 +242,7 @@ class BaseDocument(Dictionary, Document):
         self.__status = 0
         # 2. update property value with name
         info = self.properties
-        assert isinstance(info, dict), 'failed to get properties: %s' % self
+        # assert isinstance(info, Dict), 'failed to get properties: %s' % self
         if value is None:
             info.pop(key, None)
         else:
@@ -256,10 +260,7 @@ class BaseDocument(Dictionary, Document):
     @property  # Override
     def time(self) -> float:
         timestamp = self.get_property(key='time')
-        if timestamp is None:
-            return 0
-        else:
-            return float(timestamp)
+        return 0 if timestamp is None else float(timestamp)
 
     @property  # Override
     def name(self) -> Optional[str]:
@@ -272,7 +273,8 @@ class BaseDocument(Dictionary, Document):
 
 class BaseVisa(BaseDocument, Visa):
 
-    def __init__(self, document: Optional[dict] = None, identifier: Optional[ID] = None,
+    def __init__(self, document: Optional[Dict[str, Any]] = None,
+                 identifier: Optional[ID] = None,
                  data: Optional[str] = None, signature: Union[bytes, str, None] = None):
         super().__init__(document, doc_type=Document.VISA, identifier=identifier, data=data, signature=signature)
         self.__key = None
@@ -311,7 +313,8 @@ class BaseVisa(BaseDocument, Visa):
 
 class BaseBulletin(BaseDocument, Bulletin):
 
-    def __init__(self, document: Optional[dict] = None, identifier: Optional[ID] = None,
+    def __init__(self, document: Optional[Dict[str, Any]] = None,
+                 identifier: Optional[ID] = None,
                  data: Optional[str] = None, signature: Union[bytes, str, None] = None):
         super().__init__(document, doc_type=Document.BULLETIN, identifier=identifier, data=data, signature=signature)
         self.__assistants = None

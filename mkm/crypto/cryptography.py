@@ -24,12 +24,12 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Any, Dict
 
-from ..wrappers import MapWrapper
+from ..types import Mapper
 
 
-class CryptographyKey(MapWrapper, ABC):
+class CryptographyKey(Mapper, ABC):
     """Cryptography key with designated algorithm
 
         Cryptography Key
@@ -88,7 +88,7 @@ class DecryptKey(CryptographyKey, ABC):
         """
         raise NotImplemented
 
-    def match(self, key: EncryptKey):
+    def match(self, key: EncryptKey) -> bool:
         """
         OK = decrypt(encrypt(data, SK), PK) == data
 
@@ -98,7 +98,7 @@ class DecryptKey(CryptographyKey, ABC):
         return keys_match(encrypt_key=key, decrypt_key=self)
 
 
-def key_algorithm(key: dict) -> str:
+def key_algorithm(key: Dict[str, Any]) -> str:
     return key.get('algorithm')
 
 

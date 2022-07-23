@@ -23,14 +23,15 @@
 # SOFTWARE.
 # ==============================================================================
 
-from .map import Wrapper, ArrayWrapper, MapWrapper
+from .wrapper import Wrapper, Stringer, Mapper
+from .string import ConstantString
 from .dictionary import Dictionary
-from .string import StringWrapper
+from .network import NetworkType, network_is_user, network_is_group
+from .meta import MetaType, meta_has_seed
 
 __all__ = [
-    'Wrapper',
-    'ArrayWrapper',
-    'MapWrapper',
-    'Dictionary',
-    'StringWrapper',
+    'Wrapper', 'Stringer', 'Mapper',
+    'ConstantString', 'Dictionary',
+    'NetworkType', 'network_is_user', 'network_is_group',
+    'MetaType', 'meta_has_seed',
 ]

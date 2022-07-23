@@ -33,7 +33,7 @@
 import base64
 import json
 from abc import ABC, abstractmethod
-from typing import Optional, Union, Any
+from typing import Optional, Union, Any, Dict, List
 
 
 class DataCoder(ABC):
@@ -158,11 +158,11 @@ def hex_decode(string: str) -> Optional[bytes]:
     return Hex.decode(string)
 
 
-def json_encode(obj: Union[dict, list]) -> str:
+def json_encode(obj: Union[Dict, List]) -> str:
     return JSON.encode(obj=obj)
 
 
-def json_decode(string: str) -> Union[dict, list, None]:
+def json_decode(string: str) -> Union[Dict, List, None]:
     return JSON.decode(string=string)
 
 
@@ -215,12 +215,12 @@ class Base64:
 
     @staticmethod
     def encode(data: bytes) -> str:
-        assert Base64.coder is not None, 'Base64 coder not set yet'
+        # assert Base64.coder is not None, 'Base64 coder not set yet'
         return Base64.coder.encode(data=data)
 
     @staticmethod
     def decode(string: str) -> Optional[bytes]:
-        assert Base64.coder is not None, 'Base64 coder not set yet'
+        # assert Base64.coder is not None, 'Base64 coder not set yet'
         return Base64.coder.decode(string=string)
 
 
@@ -229,12 +229,12 @@ class Base58:
 
     @staticmethod
     def encode(data: bytes) -> str:
-        assert Base58.coder is not None, 'Base58 coder not set yet'
+        # assert Base58.coder is not None, 'Base58 coder not set yet'
         return Base58.coder.encode(data=data)
 
     @staticmethod
     def decode(string: str) -> Optional[bytes]:
-        assert Base58.coder is not None, 'Base58 coder not set yet'
+        # assert Base58.coder is not None, 'Base58 coder not set yet'
         return Base58.coder.decode(string=string)
 
 
@@ -243,12 +243,12 @@ class Hex:
 
     @staticmethod
     def encode(data: bytes) -> str:
-        assert Hex.coder is not None, 'Hex coder not set yet'
+        # assert Hex.coder is not None, 'Hex coder not set yet'
         return Hex.coder.encode(data=data)
 
     @staticmethod
     def decode(string: str) -> Optional[bytes]:
-        assert Hex.coder is not None, 'Hex coder not set yet'
+        # assert Hex.coder is not None, 'Hex coder not set yet'
         return Hex.coder.decode(string=string)
 
 
@@ -291,12 +291,12 @@ class JSON:
 
     @staticmethod
     def encode(obj: Any) -> str:
-        assert JSON.coder is not None, 'JSON parser not set yet'
+        # assert JSON.coder is not None, 'JSON parser not set yet'
         return JSON.coder.encode(obj=obj)
 
     @staticmethod
     def decode(string: str) -> Optional[Any]:
-        assert JSON.coder is not None, 'JSON parser not set yet'
+        # assert JSON.coder is not None, 'JSON parser not set yet'
         return JSON.coder.decode(string=string)
 
 
@@ -305,10 +305,10 @@ class UTF8:
 
     @staticmethod
     def encode(string: str) -> bytes:
-        assert UTF8.coder is not None, 'UTF8 parser not set yet'
+        # assert UTF8.coder is not None, 'UTF8 parser not set yet'
         return UTF8.coder.encode(string=string)
 
     @staticmethod
     def decode(data: bytes) -> Optional[str]:
-        assert UTF8.coder is not None, 'UTF8 parser not set yet'
+        # assert UTF8.coder is not None, 'UTF8 parser not set yet'
         return UTF8.coder.decode(data=data)

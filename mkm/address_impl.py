@@ -29,11 +29,11 @@
 # ==============================================================================
 
 from abc import ABC
-from typing import Optional, Dict
+from typing import Optional, Union, Dict
 
-from .wrappers import StringWrapper
+from .types import ConstantString
+from .types import NetworkType, network_is_user, network_is_group
 
-from .types import NetworkType
 from .address import Address, AddressFactory
 
 
@@ -43,11 +43,13 @@ from .address import Address, AddressFactory
 """
 
 
-class BroadcastAddress(StringWrapper, Address):
+class BroadcastAddress(ConstantString, Address):
 
-    def __init__(self, address: str, network: NetworkType):
+    def __init__(self, address: str, network: Union[int, NetworkType]):
         super().__init__(string=address)
-        self.__network = network.value
+        if isinstance(network, NetworkType):
+            network = network.value
+        self.__network = network
 
     @property  # Override
     def network(self) -> int:
@@ -56,6 +58,14 @@ class BroadcastAddress(StringWrapper, Address):
     @property  # Override
     def is_broadcast(self) -> bool:
         return True
+
+    @property  # Override
+    def is_user(self) -> bool:
+        return network_is_user(network=self.network)
+
+    @property  # Override
+    def is_group(self) -> bool:
+        return network_is_group(network=self.network)
 
 
 ANYWHERE = BroadcastAddress(address='anywhere', network=NetworkType.MAIN)

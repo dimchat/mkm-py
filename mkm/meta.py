@@ -29,20 +29,20 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Union, Any
-
-from .wrappers import MapWrapper
+from typing import Optional, Union, Any, Dict
 
 from .crypto import utf8_encode
 from .crypto import VerifyKey, SignKey
 
+from .types import Mapper, Wrapper
 from .types import MetaType, meta_has_seed
+
+from .factories import Factories
 from .address import Address
 from .identifier import ID
-from .factories import Factories
 
 
-class Meta(MapWrapper, ABC):
+class Meta(Mapper, ABC):
     """This class is used to generate entity ID
 
         User/Group Meta data
@@ -177,18 +177,16 @@ class Meta(MapWrapper, ABC):
     def parse(cls, meta: Any):  # -> Optional[Meta]:
         if meta is None:
             return None
-        elif isinstance(meta, cls):
+        elif isinstance(meta, Meta):
             return meta
-        elif isinstance(meta, MapWrapper):
-            meta = meta.dictionary
-        # assert isinstance(meta, dict), 'meta error: %s' % meta
-        version = meta_type(meta=meta)
+        info = Wrapper.get_dictionary(meta)
+        # assert info is not None, 'meta error: %s' % meta
+        version = meta_type(meta=info)
         factory = cls.factory(version=version)
         if factory is None:
             factory = cls.factory(version=0)  # unknown
-            assert factory is not None, 'cannot parse meta: %s' % meta
-        assert isinstance(factory, MetaFactory), 'meta factory error: %s' % factory
-        return factory.parse_meta(meta=meta)
+        # assert factory is not None, 'meta factory error: %s' % factory
+        return factory.parse_meta(meta=info)
 
     @classmethod
     def factory(cls, version: Union[MetaType, int]):  # -> Optional[MetaFactory]:
@@ -203,12 +201,12 @@ class Meta(MapWrapper, ABC):
         Factories.meta_factories[version] = factory
 
 
-def meta_type(meta: dict) -> int:
+def meta_type(meta: Dict[str, Any]) -> int:
     """ get meta type(version) """
     version = meta.get('type')
     if version is None:
         version = meta.get('version')
-    return int(version)
+    return 0 if version is None else int(version)
 
 
 class MetaFactory(ABC):
@@ -237,7 +235,7 @@ class MetaFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def parse_meta(self, meta: dict) -> Optional[Meta]:
+    def parse_meta(self, meta: Dict[str, Any]) -> Optional[Meta]:
         """
         Parse map object to meta
 

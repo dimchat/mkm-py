@@ -24,14 +24,13 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 
-from ..wrappers import MapWrapper
-
+from ..types import Wrapper
+from .factories import Factories
 from .cryptography import key_algorithm
 from .asymmetric import SignKey
 from .public import PublicKey
-from .factories import Factories
 
 
 class PrivateKey(SignKey, ABC):
@@ -78,18 +77,16 @@ class PrivateKey(SignKey, ABC):
     def parse(cls, key: Any):  # -> Optional[PrivateKey]:
         if key is None:
             return None
-        elif isinstance(key, cls):
+        elif isinstance(key, PrivateKey):
             return key
-        elif isinstance(key, MapWrapper):
-            key = key.dictionary
-        # assert isinstance(key, dict), 'key error: %s' % key
-        algorithm = key_algorithm(key=key)
+        info = Wrapper.get_dictionary(key)
+        # assert info is not None, 'key error: %s' % key
+        algorithm = key_algorithm(key=info)
         factory = cls.factory(algorithm=algorithm)
         if factory is None:
             factory = cls.factory(algorithm='*')  # unknown
-            assert factory is not None, 'cannot parse key: %s' % key
-        assert isinstance(factory, PrivateKeyFactory), 'key algorithm not support: %s' % algorithm
-        return factory.parse_private_key(key=key)
+        # assert isinstance(factory, PrivateKeyFactory), 'key algorithm not support: %s' % algorithm
+        return factory.parse_private_key(key=info)
 
     @classmethod
     def factory(cls, algorithm: str):  # -> Optional[PrivateKeyFactory]:
@@ -112,7 +109,7 @@ class PrivateKeyFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def parse_private_key(self, key: dict) -> Optional[PrivateKey]:
+    def parse_private_key(self, key: Dict[str, Any]) -> Optional[PrivateKey]:
         """
         Parse map object to key
 

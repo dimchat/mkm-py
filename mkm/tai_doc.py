@@ -29,16 +29,16 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Union, Any
+from typing import Optional, Union, Any, Dict
 
-from .wrappers import MapWrapper
+from .types import Mapper, Wrapper
 
+from .factories import Factories
 from .identifier import ID
 from .tai import TAI
-from .factories import Factories
 
 
-class Document(TAI, MapWrapper, ABC):
+class Document(TAI, Mapper, ABC):
 
     #
     #  Document types
@@ -110,18 +110,16 @@ class Document(TAI, MapWrapper, ABC):
     def parse(cls, document: Any):  # -> Optional[Document]:
         if document is None:
             return None
-        elif isinstance(document, cls):
+        elif isinstance(document, Document):
             return document
-        elif isinstance(document, MapWrapper):
-            document = document.dictionary
-        # assert isinstance(document, dict), 'document error: %s' % document
-        doc_type = document_type(document=document)
+        info = Wrapper.get_dictionary(document)
+        # assert info is not None, 'document error: %s' % key
+        doc_type = document_type(document=info)
         factory = cls.factory(doc_type=doc_type)
         if factory is None:
             factory = cls.factory(doc_type='*')  # unknown
-            assert factory is not None, 'cannot parse document: %s' % document
-        assert isinstance(factory, DocumentFactory), 'document factory error: %s' % factory
-        return factory.parse_document(document=document)
+        # assert isinstance(factory, DocumentFactory), 'document factory error: %s' % factory
+        return factory.parse_document(document=info)
 
     @classmethod
     def register(cls, doc_type: str, factory):
@@ -132,7 +130,7 @@ class Document(TAI, MapWrapper, ABC):
         return Factories.document_factories.get(doc_type)
 
 
-def document_type(document: dict) -> str:
+def document_type(document: Dict[str, Any]) -> str:
     return document.get('type')
 
 
@@ -153,7 +151,7 @@ class DocumentFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def parse_document(self, document: dict) -> Optional[Document]:
+    def parse_document(self, document: Dict[str, Any]) -> Optional[Document]:
         """
         Parse map object to entity document
 

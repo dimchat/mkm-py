@@ -25,34 +25,77 @@
 
 from typing import Optional, Union, Any, Tuple, Mapping, List, Iterable, Iterator
 
+from .wrapper import Stringer, Wrapper
 
-class String:
+
+class ConstantString(Stringer):
+    """
+        Constant String Wrapper
+        ~~~~~~~~~~~~~~~~~~~~~~~
+        A container with inner string
+    """
+
+    def __init__(self, string: Union[str, Stringer] = None):
+        super().__init__()
+        if string is None:
+            string = ''
+        elif isinstance(string, Stringer):
+            string = string.string
+        self.__string = string
+
+    # Override
+    def __hash__(self) -> int:
+        """ Return hash(self). """
+        return self.__string.__hash__()
+
+    # Override
+    def __len__(self) -> int:
+        """ Return len(self). """
+        return self.__string.__len__()
+
+    # Override
+    def __eq__(self, x: str) -> bool:
+        """ Return self==value. """
+        if self is x:
+            return True
+        if isinstance(x, Stringer):
+            x = x.string
+        return self.__string.__eq__(x)
+
+    # Override
+    def __ne__(self, x: str) -> bool:
+        """ Return self!=value. """
+        if self is x:
+            return False
+        if isinstance(x, Stringer):
+            x = x.string
+        return self.__string.__ne__(x)
+
+    # Override
+    def __str__(self) -> str:
+        """ Return str(self). """
+        return self.__string
+
+    @property  # Override
+    def string(self) -> str:
+        return self.__string
+
+
+class String(Stringer):
     """
         A container with inner string
     """
 
-    @classmethod
-    def unwrap(cls, s: str) -> str:
-        # unwrap string container
-        if isinstance(s, String):
-            return s.string
-        # assert isinstance(s, str)
-        return s
-
-    # def __new__(cls, string: Optional[str]=None):
-    #     return super().__new__(cls, string=string)
-
-    def __init__(self, string: Optional[str] = None):
+    def __init__(self, string: Union[str, Stringer] = None):
         super().__init__()
         if string is None:
-            self.__string = ''
-        elif isinstance(string, String):
-            self.__string = string.string
-        else:
-            assert isinstance(string, str), 'string error: %s' % string
-            self.__string = string
+            string = ''
+        elif isinstance(string, Stringer):
+            string = string.string
+        assert isinstance(string, str), 'string error: %s' % string
+        self.__string = string
 
-    @property
+    @property  # Override
     def string(self) -> str:
         return self.__string
 
@@ -77,7 +120,7 @@ class String:
 
         Padding is done using the specified fill character (default is a space).
         """
-        if isinstance(fillchar, String):
+        if isinstance(fillchar, Stringer):
             fillchar = fillchar.string
         string = self.__string.center(width, fillchar)
         return String(string=string)
@@ -90,7 +133,7 @@ class String:
         string S[start:end].  Optional arguments start and end are
         interpreted as in slice notation.
         """
-        if isinstance(x, String):
+        if isinstance(x, Stringer):
             x = x.string
         return self.__string.count(x, __start, __end)
 
@@ -118,7 +161,7 @@ class String:
         With optional end, stop comparing S at that position.
         suffix can also be a tuple of strings to try.
         """
-        if isinstance(suffix, String):
+        if isinstance(suffix, Stringer):
             suffix = suffix.string
         return self.__string.endswith(suffix, start, end)
 
@@ -141,7 +184,7 @@ class String:
 
         Return -1 on failure.
         """
-        if isinstance(sub, String):
+        if isinstance(sub, Stringer):
             sub = sub.string
         return self.__string.find(sub, __start, __end)
 
@@ -162,9 +205,7 @@ class String:
         Return a formatted version of S, using substitutions from mapping.
         The substitutions are identified by braces ('{' and '}').
         """
-        from .map import MapWrapper
-        if isinstance(mapping, MapWrapper):
-            mapping = mapping.dictionary
+        mapping = Wrapper.unwrap_map(mapping)
         string = self.__string.format_map(map=mapping)
         return String(string=string)
 
@@ -178,7 +219,7 @@ class String:
 
         Raises ValueError when the substring is not found.
         """
-        if isinstance(sub, String):
+        if isinstance(sub, Stringer):
             sub = sub.string
         return self.__string.index(sub, __start, __end)
 
@@ -308,7 +349,7 @@ class String:
 
         Padding is done using the specified fill character (default is a space).
         """
-        if isinstance(fillchar, String):
+        if isinstance(fillchar, Stringer):
             fillchar = fillchar.string
         string = self.__string.ljust(width, fillchar)
         return String(string=string)
@@ -324,7 +365,7 @@ class String:
 
         If chars is given and not None, remove characters in chars instead.
         """
-        if isinstance(chars, String):
+        if isinstance(chars, Stringer):
             chars = chars.string
         string = self.__string.lstrip(chars)
         return String(string=string)
@@ -354,7 +395,7 @@ class String:
         If the separator is not found, returns a 3-tuple containing the original string
         and two empty strings.
         """
-        if isinstance(sep, String):
+        if isinstance(sep, Stringer):
             sep = sep.string
         return self.__string.partition(sep)
 
@@ -369,9 +410,9 @@ class String:
         If the optional argument count is given, only the first count occurrences are
         replaced.
         """
-        if isinstance(old, String):
+        if isinstance(old, Stringer):
             old = old.string
-        if isinstance(new, String):
+        if isinstance(new, Stringer):
             new = new.string
         string = self.__string.replace(old, new, count)
         return String(string=string)
@@ -386,7 +427,7 @@ class String:
 
         Return -1 on failure.
         """
-        if isinstance(sub, String):
+        if isinstance(sub, Stringer):
             sub = sub.string
         return self.__string.rfind(sub, __start, __end)
 
@@ -400,7 +441,7 @@ class String:
 
         Raises ValueError when the substring is not found.
         """
-        if isinstance(sub, String):
+        if isinstance(sub, Stringer):
             sub = sub.string
         return self.__string.rindex(sub, __start, __end)
 
@@ -410,7 +451,7 @@ class String:
 
         Padding is done using the specified fill character (default is a space).
         """
-        if isinstance(fillchar, String):
+        if isinstance(fillchar, Stringer):
             fillchar = fillchar.string
         string = self.__string.rjust(width, fillchar)
         return String(string=string)
@@ -426,7 +467,7 @@ class String:
         If the separator is not found, returns a 3-tuple containing two empty strings
         and the original string.
         """
-        if isinstance(sep, String):
+        if isinstance(sep, Stringer):
             sep = sep.string
         return self.__string.rpartition(sep)
 
@@ -444,7 +485,7 @@ class String:
 
         Splits are done starting at the end of the string and working to the front.
         """
-        if isinstance(sep, String):
+        if isinstance(sep, Stringer):
             sep = sep.string
         return self.__string.rsplit(sep, maxsplit)
 
@@ -454,7 +495,7 @@ class String:
 
         If chars is given and not None, remove characters in chars instead.
         """
-        if isinstance(chars, String):
+        if isinstance(chars, Stringer):
             chars = chars.string
         string = self.__string.rstrip(chars)
         return String(string=string)
@@ -471,7 +512,7 @@ class String:
             Maximum number of splits to do.
             -1 (the default value) means no limit.
         """
-        if isinstance(sep, String):
+        if isinstance(sep, Stringer):
             sep = sep.string
         return self.__string.split(sep, maxsplit)
 
@@ -493,7 +534,7 @@ class String:
         With optional end, stop comparing S at that position.
         prefix can also be a tuple of strings to try.
         """
-        if isinstance(prefix, String):
+        if isinstance(prefix, Stringer):
             prefix = prefix.string
         return self.__string.startswith(prefix, start, end)
 
@@ -503,7 +544,7 @@ class String:
 
         If chars is given and not None, remove characters in chars instead.
         """
-        if isinstance(chars, String):
+        if isinstance(chars, Stringer):
             chars = chars.string
         string = self.__string.strip(chars)
         return String(string=string)
@@ -553,14 +594,14 @@ class String:
 
     def __add__(self, s: str):
         """ Return self+value. """
-        if isinstance(s, String):
+        if isinstance(s, Stringer):
             s = s.string
         string = self.__string.__add__(s)
         return String(string=string)
 
     def __contains__(self, s: str) -> bool:
         """ Return key in self. """
-        if isinstance(s, String):
+        if isinstance(s, Stringer):
             s = s.string
         return self.__string.__contains__(s)
 
@@ -568,20 +609,20 @@ class String:
         """ Return self==value. """
         if self is x:
             return True
-        if isinstance(x, String):
+        if isinstance(x, Stringer):
             x = x.string
         return self.__string.__eq__(x)
 
     def __format__(self, format_spec: str):
         """ Return a formatted version of the string as described by format_spec. """
-        if isinstance(format_spec, String):
+        if isinstance(format_spec, Stringer):
             format_spec = format_spec.string
         string = self.__string.__format__(format_spec)
         return String(string=string)
 
     # def __getattribute__(self, name: str) -> Any:
     #     """ Return getattr(self, name). """
-    #     if isinstance(name, String):
+    #     if isinstance(name, Stringer):
     #         name = name.string
     #     return self.__string.__getattribute__(name=name)
 
@@ -596,7 +637,7 @@ class String:
         """ Return self>=value. """
         if self is x:
             return True
-        if isinstance(x, String):
+        if isinstance(x, Stringer):
             x = x.string
         return self.__string.__ge__(x)
 
@@ -604,7 +645,7 @@ class String:
         """ Return self>value. """
         if self is x:
             return False
-        if isinstance(x, String):
+        if isinstance(x, Stringer):
             x = x.string
         return self.__string.__gt__(x)
 
@@ -624,7 +665,7 @@ class String:
         """ Return self<=value. """
         if self is x:
             return True
-        if isinstance(x, String):
+        if isinstance(x, Stringer):
             x = x.string
         return self.__string.__le__(x)
 
@@ -632,7 +673,7 @@ class String:
         """ Return self<value. """
         if self is x:
             return False
-        if isinstance(x, String):
+        if isinstance(x, Stringer):
             x = x.string
         return self.__string.__lt__(x)
 
@@ -650,7 +691,7 @@ class String:
         """ Return self!=value. """
         if self is x:
             return False
-        if isinstance(x, String):
+        if isinstance(x, Stringer):
             x = x.string
         return self.__string.__ne__(x)
 
@@ -674,6 +715,3 @@ class String:
     def __str__(self) -> str:
         """ Return str(self). """
         return self.__string
-
-
-StringWrapper = String

@@ -31,13 +31,13 @@
 from abc import ABC, abstractmethod
 from typing import Optional, List, Any
 
-from .wrappers import StringWrapper
+from .types import Stringer, Wrapper
 
-from .address import Address
 from .factories import Factories
+from .address import Address
 
 
-class ID(ABC):
+class ID(Stringer, ABC):
     """
         ID for entity (User/Group)
         ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -64,20 +64,23 @@ class ID(ABC):
 
     @property
     def type(self) -> int:
-        """ ID type """
-        return self.address.network
+        # return self.address.network
+        raise NotImplemented
 
     @property
     def is_broadcast(self) -> bool:
-        return self.address.is_broadcast
+        # return self.address.is_broadcast
+        raise NotImplemented
 
     @property
     def is_user(self) -> bool:
-        return self.address.is_user
+        # return self.address.is_user
+        raise NotImplemented
 
     @property
     def is_group(self) -> bool:
-        return self.address.is_group
+        # return self.address.is_group
+        raise NotImplemented
 
     @classmethod
     def convert(cls, members: List[str]):  # -> List[ID]:
@@ -115,27 +118,26 @@ class ID(ABC):
     @classmethod
     def generate(cls, meta, network: int, terminal: Optional[str] = None):  # -> ID:
         factory = cls.factory()
-        assert isinstance(factory, IDFactory), 'ID factory error: %s' % factory
+        # assert isinstance(factory, IDFactory), 'ID factory error: %s' % factory
         return factory.generate_identifier(meta=meta, network=network, terminal=terminal)
 
     @classmethod
     def create(cls, address: Address, name: Optional[str] = None, terminal: Optional[str] = None):  # -> ID:
         factory = cls.factory()
-        assert isinstance(factory, IDFactory), 'ID factory error: %s' % factory
+        # assert isinstance(factory, IDFactory), 'ID factory error: %s' % factory
         return factory.create_identifier(name=name, address=address, terminal=terminal)
 
     @classmethod
     def parse(cls, identifier: Any):  # -> Optional[ID]:
         if identifier is None:
             return None
-        elif isinstance(identifier, cls):
+        elif isinstance(identifier, ID):
             return identifier
-        elif isinstance(identifier, StringWrapper):
-            identifier = identifier.string
-        # assert isinstance(identifier, str), 'ID error: %s' % identifier
+        string = Wrapper.get_string(identifier)
+        # assert string is not None, 'ID error: %s' % identifier
         factory = cls.factory()
-        assert isinstance(factory, IDFactory), 'ID factory error: %s' % factory
-        return factory.parse_identifier(identifier=identifier)
+        # assert factory is not None, 'ID factory error: %s' % factory
+        return factory.parse_identifier(identifier=string)
 
     @classmethod
     def register(cls, factory):

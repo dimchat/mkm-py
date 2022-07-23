@@ -24,36 +24,33 @@
 # ==============================================================================
 
 import copy
-from typing import Any, Optional, Union, Tuple, Iterator
+from typing import Any, Optional, Iterator, Tuple, Dict
 from typing import Mapping, ItemsView, KeysView, ValuesView
 
-from .map import MapWrapper
+from .wrapper import Mapper
 
 
-class Dictionary(MapWrapper):
+class Dictionary(Mapper):
     """
+        Mutable Map Wrapper
+        ~~~~~~~~~~~~~~~~~~~
         A container sharing the same inner dictionary
     """
 
-    # def __new__(cls, dictionary: Optional[dict]=None):
-    #     return super().__new__(cls, dictionary=dictionary)
-
-    def __init__(self, dictionary: Optional[dict] = None):
+    def __init__(self, dictionary: Dict = None):
         super().__init__()
         if dictionary is None:
-            self.__dictionary = {}
-        elif isinstance(dictionary, MapWrapper):
-            self.__dictionary = dictionary.dictionary
-        else:
-            assert isinstance(dictionary, dict), 'dictionary error: %s' % dictionary
-            self.__dictionary = dictionary
+            dictionary = {}
+        elif isinstance(dictionary, Mapper):
+            dictionary = dictionary.dictionary
+        self.__dictionary = dictionary
 
     @property  # Override
-    def dictionary(self) -> dict:
+    def dictionary(self) -> Dict:
         return self.__dictionary
 
     # Override
-    def copy_dictionary(self, deep_copy: bool = False) -> dict:
+    def copy_dictionary(self, deep_copy: bool = False) -> Dict:
         if deep_copy:
             copy.deepcopy(self.__dictionary)
         else:
@@ -133,17 +130,17 @@ class Dictionary(MapWrapper):
         """ Delete self[key]. """
         self.__dictionary.__delitem__(v)
 
-    def __eq__(self, o: Union[dict, MapWrapper]) -> bool:
+    def __eq__(self, o: Dict) -> bool:
         """ Return self==value. """
-        if self is o:
-            return True
-        if isinstance(o, MapWrapper):
+        if isinstance(o, Mapper):
+            if self is o:
+                return True
             o = o.dictionary
         return self.__dictionary.__eq__(o)
 
     # def __getattribute__(self, name: str) -> Any:
     #     """ Return getattr(self, name). """
-    #     if isinstance(name, StringWrapper):
+    #     if isinstance(name, Stringer):
     #         name = name.string
     #     return self.__dictionary.__getattribute__(name=name)
 
@@ -175,9 +172,9 @@ class Dictionary(MapWrapper):
         """ Return self<value. """
         pass
 
-    def __ne__(self, o: Union[dict, MapWrapper]) -> bool:
+    def __ne__(self, o: Dict) -> bool:
         """ Return self!=value. """
-        if isinstance(o, MapWrapper):
+        if isinstance(o, Mapper):
             if self is o:
                 return False
             o = o.dictionary
