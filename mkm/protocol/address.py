@@ -31,7 +31,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
-from .types import Stringer, Wrapper
+from ..types import Stringer, Wrapper
 
 from .factories import Factories
 

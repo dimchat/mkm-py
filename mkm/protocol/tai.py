@@ -31,7 +31,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Any, Dict
 
-from .crypto import VerifyKey, SignKey
+from ..crypto import VerifyKey, SignKey
 
 
 class TAI(ABC):

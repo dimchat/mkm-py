@@ -31,7 +31,7 @@
 from abc import ABC
 from typing import Optional, Union, List
 
-from .crypto import EncryptKey, VerifyKey
+from ..crypto import EncryptKey, VerifyKey
 
 from .identifier import ID
 from .tai_doc import Document

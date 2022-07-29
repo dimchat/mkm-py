@@ -30,11 +30,11 @@
 
 from typing import Optional
 
-from .types import ConstantString
+from ..types import ConstantString
+from ..protocol import ID, IDFactory
+from ..protocol import Address
 
-from .address import Address
-from .address_impl import ANYWHERE, EVERYWHERE
-from .identifier import ID, IDFactory
+from .address import ANYWHERE, EVERYWHERE
 
 
 class Identifier(ConstantString, ID):

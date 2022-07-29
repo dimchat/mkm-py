@@ -31,7 +31,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Union, Any, Dict
 
-from .types import Mapper, Wrapper
+from ..types import Mapper, Wrapper
 
 from .factories import Factories
 from .identifier import ID

@@ -31,13 +31,12 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Union, Any, Dict
 
-from .crypto import utf8_encode
-from .crypto import VerifyKey, SignKey
-
-from .types import Mapper, Wrapper
-from .types import MetaType, meta_has_seed
+from ..types import Mapper, Wrapper
+from ..crypto import utf8_encode
+from ..crypto import VerifyKey, SignKey
 
 from .factories import Factories
+from .version import MetaType, meta_has_seed
 from .address import Address
 from .identifier import ID
 

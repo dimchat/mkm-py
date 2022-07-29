@@ -31,13 +31,11 @@
 from abc import ABC
 from typing import Optional, Union, Any, Dict
 
-from .crypto import base64_encode, base64_decode
-from .crypto import VerifyKey, PublicKey
-from .types import Dictionary
-from .types import MetaType, meta_has_seed
-
-from .meta import Meta
-from .meta import meta_type
+from ..crypto import base64_encode, base64_decode
+from ..crypto import VerifyKey, PublicKey
+from ..types import Dictionary
+from ..protocol import Meta, MetaType
+from ..protocol import meta_has_seed, meta_type
 
 
 class BaseMeta(Dictionary, Meta, ABC):

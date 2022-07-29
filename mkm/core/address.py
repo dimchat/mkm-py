@@ -31,10 +31,9 @@
 from abc import ABC
 from typing import Optional, Union, Dict
 
-from .types import ConstantString
-from .types import NetworkType, network_is_user, network_is_group
-
-from .address import Address, AddressFactory
+from ..types import ConstantString
+from ..protocol import NetworkType, network_is_user, network_is_group
+from ..protocol import Address, AddressFactory
 
 
 """

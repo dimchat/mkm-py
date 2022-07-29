@@ -31,14 +31,12 @@
 import time
 from typing import Optional, Union, Any, Dict, List
 
-from .types import Dictionary
-
-from .crypto import json_encode, json_decode, utf8_encode, base64_encode, base64_decode
-from .crypto import PublicKey, EncryptKey, VerifyKey, SignKey
-
-from .identifier import ID
-from .tai_doc import Document, document_type
-from .tai_docs import Visa, Bulletin
+from ..types import Dictionary
+from ..crypto import json_encode, json_decode, utf8_encode, base64_encode, base64_decode
+from ..crypto import PublicKey, EncryptKey, VerifyKey, SignKey
+from ..protocol import ID
+from ..protocol import Document, document_type
+from ..protocol import Visa, Bulletin
 
 
 """

@@ -28,17 +28,8 @@
 # SOFTWARE.
 # ==============================================================================
 
-from .types import NetworkType, MetaType
-from .address import Address, AddressFactory
-from .address_impl import BaseAddressFactory
-from .address_impl import ANYWHERE, EVERYWHERE
-from .identifier import ID
-from .id_impl import ANYONE, EVERYONE, FOUNDER
-from .meta import Meta, MetaFactory
-from .meta_impl import BaseMeta
-from .tai_doc import Document, DocumentFactory
-from .tai_docs import Visa, Bulletin
-from .profile import BaseDocument, BaseVisa, BaseBulletin
+from .protocol import *
+from .core import *
 
 name = "MingKeMing"
 
@@ -46,14 +37,22 @@ __author__ = 'Albert Moky'
 
 __all__ = [
 
+    #
+    #   Protocol
+    #
     'NetworkType', 'MetaType',
-    'Address', 'AddressFactory', 'BaseAddressFactory',
-    'ANYWHERE', 'EVERYWHERE',
-    'ID', 'ANYONE', 'EVERYONE', 'FOUNDER',
-    'Meta', 'BaseMeta',
-    'MetaFactory',
-    'DocumentFactory',
-    'Document', 'BaseDocument',
-    'Visa', 'BaseVisa',
-    'Bulletin', 'BaseBulletin',
+    'Address', 'AddressFactory',
+    'ID', 'IDFactory',
+    'Meta', 'MetaFactory',
+    'Document', 'DocumentFactory',
+    'Visa', 'Bulletin',
+
+    #
+    #   Core
+    #
+    'BaseAddressFactory', 'BroadcastAddress',
+    'IdentifierFactory', 'Identifier',
+    'ANYWHERE', 'EVERYWHERE', 'ANYONE', 'EVERYONE', 'FOUNDER',
+    'BaseMeta',
+    'BaseDocument', 'BaseVisa', 'BaseBulletin',
 ]

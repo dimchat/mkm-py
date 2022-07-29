@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+#
+#   Ming-Ke-Ming : Decentralized User Identity Authentication
+#
+#                                Written in 2019 by Moky <albert.moky@gmail.com>
+#
 # ==============================================================================
 # MIT License
 #
@@ -23,50 +28,26 @@
 # SOFTWARE.
 # ==============================================================================
 
-"""
-    Crypto
-    ~~~~~~
-
-    Crypto Keys: SymmetricKey, PrivateKey, PublicKey
-"""
-
-from .format import *
-from .digest import *
-
-from .cryptography import CryptographyKey
-from .symmetric import SymmetricKey, EncryptKey, DecryptKey
-from .symmetric import SymmetricKeyFactory
-from .asymmetric import AsymmetricKey, SignKey, VerifyKey
-from .public import PublicKey, PublicKeyFactory
-from .private import PrivateKey, PrivateKeyFactory
-
-name = "Crypto"
-
-__author__ = 'Albert Moky'
+from .network import NetworkType, network_is_user, network_is_group
+from .version import MetaType, meta_has_seed
+from .address import Address, AddressFactory
+from .identifier import ID, IDFactory
+from .meta import Meta, MetaFactory, meta_type
+from .tai_doc import Document, DocumentFactory, document_type
+from .tai_docs import Visa, Bulletin
 
 __all__ = [
 
-    # Data Format
-    'DataCoder', 'ObjectCoder', 'StringCoder',
-    'Base64', 'Base58',
-    'Hex',
-    'JSON', 'UTF8',
+    'NetworkType',
+    'MetaType',
 
-    'base64_encode', 'base64_decode', 'base58_encode', 'base58_decode',
-    'hex_encode', 'hex_decode',
-    'json_encode', 'json_decode', 'utf8_encode', 'utf8_decode',
+    'Address', 'AddressFactory',
+    'ID', 'IDFactory',
+    'Meta', 'MetaFactory',
+    'Document', 'DocumentFactory',
+    'Visa', 'Bulletin',
 
-    # Data Digest
-    'DataDigester',
-    'MD5', 'SHA1', 'SHA256', 'KECCAK256', 'RIPEMD160',
-
-    'md5', 'sha1', 'sha256', 'keccak256', 'ripemd160',
-
-    # Crypto
-    'CryptographyKey',
-    'SymmetricKey', 'EncryptKey', 'DecryptKey',
-    'SymmetricKeyFactory',
-    'AsymmetricKey', 'SignKey', 'VerifyKey',
-    'PublicKey', 'PublicKeyFactory',
-    'PrivateKey', 'PrivateKeyFactory',
+    'network_is_user', 'network_is_group',
+    'meta_has_seed', 'meta_type',
+    'document_type',
 ]
