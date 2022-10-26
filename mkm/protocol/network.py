@@ -2,12 +2,12 @@
 #
 #   Ming-Ke-Ming : Decentralized User Identity Authentication
 #
-#                                Written in 2019 by Moky <albert.moky@gmail.com>
+#                                Written in 2022 by Moky <albert.moky@gmail.com>
 #
 # ==============================================================================
 # MIT License
 #
-# Copyright (c) 2019 Albert Moky
+# Copyright (c) 2022 Albert Moky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -31,105 +31,87 @@
 from enum import IntEnum
 
 
-class NetworkType(IntEnum):
+class EntityType(IntEnum):
     """
-        @enum MKMNetworkID
+        @enum MKMEntityType
 
-        @abstract A network type to indicate what kind the entity is.
+        @abstract A network ID to indicate what kind the entity is.
 
         @discussion An address can identify a person, a group of people,
             a team, even a thing.
 
-            MKMNetwork_Main indicates this entity is a person's account.
+            MKMEntityType_User indicates this entity is a person's account.
             An account should have a public key, which proved by meta data.
 
-            MKMNetwork_Group indicates this entity is a group of people,
+            MKMEntityType_Group indicates this entity is a group of people,
             which should have a founder (also the owner), and some members.
 
-            MKMNetwork_Moments indicates a special personal social network,
-            where the owner can share information and interact with its friends.
-            The owner is the king here, it can do anything and no one can stop it.
+            MKMEntityType_Station indicates this entity is a DIM network station.
 
-            MKMNetwork_Polylogue indicates a virtual (temporary) social network.
-            It's created to talk with multi-people (but not too much, e.g. < 100).
-            Any member can invite people in, but only the founder can expel member.
+            MKMEntityType_ISP indicates this entity is a group for stations.
 
-            MKMNetwork_Chatroom indicates a massive (persistent) social network.
-            It's usually more than 100 people in it, so we need administrators
-            to help the owner to manage the group.
+            MKMEntityType_Bot indicates this entity is a bot user.
 
-            MKMNetwork_SocialEntity indicates this entity is a social entity.
-
-            MKMNetwork_Organization indicates an independent organization.
-
-            MKMNetwork_Company indicates this entity is a company.
-
-            MKMNetwork_School indicates this entity is a school.
-
-            MKMNetwork_Government indicates this entity is a government department.
-
-            MKMNetwork_Department indicates this entity is a department.
-
-            MKMNetwork_Thing this is reserved for IoT (Internet of Things).
+            MKMEntityType_Company indicates a company for stations and/or bots.
 
         Bits:
-            0000 0001 - this entity's branch is independent (clear division).
-            0000 0010 - this entity can contains other group (big organization).
-            0000 0100 - this entity is top organization.
-            0000 1000 - (MAIN) this entity acts like a human.
-
-            0001 0000 - this entity contains members (Group)
-            0010 0000 - this entity needs other administrators (big organization)
-            0100 0000 - this is an entity in reality.
-            1000 0000 - (IoT) this entity is a 'Thing'.
+            0000 0001 - group flag
+            0000 0010 - node flag
+            0000 0100 - bot flag
+            0000 1000 - CA flag
+            ...         (reserved)
+            0100 0000 - customized flag
+            1000 0000 - broadcast flag
 
             (All above are just some advices to help choosing numbers :P)
     """
     ################################
-    #  BTC Network
+    #  Main: 0, 1
     ################################
-    BTC_MAIN = 0x00         # 0000 0000 (BitCoin Address)
-    # BTC_TEST = 0x6f       # 0110 1111 (BitCoin Test)
+    USER = 0x00             # 0000 0000
+    GROUP = 0x01            # 0000 0001 (User Group)
 
     ################################
-    #  Person Account
+    #  Network: 2, 3
     ################################
-    MAIN = 0x08             # 0000 1000 (Person)
+    STATION = 0x02          # 0000 0010 (Server Node)
+    ISP = 0x03              # 0000 0011 (Service Provider)
+    # STATION_GROUP = 0x03  # 0000 0011
 
     ################################
-    #  Virtual Groups
+    #  Bot: 4, 5
     ################################
-    GROUP = 0x10            # 0001 0000 (Multi-Persons)
-    # MOMENTS = 0x18        # 0001 1000 (Twitter)
-    POLYLOGUE = 0x10        # 0001 0000 (Multi-Persons Chat, N < 100)
-    CHATROOM = 0x30         # 0011 0000 (Multi-Persons Chat, N >= 100)
+    BOT = 0x04              # 0000 0100 (Business Node)
+    ICP = 0x05              # 0000 0101 (Content Provider)
+    # BOT_GROUP = 0x05      # 0000 0101
 
     ################################
-    #  Social Entities in Reality
+    #  Management: 6, 7, 8
     ################################
-    # SOCIAL_ENTITY = 0x50  # 0101 0000
-    # ORGANIZATION = 0x74   # 0111 0100
-    # COMPANY = 0x76        # 0111 0110
-    # SCHOOL = 0x77         # 0111 0111
-    # GOVERNMENT = 0x73     # 0111 0011
-    # DEPARTMENT = 0x52     # 0101 0010
+    SUPERVISOR = 0x06       # 0000 0110 (Company President)
+    COMPANY = 0x07          # 0000 0111 (Super Group for ISP/ICP)
+    # CA = 0x08             # 0000 1000 (Certification Authority)
 
     ################################
-    #  Network
+    #  Customized: 64, 65
     ################################
-    PROVIDER = 0x76         # 0111 0110 (Service Provider)
-    STATION = 0x88          # 1000 1000 (Server Node)
+    # APP_USER = 0x40       # 0100 0000 (Application Customized User)
+    # APP_GROUP = 0x41      # 0100 0001 (Application Customized Group)
 
     ################################
-    #  Internet of Things
+    #  Broadcast: 128, 129
     ################################
-    THING = 0x80            # 1000 0000 (IoT)
-    ROBOT = 0xC8            # 1100 1000
+    ANY = 0x80              # 1000 0000 (anyone@anywhere)
+    EVERY = 0x81            # 1000 0001 (everyone@everywhere)
 
 
-def network_is_user(network: int) -> bool:
-    return (network & NetworkType.MAIN) == NetworkType.MAIN or network == NetworkType.BTC_MAIN
+def entity_is_user(network: int) -> bool:
+    return (network & EntityType.GROUP) == EntityType.USER
 
 
-def network_is_group(network: int) -> bool:
-    return (network & NetworkType.GROUP) == NetworkType.GROUP
+def entity_is_group(network: int) -> bool:
+    return (network & EntityType.GROUP) == EntityType.GROUP
+
+
+def entity_is_broadcast(network: int) -> bool:
+    return (network & EntityType.ANY) == EntityType.ANY

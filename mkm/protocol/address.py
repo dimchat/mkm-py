@@ -43,15 +43,15 @@ class Address(Stringer, ABC):
         ~~~~~~~~~~~~~~~~~~
 
         properties:
-            network - address type
+            type - network ID
     """
 
     @property
-    def network(self) -> int:
+    def type(self) -> int:
         """
-        Get network type of address
+        Get network ID for address
 
-        :return: integer as NetworkType
+        :return: integer as EntityType
         """
         raise NotImplemented
 
@@ -62,12 +62,12 @@ class Address(Stringer, ABC):
 
     @property
     def is_user(self) -> bool:
-        # return network_is_user(network=self.network)
+        # return entity_is_user(network=self.type)
         raise NotImplemented
 
     @property
     def is_group(self) -> bool:
-        # return network_is_group(network=self.network)
+        # return entity_is_group(network=self.type)
         raise NotImplemented
 
     #

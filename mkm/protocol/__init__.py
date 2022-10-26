@@ -28,7 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from .network import NetworkType, network_is_user, network_is_group
+from .network import EntityType, entity_is_user, entity_is_group, entity_is_broadcast
 from .version import MetaType, meta_has_seed
 from .address import Address, AddressFactory
 from .identifier import ID, IDFactory
@@ -38,7 +38,7 @@ from .tai_docs import Visa, Bulletin
 
 __all__ = [
 
-    'NetworkType',
+    'EntityType',
     'MetaType',
 
     'Address', 'AddressFactory',
@@ -47,7 +47,7 @@ __all__ = [
     'Document', 'DocumentFactory',
     'Visa', 'Bulletin',
 
-    'network_is_user', 'network_is_group',
+    'entity_is_user', 'entity_is_group', 'entity_is_broadcast',
     'meta_has_seed', 'meta_type',
     'document_type',
 ]

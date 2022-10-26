@@ -64,7 +64,7 @@ class ID(Stringer, ABC):
 
     @property
     def type(self) -> int:
-        # return self.address.network
+        # return self.address.type
         raise NotImplemented
 
     @property

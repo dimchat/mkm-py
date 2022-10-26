@@ -32,7 +32,7 @@ from abc import ABC
 from typing import Optional, Union, Dict
 
 from ..types import ConstantString
-from ..protocol import NetworkType, network_is_user, network_is_group
+from ..protocol import EntityType
 from ..protocol import Address, AddressFactory
 
 
@@ -44,15 +44,15 @@ from ..protocol import Address, AddressFactory
 
 class BroadcastAddress(ConstantString, Address):
 
-    def __init__(self, address: str, network: Union[int, NetworkType]):
+    def __init__(self, address: str, network: Union[int, EntityType]):
         super().__init__(string=address)
-        if isinstance(network, NetworkType):
+        if isinstance(network, EntityType):
             network = network.value
-        self.__network = network
+        self.__type = network
 
     @property  # Override
-    def network(self) -> int:
-        return self.__network
+    def type(self) -> int:
+        return self.__type
 
     @property  # Override
     def is_broadcast(self) -> bool:
@@ -60,15 +60,15 @@ class BroadcastAddress(ConstantString, Address):
 
     @property  # Override
     def is_user(self) -> bool:
-        return network_is_user(network=self.network)
+        return self.type == EntityType.ANY
 
     @property  # Override
     def is_group(self) -> bool:
-        return network_is_group(network=self.network)
+        return self.type == EntityType.EVERY
 
 
-ANYWHERE = BroadcastAddress(address='anywhere', network=NetworkType.MAIN)
-EVERYWHERE = BroadcastAddress(address='everywhere', network=NetworkType.GROUP)
+ANYWHERE = BroadcastAddress(address='anywhere', network=EntityType.USER)
+EVERYWHERE = BroadcastAddress(address='everywhere', network=EntityType.GROUP)
 
 
 """

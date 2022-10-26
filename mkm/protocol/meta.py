@@ -108,9 +108,9 @@ class Meta(Mapper, ABC):
     @abstractmethod
     def generate_address(self, network: int) -> Optional[Address]:
         """
-        Generate Address with network type
+        Generate Address with network ID
 
-        :param network:  Address.network
+        :param network:  Address.type
         :return: Address
         """
         raise NotImplemented
@@ -140,8 +140,9 @@ class Meta(Mapper, ABC):
             # check ID.name
             if meta.seed == identifier.name:
                 # check ID.address
-                address = Address.generate(meta=meta, network=identifier.type)
-                return address == identifier.address
+                old = identifier.address
+                gen = Address.generate(meta=meta, network=old.type)
+                return old == gen
         elif key is not None:
             """ Check whether meta match with public key """
             if key == meta.key:

@@ -40,7 +40,7 @@ __all__ = [
     #
     #   Protocol
     #
-    'NetworkType', 'MetaType',
+    'EntityType', 'MetaType',
     'Address', 'AddressFactory',
     'ID', 'IDFactory',
     'Meta', 'MetaFactory',
