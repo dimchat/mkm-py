@@ -67,8 +67,8 @@ class BroadcastAddress(ConstantString, Address):
         return self.type == EntityType.EVERY
 
 
-ANYWHERE = BroadcastAddress(address='anywhere', network=EntityType.USER)
-EVERYWHERE = BroadcastAddress(address='everywhere', network=EntityType.GROUP)
+ANYWHERE = BroadcastAddress(address='anywhere', network=EntityType.ANY)
+EVERYWHERE = BroadcastAddress(address='everywhere', network=EntityType.EVERY)
 
 
 """
