@@ -51,33 +51,40 @@ class ID(Stringer, ABC):
     """
 
     @property
+    @abstractmethod
     def name(self) -> Optional[str]:
         raise NotImplemented
 
     @property
+    @abstractmethod
     def address(self) -> Address:
         raise NotImplemented
 
     @property
+    @abstractmethod
     def terminal(self) -> Optional[str]:
         raise NotImplemented
 
     @property
+    @abstractmethod
     def type(self) -> int:
         # return self.address.type
         raise NotImplemented
 
     @property
+    @abstractmethod
     def is_broadcast(self) -> bool:
         # return self.address.is_broadcast
         raise NotImplemented
 
     @property
+    @abstractmethod
     def is_user(self) -> bool:
         # return self.address.is_user
         raise NotImplemented
 
     @property
+    @abstractmethod
     def is_group(self) -> bool:
         # return self.address.is_group
         raise NotImplemented

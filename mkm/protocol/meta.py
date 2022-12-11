@@ -59,6 +59,7 @@ class Meta(Mapper, ABC):
     """
 
     @property
+    @abstractmethod
     def type(self) -> int:
         """
         Meta algorithm version
@@ -73,6 +74,7 @@ class Meta(Mapper, ABC):
         raise NotImplemented
 
     @property
+    @abstractmethod
     def key(self) -> VerifyKey:
         """
         Public key (used for signature)
@@ -85,6 +87,7 @@ class Meta(Mapper, ABC):
         raise NotImplemented
 
     @property
+    @abstractmethod
     def seed(self) -> Optional[str]:
         """
         Seed to generate fingerprint
@@ -94,6 +97,7 @@ class Meta(Mapper, ABC):
         raise NotImplemented
 
     @property
+    @abstractmethod
     def fingerprint(self) -> Optional[bytes]:
         """
         Fingerprint to verify ID and public key

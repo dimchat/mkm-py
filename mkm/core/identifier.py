@@ -28,13 +28,14 @@
 # SOFTWARE.
 # ==============================================================================
 
-from typing import Optional
+from typing import Optional, Tuple
 
 from ..types import ConstantString
 from ..protocol import ID, IDFactory
 from ..protocol import Address
 
 from .address import ANYWHERE, EVERYWHERE
+from .address import thanos
 
 
 class Identifier(ConstantString, ID):
@@ -80,6 +81,17 @@ class IdentifierFactory(IDFactory):
         super().__init__()
         self.__ids = {}
 
+    def reduce_memory(self) -> int:
+        """
+        Call it when received 'UIApplicationDidReceiveMemoryWarningNotification',
+        this will remove 50% of cached objects
+
+        :return: number of survivors
+        """
+        finger = 0
+        finger = thanos(self.__ids, finger)
+        return finger >> 1
+
     # Override
     def generate_identifier(self, meta, network: int, terminal: Optional[str]) -> ID:
         address = Address.generate(meta=meta, network=network)
@@ -91,7 +103,7 @@ class IdentifierFactory(IDFactory):
         identifier = concat(address=address, name=name, terminal=terminal)
         cid = self.__ids.get(identifier)
         if cid is None:
-            cid = Identifier(identifier=identifier, address=address, name=name, terminal=terminal)
+            cid = self._new_id(identifier=identifier, name=name, address=address, terminal=terminal)
             self.__ids[identifier] = cid
         return cid
 
@@ -99,13 +111,19 @@ class IdentifierFactory(IDFactory):
     def parse_identifier(self, identifier: str) -> Optional[ID]:
         cid = self.__ids.get(identifier)
         if cid is None:
-            cid = parse(string=identifier)
-            if cid is not None:
+            name, address, terminal = parse(string=identifier)
+            if address is not None:
+                cid = self._new_id(identifier=identifier, name=name, address=address, terminal=terminal)
                 self.__ids[identifier] = cid
         return cid
 
+    # noinspection PyMethodMayBeStatic
+    def _new_id(self, identifier: str, name: Optional[str], address: Address, terminal: Optional[str]):
+        # override for customized ID
+        return Identifier(identifier=identifier, name=name, address=address, terminal=terminal)
 
-def parse(string: str) -> Optional[ID]:
+
+def parse(string: str) -> Tuple[Optional[str], Optional[Address], Optional[str]]:
     # split ID string
     pair = string.split('/', 1)
     # terminal
@@ -126,8 +144,7 @@ def parse(string: str) -> Optional[ID]:
         # got name & address
         name = pair[0]
         address = Address.parse(address=pair[1])
-    if address is not None:
-        return Identifier(identifier=string, address=address, name=name, terminal=terminal)
+    return name, address, terminal
 
 
 def concat(address: Address, name: Optional[str] = None, terminal: Optional[str] = None) -> str:

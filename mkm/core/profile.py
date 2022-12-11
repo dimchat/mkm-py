@@ -110,7 +110,7 @@ class BaseDocument(Dictionary, Document):
             self.__identifier = document_identifier(document=self.dictionary)
         return self.__identifier
 
-    @property
+    @property  # private
     def data(self) -> Optional[str]:
         """
         Get serialized properties
@@ -121,7 +121,7 @@ class BaseDocument(Dictionary, Document):
             self.__data = self.get('data')
         return self.__data
 
-    @property
+    @property  # private
     def signature(self) -> Optional[bytes]:
         """
         Get signature for serialized properties

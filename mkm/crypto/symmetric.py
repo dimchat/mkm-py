@@ -47,12 +47,6 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
     AES = 'AES'
     DES = 'DES'
 
-    def __eq__(self, other) -> bool:
-        if self is other:
-            return True
-        if isinstance(other, SymmetricKey):
-            return self.match(key=other)
-
     #
     #  Factory methods
     #

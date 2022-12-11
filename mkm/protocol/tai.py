@@ -46,6 +46,7 @@ class TAI(ABC):
     """
 
     @property
+    @abstractmethod
     def valid(self) -> bool:
         """
         Check if signature matched
@@ -83,6 +84,7 @@ class TAI(ABC):
     #
 
     @property
+    @abstractmethod
     def properties(self) -> Optional[Dict[str, Any]]:
         """
         Get all properties when valid

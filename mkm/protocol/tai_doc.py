@@ -48,6 +48,7 @@ class Document(TAI, Mapper, ABC):
     BULLETIN = 'bulletin'  # for group info
 
     @property
+    @abstractmethod
     def type(self) -> str:
         """
         Get document type
@@ -57,6 +58,7 @@ class Document(TAI, Mapper, ABC):
         raise NotImplemented
 
     @property
+    @abstractmethod
     def identifier(self) -> ID:
         """
         Get entity ID
@@ -66,6 +68,7 @@ class Document(TAI, Mapper, ABC):
         raise NotImplemented
 
     @property
+    @abstractmethod
     def time(self) -> float:
         """
         Get sign time
@@ -78,6 +81,7 @@ class Document(TAI, Mapper, ABC):
     #  properties getter/setter
     #
     @property
+    @abstractmethod
     def name(self) -> str:
         """
         Get entity name
@@ -87,6 +91,7 @@ class Document(TAI, Mapper, ABC):
         raise NotImplemented
 
     @name.setter
+    @abstractmethod
     def name(self, string: str):
         """
         Set entity name

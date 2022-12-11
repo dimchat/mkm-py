@@ -34,6 +34,7 @@ from .identifier import IdentifierFactory, Identifier
 from .identifier import ANYONE, EVERYONE, FOUNDER
 from .meta import BaseMeta
 from .profile import BaseDocument, BaseVisa, BaseBulletin
+from .profile import document_identifier
 
 __all__ = [
 
@@ -42,4 +43,6 @@ __all__ = [
     'ANYWHERE', 'EVERYWHERE', 'ANYONE', 'EVERYONE', 'FOUNDER',
     'BaseMeta',
     'BaseDocument', 'BaseVisa', 'BaseBulletin',
+
+    'document_identifier',
 ]

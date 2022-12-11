@@ -49,6 +49,7 @@ class Stringer(ABC):
         return NotImplemented
 
     @property
+    @abstractmethod
     def string(self) -> str:
         """ get inner string """
         return NotImplemented
@@ -61,6 +62,7 @@ class Mapper(MutableMapping[str, Any], ABC):
     """
 
     @property
+    @abstractmethod
     def dictionary(self) -> Dict[str, Any]:
         """ get inner map """
         raise NotImplemented

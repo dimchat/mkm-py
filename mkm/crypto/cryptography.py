@@ -43,6 +43,7 @@ class CryptographyKey(Mapper, ABC):
     """
 
     @property
+    @abstractmethod
     def algorithm(self) -> str:
         """
         Get key algorithm name
@@ -52,6 +53,7 @@ class CryptographyKey(Mapper, ABC):
         raise NotImplemented
 
     @property
+    @abstractmethod
     def data(self) -> bytes:
         """
         Get key data
@@ -88,6 +90,7 @@ class DecryptKey(CryptographyKey, ABC):
         """
         raise NotImplemented
 
+    @abstractmethod
     def match(self, key: EncryptKey) -> bool:
         """
         OK = decrypt(encrypt(data, SK), PK) == data
@@ -95,15 +98,19 @@ class DecryptKey(CryptographyKey, ABC):
         :param key: encrypt key
         :return:    False on error
         """
-        return keys_match(encrypt_key=key, decrypt_key=self)
+        raise NotImplemented
 
 
 def key_algorithm(key: Dict[str, Any]) -> str:
     return key.get('algorithm')
 
 
+# sample data for checking keys
 promise = 'Moky loves May Lee forever!'.encode('utf-8')
 
 
 def keys_match(encrypt_key: EncryptKey, decrypt_key: DecryptKey) -> bool:
-    return decrypt_key.decrypt(encrypt_key.encrypt(promise)) == promise
+    """ check by encryption """
+    ciphertext = encrypt_key.encrypt(data=promise)
+    plaintext = decrypt_key.decrypt(data=ciphertext)
+    return plaintext == promise

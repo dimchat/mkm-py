@@ -46,15 +46,8 @@ class PrivateKey(SignKey, ABC):
         }
     """
 
-    def __eq__(self, other) -> bool:
-        if self is other:
-            return True
-        if isinstance(other, SignKey):
-            verify_key = self.public_key
-            if verify_key is not None:
-                return verify_key.match(key=other)
-
     @property
+    @abstractmethod
     def public_key(self) -> Optional[PublicKey]:
         """
         Get public key from private key

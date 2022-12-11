@@ -60,6 +60,7 @@ class VerifyKey(AsymmetricKey, ABC):
         """
         raise NotImplemented
 
+    @abstractmethod
     def match(self, key: SignKey) -> bool:
         """
         OK = verify(data, sign(data, SK), PK)
@@ -67,7 +68,7 @@ class VerifyKey(AsymmetricKey, ABC):
         :param key: private key
         :return:    True on signature matched
         """
-        return asymmetric_keys_match(sign_key=key, verify_key=self)
+        raise NotImplemented
 
 
 def asymmetric_keys_match(sign_key: SignKey, verify_key: VerifyKey) -> bool:

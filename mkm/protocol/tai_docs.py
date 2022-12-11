@@ -28,7 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Optional, Union, List
 
 from ..crypto import EncryptKey, VerifyKey
@@ -46,6 +46,7 @@ class Visa(Document, ABC):
     """
 
     @property
+    @abstractmethod
     def key(self) -> Union[EncryptKey, VerifyKey, None]:
         """
         Get public key to encrypt message for user
@@ -55,6 +56,7 @@ class Visa(Document, ABC):
         raise NotImplemented
 
     @key.setter
+    @abstractmethod
     def key(self, value: Union[EncryptKey, VerifyKey]):
         """
         Set public key for other user to encrypt message
@@ -64,22 +66,24 @@ class Visa(Document, ABC):
         raise NotImplemented
 
     @property
+    @abstractmethod
     def avatar(self) -> Optional[str]:
         """
         Get avatar URL
 
         :return: URL string
         """
-        return None
+        raise NotImplemented
 
     @avatar.setter
+    @abstractmethod
     def avatar(self, url: str):
         """
         Set avatar URL
 
         :param url: URL string
         """
-        pass
+        raise NotImplemented
 
 
 class Bulletin(Document, ABC):
@@ -89,6 +93,7 @@ class Bulletin(Document, ABC):
     """
 
     @property
+    @abstractmethod
     def assistants(self) -> Optional[List[ID]]:
         """
         Get group assistants
@@ -98,6 +103,7 @@ class Bulletin(Document, ABC):
         raise NotImplemented
 
     @assistants.setter
+    @abstractmethod
     def assistants(self, bots: List[ID]):
         """
         Set group assistants

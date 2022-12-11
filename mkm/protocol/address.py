@@ -47,6 +47,7 @@ class Address(Stringer, ABC):
     """
 
     @property
+    @abstractmethod
     def type(self) -> int:
         """
         Get network ID for address
@@ -56,16 +57,19 @@ class Address(Stringer, ABC):
         raise NotImplemented
 
     @property
+    @abstractmethod
     def is_broadcast(self) -> bool:
         # return isinstance(self, BroadcastAddress)
         raise NotImplemented
 
     @property
+    @abstractmethod
     def is_user(self) -> bool:
         # return entity_is_user(network=self.type)
         raise NotImplemented
 
     @property
+    @abstractmethod
     def is_group(self) -> bool:
         # return entity_is_group(network=self.type)
         raise NotImplemented
