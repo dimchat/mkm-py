@@ -134,8 +134,10 @@ class Dictionary(Mapper):
         """ Return self==value. """
         if isinstance(o, Mapper):
             if self is o:
+                # same object
                 return True
             o = o.dictionary
+        # check inner map
         return self.__dictionary.__eq__(o)
 
     # def __getattribute__(self, name: str) -> Any:
@@ -176,8 +178,10 @@ class Dictionary(Mapper):
         """ Return self!=value. """
         if isinstance(o, Mapper):
             if self is o:
+                # same object
                 return False
             o = o.dictionary
+        # check inner map
         return self.__dictionary.__ne__(o)
 
     def __repr__(self) -> str:

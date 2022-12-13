@@ -56,19 +56,23 @@ class ConstantString(Stringer):
     # Override
     def __eq__(self, x: str) -> bool:
         """ Return self==value. """
-        if self is x:
-            return True
         if isinstance(x, Stringer):
+            if self is x:
+                # same object
+                return True
             x = x.string
+        # check inner string
         return self.__string.__eq__(x)
 
     # Override
     def __ne__(self, x: str) -> bool:
         """ Return self!=value. """
-        if self is x:
-            return False
         if isinstance(x, Stringer):
+            if self is x:
+                # same object
+                return False
             x = x.string
+        # check inner string
         return self.__string.__ne__(x)
 
     # Override

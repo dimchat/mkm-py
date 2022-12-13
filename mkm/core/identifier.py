@@ -118,7 +118,7 @@ class IdentifierFactory(IDFactory):
         return cid
 
     # noinspection PyMethodMayBeStatic
-    def _new_id(self, identifier: str, name: Optional[str], address: Address, terminal: Optional[str]):
+    def _new_id(self, identifier: str, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
         # override for customized ID
         return Identifier(identifier=identifier, name=name, address=address, terminal=terminal)
 
