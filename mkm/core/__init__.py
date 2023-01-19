@@ -28,21 +28,15 @@
 # SOFTWARE.
 # ==============================================================================
 
-from .address import BaseAddressFactory, BroadcastAddress
+from .address import BroadcastAddress
 from .address import ANYWHERE, EVERYWHERE
-from .identifier import IdentifierFactory, Identifier
+from .identifier import Identifier
 from .identifier import ANYONE, EVERYONE, FOUNDER
-from .meta import BaseMeta
-from .profile import BaseDocument, BaseVisa, BaseBulletin
-from .profile import document_identifier
 
 __all__ = [
 
-    'BaseAddressFactory', 'BroadcastAddress',
-    'IdentifierFactory', 'Identifier',
-    'ANYWHERE', 'EVERYWHERE', 'ANYONE', 'EVERYONE', 'FOUNDER',
-    'BaseMeta',
-    'BaseDocument', 'BaseVisa', 'BaseBulletin',
+    'BroadcastAddress',
+    'Identifier',
 
-    'document_identifier',
+    'ANYWHERE', 'EVERYWHERE', 'ANYONE', 'EVERYONE', 'FOUNDER',
 ]

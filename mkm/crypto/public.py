@@ -26,9 +26,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Any, Dict
 
-from ..types import Wrapper
-from .factories import Factories
-from .cryptography import key_algorithm
 from .asymmetric import VerifyKey
 
 
@@ -51,26 +48,23 @@ class PublicKey(VerifyKey, ABC):
 
     @classmethod
     def parse(cls, key: Any):  # -> Optional[PublicKey]:
-        if key is None:
-            return None
-        elif isinstance(key, PublicKey):
-            return key
-        info = Wrapper.get_dictionary(key)
-        # assert info is not None, 'key error: %s' % key
-        algorithm = key_algorithm(key=info)
-        factory = cls.factory(algorithm=algorithm)
-        if factory is None:
-            factory = cls.factory(algorithm='*')  # unknown
-        # assert isinstance(factory, PublicKeyFactory), 'key algorithm not support: %s' % algorithm
-        return factory.parse_public_key(key=info)
+        gf = general_factory()
+        return gf.parse_public_key(key=key)
 
     @classmethod
     def factory(cls, algorithm: str):  # -> Optional[PublicKeyFactory]:
-        return Factories.public_key_factories.get(algorithm)
+        gf = general_factory()
+        return gf.get_public_key_factory(algorithm=algorithm)
 
     @classmethod
     def register(cls, algorithm: str, factory):
-        Factories.public_key_factories[algorithm] = factory
+        gf = general_factory()
+        gf.set_public_key_factory(algorithm=algorithm, factory=factory)
+
+
+def general_factory():
+    from .factory import FactoryManager
+    return FactoryManager.general_factory
 
 
 class PublicKeyFactory(ABC):

@@ -31,9 +31,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
-from ..types import Stringer, Wrapper
-
-from .factories import Factories
+from ..types import Stringer
 
 
 class Address(Stringer, ABC):
@@ -79,36 +77,34 @@ class Address(Stringer, ABC):
     #
 
     @classmethod
-    def generate(cls, meta, network: int):  # -> Address:
-        factory = cls.factory()
-        # assert isinstance(factory, AddressFactory), 'address factory error: %s' % factory
-        return factory.generate_address(meta=meta, network=network)
+    def generate(cls, meta, network: int):  # -> Optional[Address]:
+        gf = general_factory()
+        return gf.generate_address(meta=meta, network=network)
 
     @classmethod
-    def create(cls, address: str):  # -> Address:
-        factory = cls.factory()
-        # assert isinstance(factory, AddressFactory), 'address factory error: %s' % factory
-        return factory.create_address(address=address)
+    def create(cls, address: str):  # -> Optional[Address]:
+        gf = general_factory()
+        return gf.create_address(address=address)
 
     @classmethod
     def parse(cls, address: Any):  # -> Optional[Address]:
-        if address is None:
-            return None
-        elif isinstance(address, Address):
-            return address
-        string = Wrapper.get_string(address)
-        # assert string is not None, 'address error: %s' % address
-        factory = cls.factory()
-        # assert factory is not None, 'address factory error: %s' % factory
-        return factory.parse_address(address=string)
+        gf = general_factory()
+        return gf.parse_address(address=address)
 
     @classmethod
-    def factory(cls):  # -> AddressFactory:
-        return Factories.address_factory
+    def factory(cls):  # -> Optional[AddressFactory]:
+        gf = general_factory()
+        return gf.get_address_factory()
 
     @classmethod
     def register(cls, factory):
-        Factories.address_factory = factory
+        gf = general_factory()
+        gf.set_address_factory(factory=factory)
+
+
+def general_factory():
+    from ..core.factory import FactoryManager
+    return FactoryManager.general_factory
 
 
 class AddressFactory(ABC):

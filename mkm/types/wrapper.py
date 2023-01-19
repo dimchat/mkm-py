@@ -61,6 +61,34 @@ class Mapper(MutableMapping[str, Any], ABC):
         ~~~~~~~~~~~~~~~~~~~
     """
 
+    @abstractmethod
+    def get_str(self, key: str, default: Optional[str] = None) -> Optional[str]:
+        raise NotImplemented
+
+    @abstractmethod
+    def get_bool(self, key: str, default: bool = False) -> bool:
+        raise NotImplemented
+
+    @abstractmethod
+    def get_int(self, key: str, default: int = 0) -> int:
+        raise NotImplemented
+
+    @abstractmethod
+    def get_float(self, key: str, default: float = 0.0) -> float:
+        raise NotImplemented
+
+    # @abstractmethod
+    # def get_time(self, key: str, default: float = 0.0) -> float:
+    #     raise NotImplemented
+    #
+    # @abstractmethod
+    # def set_string(self, string: Stringer):
+    #     raise NotImplemented
+    #
+    # @abstractmethod
+    # def set_map(self, dictionary: Mapper):
+    #     raise NotImplemented
+
     @property
     @abstractmethod
     def dictionary(self) -> Dict[str, Any]:

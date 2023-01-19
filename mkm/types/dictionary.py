@@ -74,6 +74,22 @@ class Dictionary(Mapper):
         return Dictionary(dictionary=dictionary)
 
     # Override
+    def get_str(self, key: str, default: Optional[str] = None) -> Optional[str]:
+        return self.__dictionary.get(key, default)
+
+    # Override
+    def get_bool(self, key: str, default: bool = False) -> bool:
+        return self.__dictionary.get(key, default)
+
+    # Override
+    def get_int(self, key: str, default: int = 0) -> int:
+        return self.__dictionary.get(key, default)
+
+    # Override
+    def get_float(self, key: str, default: float = 0.0) -> float:
+        return self.__dictionary.get(key, default)
+
+    # Override
     def get(self, k: str, default: Optional[Any] = None) -> Optional[Any]:
         """ Return the value for key if key is in the dictionary, else default. """
         return self.__dictionary.get(k, default)

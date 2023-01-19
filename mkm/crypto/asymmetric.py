@@ -25,7 +25,7 @@
 
 from abc import ABC, abstractmethod
 
-from .cryptography import CryptographyKey, promise
+from .cryptography import CryptographyKey
 
 
 class AsymmetricKey(CryptographyKey, ABC):
@@ -69,9 +69,3 @@ class VerifyKey(AsymmetricKey, ABC):
         :return:    True on signature matched
         """
         raise NotImplemented
-
-
-def asymmetric_keys_match(sign_key: SignKey, verify_key: VerifyKey) -> bool:
-    # try to verify with signature
-    signature = sign_key.sign(data=promise)
-    return verify_key.verify(data=promise, signature=signature)

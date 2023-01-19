@@ -28,19 +28,17 @@
 # SOFTWARE.
 # ==============================================================================
 
-from typing import Optional, Tuple
+from typing import Optional
 
 from ..types import ConstantString
-from ..protocol import ID, IDFactory
-from ..protocol import Address
+from ..protocol import ID, Address
 
 from .address import ANYWHERE, EVERYWHERE
-from .address import thanos
 
 
 class Identifier(ConstantString, ID):
 
-    def __init__(self, identifier: str, name: Optional[str], address: Address, terminal: Optional[str]):
+    def __init__(self, identifier: str, name: Optional[str], address: Address, terminal: Optional[str] = None):
         super().__init__(string=identifier)
         self.__name = name
         self.__address = address
@@ -75,98 +73,13 @@ class Identifier(ConstantString, ID):
         return self.address.is_group
 
 
-class IdentifierFactory(IDFactory):
-
-    def __init__(self):
-        super().__init__()
-        self.__ids = {}
-
-    def reduce_memory(self) -> int:
-        """
-        Call it when received 'UIApplicationDidReceiveMemoryWarningNotification',
-        this will remove 50% of cached objects
-
-        :return: number of survivors
-        """
-        finger = 0
-        finger = thanos(self.__ids, finger)
-        return finger >> 1
-
-    # Override
-    def generate_identifier(self, meta, network: int, terminal: Optional[str]) -> ID:
-        address = Address.generate(meta=meta, network=network)
-        assert address is not None, 'failed to generate ID with meta: %s' % meta
-        return ID.create(address=address, name=meta.seed, terminal=terminal)
-
-    # Override
-    def create_identifier(self, address: Address, name: Optional[str] = None, terminal: Optional[str] = None) -> ID:
-        identifier = concat(address=address, name=name, terminal=terminal)
-        cid = self.__ids.get(identifier)
-        if cid is None:
-            cid = self._new_id(identifier=identifier, name=name, address=address, terminal=terminal)
-            self.__ids[identifier] = cid
-        return cid
-
-    # Override
-    def parse_identifier(self, identifier: str) -> Optional[ID]:
-        cid = self.__ids.get(identifier)
-        if cid is None:
-            name, address, terminal = parse(string=identifier)
-            if address is not None:
-                cid = self._new_id(identifier=identifier, name=name, address=address, terminal=terminal)
-                self.__ids[identifier] = cid
-        return cid
-
-    # noinspection PyMethodMayBeStatic
-    def _new_id(self, identifier: str, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
-        # override for customized ID
-        return Identifier(identifier=identifier, name=name, address=address, terminal=terminal)
-
-
-def parse(string: str) -> Tuple[Optional[str], Optional[Address], Optional[str]]:
-    # split ID string
-    pair = string.split('/', 1)
-    # terminal
-    if len(pair) == 1:
-        # no terminal
-        terminal = None
-    else:
-        # got terminal
-        terminal = pair[1]
-    # name @ address
-    assert len(pair[0]) > 0, 'ID error: %s' % string
-    pair = pair[0].split('@', 1)
-    if len(pair) == 1:
-        # got address without name
-        name = None
-        address = Address.parse(address=pair[0])
-    else:
-        # got name & address
-        name = pair[0]
-        address = Address.parse(address=pair[1])
-    return name, address, terminal
-
-
-def concat(address: Address, name: Optional[str] = None, terminal: Optional[str] = None) -> str:
-    string = str(address)
-    if name is not None and len(name) > 0:
-        string = name + '@' + string
-    if terminal is not None and len(terminal) > 0:
-        string = string + '/' + terminal
-    return string
-
-
-# register ID factory
-ID.register(factory=IdentifierFactory())
-
-
 """
     ID for Broadcast
     ~~~~~~~~~~~~~~~~
 """
 
-ANYONE = ID.create(name='anyone', address=ANYWHERE)
-EVERYONE = ID.create(name='everyone', address=EVERYWHERE)
+ANYONE = Identifier(identifier='anyone@anywhere', name='anyone', address=ANYWHERE)
+EVERYONE = Identifier(identifier='everyone@everywhere', name='everyone', address=EVERYWHERE)
 
 # DIM Founder
-FOUNDER = ID.create(name='moky', address=ANYWHERE)
+FOUNDER = Identifier(identifier='moky@anywhere', name='moky', address=ANYWHERE)

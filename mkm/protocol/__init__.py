@@ -32,8 +32,8 @@ from .network import EntityType, entity_is_user, entity_is_group, entity_is_broa
 from .version import MetaType, meta_has_seed
 from .address import Address, AddressFactory
 from .identifier import ID, IDFactory
-from .meta import Meta, MetaFactory, meta_type
-from .tai_doc import Document, DocumentFactory, document_type
+from .meta import Meta, MetaFactory
+from .tai_doc import Document, DocumentFactory
 from .tai_docs import Visa, Bulletin
 
 __all__ = [
@@ -48,6 +48,5 @@ __all__ = [
     'Visa', 'Bulletin',
 
     'entity_is_user', 'entity_is_group', 'entity_is_broadcast',
-    'meta_has_seed', 'meta_type',
-    'document_type',
+    'meta_has_seed',
 ]

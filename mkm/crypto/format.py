@@ -30,8 +30,6 @@
     Base64, Base58, Hex, UTF-8, JsON
 """
 
-import base64
-import json
 from abc import ABC, abstractmethod
 from typing import Optional, Union, Any, Dict, List
 
@@ -129,9 +127,9 @@ class StringCoder(ABC):
         raise NotImplemented
 
 
-"""
-    Interfaces
-"""
+#
+#   Interfaces
+#
 
 
 def base64_encode(data: bytes) -> str:
@@ -174,44 +172,13 @@ def utf8_decode(data: bytes) -> Optional[str]:
     return UTF8.decode(data=data)
 
 
-"""
-    Implementations
-    ~~~~~~~~~~~~~~~
-    
-    Data coders
-"""
-
-
-class B64(DataCoder):
-
-    # Override
-    def encode(self, data: bytes) -> str:
-        """ BASE-64 Encode """
-        return base64.b64encode(data).decode('utf-8')
-
-    # Override
-    def decode(self, string: str) -> Optional[bytes]:
-        """ BASE-64 Decode """
-        return base64.b64decode(string)
-
-
-class H(DataCoder):
-
-    # Override
-    def encode(self, data: bytes) -> str:
-        """ HEX Encode """
-        # return binascii.b2a_hex(data).decode('utf-8')
-        return data.hex()
-
-    # Override
-    def decode(self, string: str) -> Optional[bytes]:
-        """ HEX Decode """
-        # return binascii.a2b_hex(string)
-        return bytes.fromhex(string)
+#
+#   Singleton
+#
 
 
 class Base64:
-    coder: DataCoder = B64()
+    coder: DataCoder = None
 
     @staticmethod
     def encode(data: bytes) -> str:
@@ -239,7 +206,7 @@ class Base58:
 
 
 class Hex:
-    coder: DataCoder = H()
+    coder: DataCoder = None
 
     @staticmethod
     def encode(data: bytes) -> str:
@@ -252,42 +219,8 @@ class Hex:
         return Hex.coder.decode(string=string)
 
 
-"""
-    Implementations
-    ~~~~~~~~~~~~~~~
-
-    Data parsers
-"""
-
-
-class J(ObjectCoder):
-
-    # Override
-    def encode(self, obj: Any) -> str:
-        """ JsON encode """
-        return json.dumps(obj)
-
-    # Override
-    def decode(self, string: str) -> Optional[Any]:
-        """ JsON decode """
-        return json.loads(string)
-
-
-class U(StringCoder):
-
-    # Override
-    def encode(self, string: str) -> bytes:
-        """ UTF-8 encode """
-        return string.encode('utf-8')
-
-    # Override
-    def decode(self, data: bytes) -> Optional[str]:
-        """ UTF-8 decode """
-        return data.decode('utf-8')
-
-
 class JSON:
-    coder: ObjectCoder = J()
+    coder: ObjectCoder = None
 
     @staticmethod
     def encode(obj: Any) -> str:
@@ -301,7 +234,7 @@ class JSON:
 
 
 class UTF8:
-    coder: StringCoder = U()
+    coder: StringCoder = None
 
     @staticmethod
     def encode(string: str) -> bytes:

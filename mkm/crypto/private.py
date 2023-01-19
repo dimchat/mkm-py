@@ -26,9 +26,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Any, Dict
 
-from ..types import Wrapper
-from .factories import Factories
-from .cryptography import key_algorithm
 from .asymmetric import SignKey
 from .public import PublicKey
 
@@ -62,32 +59,28 @@ class PrivateKey(SignKey, ABC):
 
     @classmethod
     def generate(cls, algorithm: str):  # -> Optional[PrivateKey]:
-        factory = cls.factory(algorithm=algorithm)
-        assert isinstance(factory, PrivateKeyFactory), 'key algorithm not support: %s' % algorithm
-        return factory.generate_private_key()
+        gf = general_factory()
+        return gf.generate_private_key(algorithm=algorithm)
 
     @classmethod
     def parse(cls, key: Any):  # -> Optional[PrivateKey]:
-        if key is None:
-            return None
-        elif isinstance(key, PrivateKey):
-            return key
-        info = Wrapper.get_dictionary(key)
-        # assert info is not None, 'key error: %s' % key
-        algorithm = key_algorithm(key=info)
-        factory = cls.factory(algorithm=algorithm)
-        if factory is None:
-            factory = cls.factory(algorithm='*')  # unknown
-        # assert isinstance(factory, PrivateKeyFactory), 'key algorithm not support: %s' % algorithm
-        return factory.parse_private_key(key=info)
+        gf = general_factory()
+        return gf.parse_private_key(key=key)
 
     @classmethod
     def factory(cls, algorithm: str):  # -> Optional[PrivateKeyFactory]:
-        return Factories.private_key_factories.get(algorithm)
+        gf = general_factory()
+        return gf.get_private_key_factory(algorithm=algorithm)
 
     @classmethod
     def register(cls, algorithm: str, factory):
-        Factories.private_key_factories[algorithm] = factory
+        gf = general_factory()
+        gf.set_private_key_factory(algorithm=algorithm, factory=factory)
+
+
+def general_factory():
+    from .factory import FactoryManager
+    return FactoryManager.general_factory
 
 
 class PrivateKeyFactory(ABC):

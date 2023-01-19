@@ -31,9 +31,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Union, Any, Dict
 
-from ..types import Mapper, Wrapper
+from ..types import Mapper
 
-from .factories import Factories
 from .identifier import ID
 from .tai import TAI
 
@@ -106,37 +105,30 @@ class Document(TAI, Mapper, ABC):
     #
 
     @classmethod
-    def create(cls, doc_type: str, identifier: ID, data: Optional[str] = None, signature: Union[bytes, str] = None):
-        factory = cls.factory(doc_type=doc_type)
-        assert isinstance(factory, DocumentFactory), 'doc_type not support: %s, %s' % (doc_type, factory)
-        return factory.create_document(identifier=identifier, data=data, signature=signature)
+    def create(cls, doc_type: str, identifier: ID,
+               data: Optional[str] = None, signature: Union[bytes, str] = None):  # -> Document:
+        gf = general_factory()
+        return gf.create_document(doc_type=doc_type, identifier=identifier, data=data, signature=signature)
 
     @classmethod
     def parse(cls, document: Any):  # -> Optional[Document]:
-        if document is None:
-            return None
-        elif isinstance(document, Document):
-            return document
-        info = Wrapper.get_dictionary(document)
-        # assert info is not None, 'document error: %s' % key
-        doc_type = document_type(document=info)
-        factory = cls.factory(doc_type=doc_type)
-        if factory is None:
-            factory = cls.factory(doc_type='*')  # unknown
-        # assert isinstance(factory, DocumentFactory), 'document factory error: %s' % factory
-        return factory.parse_document(document=info)
+        gf = general_factory()
+        return gf.parse_document(document=document)
 
     @classmethod
     def register(cls, doc_type: str, factory):
-        Factories.document_factories[doc_type] = factory
+        gf = general_factory()
+        gf.set_document_factory(doc_type=doc_type, factory=factory)
 
     @classmethod
     def factory(cls, doc_type: str):  # -> Optional[DocumentFactory]:
-        return Factories.document_factories.get(doc_type)
+        gf = general_factory()
+        return gf.get_document_factory(doc_type=doc_type)
 
 
-def document_type(document: Dict[str, Any]) -> str:
-    return document.get('type')
+def general_factory():
+    from ..core.factory import FactoryManager
+    return FactoryManager.general_factory
 
 
 class DocumentFactory(ABC):

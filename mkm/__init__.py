@@ -50,9 +50,7 @@ __all__ = [
     #
     #   Core
     #
-    'BaseAddressFactory', 'BroadcastAddress',
-    'IdentifierFactory', 'Identifier',
+    'BroadcastAddress',
+    'Identifier',
     'ANYWHERE', 'EVERYWHERE', 'ANYONE', 'EVERYONE', 'FOUNDER',
-    'BaseMeta',
-    'BaseDocument', 'BaseVisa', 'BaseBulletin',
 ]

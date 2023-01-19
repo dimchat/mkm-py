@@ -28,12 +28,11 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABC
-from typing import Optional, Union, Dict
+from typing import Union
 
 from ..types import ConstantString
 from ..protocol import EntityType
-from ..protocol import Address, AddressFactory
+from ..protocol import Address
 
 
 """
@@ -69,60 +68,3 @@ class BroadcastAddress(ConstantString, Address):
 
 ANYWHERE = BroadcastAddress(address='anywhere', network=EntityType.ANY)
 EVERYWHERE = BroadcastAddress(address='everywhere', network=EntityType.EVERY)
-
-
-"""
-    Base Address Factory
-    ~~~~~~~~~~~~~~~~~~~~
-    
-    abstractmethod:
-        - create_address(address)
-"""
-
-
-class BaseAddressFactory(AddressFactory, ABC):
-
-    def __init__(self):
-        super().__init__()
-        # cache broadcast addresses
-        self.__addresses: Dict[str, Address] = {
-            str(ANYWHERE): ANYWHERE,
-            str(EVERYWHERE): EVERYWHERE,
-        }
-
-    # Override
-    def generate_address(self, meta, network: int) -> Optional[Address]:
-        address = meta.generate_address(network=network)
-        if address is not None:
-            self.__addresses[str(address)] = address
-        return address
-
-    # Override
-    def parse_address(self, address: str) -> Optional[Address]:
-        add = self.__addresses.get(address)
-        if add is None:
-            add = Address.create(address=address)
-            if add is not None:
-                self.__addresses[address] = add
-        return add
-
-    def reduce_memory(self) -> int:
-        """
-        Call it when received 'UIApplicationDidReceiveMemoryWarningNotification',
-        this will remove 50% of cached objects
-
-        :return: number of survivors
-        """
-        finger = 0
-        finger = thanos(self.__addresses, finger)
-        return finger >> 1
-
-
-def thanos(planet: dict, finger: int) -> int:
-    """ Thanos can kill half lives of a world with a snap of the finger """
-    people = planet.keys()
-    for anybody in people:
-        if (++finger & 1) == 1:
-            # kill it
-            planet.pop(anybody)
-    return finger

@@ -24,7 +24,7 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any, Dict
+from typing import Optional
 
 from ..types import Mapper
 
@@ -99,18 +99,3 @@ class DecryptKey(CryptographyKey, ABC):
         :return:    False on error
         """
         raise NotImplemented
-
-
-def key_algorithm(key: Dict[str, Any]) -> str:
-    return key.get('algorithm')
-
-
-# sample data for checking keys
-promise = 'Moky loves May Lee forever!'.encode('utf-8')
-
-
-def keys_match(encrypt_key: EncryptKey, decrypt_key: DecryptKey) -> bool:
-    """ check by encryption """
-    ciphertext = encrypt_key.encrypt(data=promise)
-    plaintext = decrypt_key.decrypt(data=ciphertext)
-    return plaintext == promise
