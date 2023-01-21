@@ -30,8 +30,8 @@
 
 from typing import Optional
 
-from ..types import ConstantString
-from ..protocol import ID, Address
+from .types import ConstantString
+from .protocol import ID, Address
 
 from .address import ANYWHERE, EVERYWHERE
 

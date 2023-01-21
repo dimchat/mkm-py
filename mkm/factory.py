@@ -30,14 +30,14 @@
 
 from typing import Optional, Union, Any, List, Dict
 
-from ..types import Wrapper
-from ..crypto import SignKey, VerifyKey
-from ..crypto import utf8_encode
-from ..protocol import Address, AddressFactory
-from ..protocol import ID, IDFactory
-from ..protocol import Meta, MetaType, MetaFactory
-from ..protocol import meta_has_seed
-from ..protocol import Document, DocumentFactory
+from .types import Wrapper
+from .crypto import SignKey, VerifyKey
+from .crypto import utf8_encode
+from .protocol import Address, AddressFactory
+from .protocol import ID, IDFactory
+from .protocol import Meta, MetaType, MetaFactory
+from .protocol import meta_has_seed
+from .protocol import Document, DocumentFactory
 
 
 class GeneralFactory:
@@ -162,8 +162,8 @@ class GeneralFactory:
     def get_meta_type(self, meta: Dict[str, Any]) -> int:
         """ get meta type(version) """
         version = meta.get('type')
-        if version is None:
-            version = meta.get('version')
+        # if version is None:
+        #     version = meta.get('version')
         return 0 if version is None else int(version)
 
     # noinspection PyMethodMayBeStatic

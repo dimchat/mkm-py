@@ -75,24 +75,44 @@ class Dictionary(Mapper):
 
     # Override
     def get_str(self, key: str, default: Optional[str] = None) -> Optional[str]:
-        return self.__dictionary.get(key, default)
+        value = self.__dictionary.get(key, default)
+        if value is None:
+            return None
+        elif isinstance(value, str):
+            return value
+        return str(value)
 
     # Override
     def get_bool(self, key: str, default: bool = False) -> bool:
-        return self.__dictionary.get(key, default)
+        value = self.__dictionary.get(key, default)
+        if value is None:
+            return False
+        elif isinstance(value, bool):
+            return value
+        return bool(value)
 
     # Override
     def get_int(self, key: str, default: int = 0) -> int:
-        return self.__dictionary.get(key, default)
+        value = self.__dictionary.get(key, default)
+        if value is None:
+            return 0
+        elif isinstance(value, int):
+            return value
+        return int(value)
 
     # Override
     def get_float(self, key: str, default: float = 0.0) -> float:
-        return self.__dictionary.get(key, default)
+        value = self.__dictionary.get(key, default)
+        if value is None:
+            return 0.0
+        elif isinstance(value, float):
+            return value
+        return float(value)
 
     # Override
-    def get(self, k: str, default: Optional[Any] = None) -> Optional[Any]:
+    def get(self, key: str, default: Optional[Any] = None) -> Optional[Any]:
         """ Return the value for key if key is in the dictionary, else default. """
-        return self.__dictionary.get(k, default)
+        return self.__dictionary.get(key, default)
 
     # Override
     def items(self) -> ItemsView[str, Any]:
@@ -105,12 +125,12 @@ class Dictionary(Mapper):
         return self.__dictionary.keys()
 
     # Override
-    def pop(self, k: str, default: Optional[Any] = None) -> Optional[Any]:
+    def pop(self, key: str, default: Optional[Any] = None) -> Optional[Any]:
         """
         D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
         If key is not found, d is returned if given, otherwise KeyError is raised
         """
-        return self.__dictionary.pop(k, default)
+        return self.__dictionary.pop(key, default)
 
     # Override
     def popitem(self) -> Tuple[str, Any]:
@@ -121,17 +141,17 @@ class Dictionary(Mapper):
         return self.__dictionary.popitem()
 
     # Override
-    def setdefault(self, k: str, default: Optional[Any] = None) -> Any:
+    def setdefault(self, key: str, default: Optional[Any] = None) -> Any:
         """
         Insert key with a value of default if key is not in the dictionary.
 
         Return the value for key if key is in the dictionary, else default.
         """
-        self.__dictionary.setdefault(k, default)
+        self.__dictionary.setdefault(key, default)
 
     # Override
     def update(self, __m: Mapping[str, Any], **kwargs: Any):
-        self.__dictionary.update(__m)
+        self.__dictionary.update(__m, **kwargs)
 
     # Override
     def values(self) -> ValuesView[Any]:

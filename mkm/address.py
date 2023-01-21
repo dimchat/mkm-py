@@ -30,9 +30,9 @@
 
 from typing import Union
 
-from ..types import ConstantString
-from ..protocol import EntityType
-from ..protocol import Address
+from .types import ConstantString
+from .protocol import EntityType
+from .protocol import Address
 
 
 """

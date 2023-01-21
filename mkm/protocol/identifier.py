@@ -132,16 +132,16 @@ class ID(Stringer, ABC):
     @classmethod
     def factory(cls):  # -> Optional[IDFactory]:
         gf = general_factory()
-        return gf.get_id_address()
+        return gf.get_id_factory()
 
     @classmethod
     def register(cls, factory):
         gf = general_factory()
-        gf.set_id_address(factory=factory)
+        gf.set_id_factory(factory=factory)
 
 
 def general_factory():
-    from ..core.factory import FactoryManager
+    from ..factory import FactoryManager
     return FactoryManager.general_factory
 
 

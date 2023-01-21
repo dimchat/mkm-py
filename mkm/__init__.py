@@ -29,7 +29,12 @@
 # ==============================================================================
 
 from .protocol import *
-from .core import *
+
+from .address import BroadcastAddress
+from .address import ANYWHERE, EVERYWHERE
+from .identifier import Identifier
+from .identifier import ANYONE, EVERYONE, FOUNDER
+
 
 name = "MingKeMing"
 

@@ -103,7 +103,7 @@ class Address(Stringer, ABC):
 
 
 def general_factory():
-    from ..core.factory import FactoryManager
+    from ..factory import FactoryManager
     return FactoryManager.general_factory
 
 
