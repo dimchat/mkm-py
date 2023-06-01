@@ -29,6 +29,7 @@ from typing import Optional, Any, Dict
 from .asymmetric import VerifyKey
 
 
+# noinspection PyAbstractClass
 class PublicKey(VerifyKey, ABC):
     """This class is used to en/decrypt symmetric key or sign/verify signature with message data
 
@@ -63,8 +64,8 @@ class PublicKey(VerifyKey, ABC):
 
 
 def general_factory():
-    from .factory import FactoryManager
-    return FactoryManager.general_factory
+    from .factory import CryptographyKeyFactoryManager
+    return CryptographyKeyFactoryManager.general_factory
 
 
 class PublicKeyFactory(ABC):

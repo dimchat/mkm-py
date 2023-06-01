@@ -34,7 +34,7 @@ from .public import PublicKey, PublicKeyFactory
 from .private import PrivateKey, PrivateKeyFactory
 
 
-class GeneralFactory:
+class CryptographyKeyGeneralFactory:
 
     # sample data for checking keys
     promise = 'Moky loves May Lee forever!'.encode('utf-8')
@@ -60,7 +60,7 @@ class GeneralFactory:
         return verify_key.verify(data=self.promise, signature=signature)
 
     # noinspection PyMethodMayBeStatic
-    def get_key_algorithm(self, key: Dict[str, Any]) -> str:
+    def get_key_algorithm(self, key: Dict[str, Any]) -> Optional[str]:
         """ get key algorithm name """
         return key.get('algorithm')
 
@@ -84,13 +84,19 @@ class GeneralFactory:
             return None
         if isinstance(key, SymmetricKey):
             return key
-        info = Wrapper.get_dictionary(key)
-        # assert info is not None, 'key error: %s' % key
+        info = Wrapper.get_dict(key)
+        if info is None:
+            # assert False, 'key error: %s' % key
+            return None
         algorithm = self.get_key_algorithm(key=info)
+        if algorithm is None:
+            algorithm = '*'
         factory = self.get_symmetric_key_factory(algorithm=algorithm)
-        if factory is None:
+        if factory is None and algorithm != '*':
             factory = self.get_symmetric_key_factory(algorithm='*')  # unknown
-            # assert factory is not None, 'key algorithm not support: %s' % algorithm
+        # if factory is None:
+        #     # assert False, 'key algorithm not support: %s' % algorithm
+        #     return None
         return factory.parse_symmetric_key(key=info)
 
     #
@@ -108,13 +114,19 @@ class GeneralFactory:
             return None
         elif isinstance(key, PublicKey):
             return key
-        info = Wrapper.get_dictionary(key)
-        # assert info is not None, 'key error: %s' % key
+        info = Wrapper.get_dict(key)
+        if info is None:
+            # assert False, 'key error: %s' % key
+            return None
         algorithm = self.get_key_algorithm(key=info)
+        if algorithm is None:
+            algorithm = '*'
         factory = self.get_public_key_factory(algorithm=algorithm)
-        if factory is None:
+        if factory is None and algorithm != '*':
             factory = self.get_public_key_factory(algorithm='*')  # unknown
-            # assert factory is not None, 'key algorithm not support: %s' % algorithm
+        # if factory is None:
+        #     # assert False, 'key algorithm not support: %s' % algorithm
+        #     return None
         return factory.parse_public_key(key=info)
 
     #
@@ -137,17 +149,23 @@ class GeneralFactory:
             return None
         elif isinstance(key, PrivateKey):
             return key
-        info = Wrapper.get_dictionary(key)
-        # assert info is not None, 'key error: %s' % key
+        info = Wrapper.get_dict(key)
+        if info is None:
+            # assert False, 'key error: %s' % key
+            return None
         algorithm = self.get_key_algorithm(key=info)
+        if algorithm is None:
+            algorithm = '*'
         factory = self.get_private_key_factory(algorithm=algorithm)
-        if factory is None:
+        if factory is None and algorithm != '*':
             factory = self.get_private_key_factory(algorithm='*')  # unknown
-            # assert factory is not None, 'key algorithm not support: %s' % algorithm
+        # if factory is None:
+        #     # assert False, 'key algorithm not support: %s' % algorithm
+        #     return None
         return factory.parse_private_key(key=info)
 
 
 # Singleton
-class FactoryManager:
+class CryptographyKeyFactoryManager:
 
-    general_factory = GeneralFactory()
+    general_factory = CryptographyKeyGeneralFactory()

@@ -36,11 +36,10 @@ from .crypto import utf8_encode
 from .protocol import Address, AddressFactory
 from .protocol import ID, IDFactory
 from .protocol import Meta, MetaType, MetaFactory
-from .protocol import meta_has_seed
 from .protocol import Document, DocumentFactory
 
 
-class GeneralFactory:
+class AccountGeneralFactory:
 
     def __init__(self):
         super().__init__()
@@ -63,7 +62,7 @@ class GeneralFactory:
     def get_address_factory(self) -> Optional[AddressFactory]:
         return self.__address_factory
 
-    def generate_address(self, meta: Meta, network: int) -> Optional[Address]:
+    def generate_address(self, meta: Meta, network: int) -> Address:
         factory = self.get_address_factory()
         # assert factory is not None, 'address factory not set'
         return factory.generate_address(meta=meta, network=network)
@@ -78,8 +77,10 @@ class GeneralFactory:
             return None
         elif isinstance(address, Address):
             return address
-        string = Wrapper.get_string(address)
-        # assert string is not None, 'address error: %s' % address
+        string = Wrapper.get_str(address)
+        if string is None:
+            # assert False, 'address error: %s' % address
+            return None
         factory = self.get_address_factory()
         # assert factory is not None, 'address factory not set'
         return factory.parse_address(address=string)
@@ -94,7 +95,7 @@ class GeneralFactory:
     def get_id_factory(self) -> Optional[IDFactory]:
         return self.__id_factory
 
-    def generate_id(self, meta: Meta, network: int, terminal: Optional[str] = None) -> Optional[ID]:
+    def generate_id(self, meta: Meta, network: int, terminal: Optional[str] = None) -> ID:
         factory = self.get_id_factory()
         # assert factory is not None, 'ID factory not set'
         return factory.generate_id(meta=meta, network=network, terminal=terminal)
@@ -109,8 +110,10 @@ class GeneralFactory:
             return None
         elif isinstance(identifier, ID):
             return identifier
-        string = Wrapper.get_string(identifier)
-        # assert string is not None, 'ID error: %s' % identifier
+        string = Wrapper.get_str(identifier)
+        if string is None:
+            # assert False, 'ID error: %s' % identifier
+            return None
         factory = self.get_id_factory()
         # assert factory is not None, 'ID factory not set'
         return factory.parse_id(identifier=string)
@@ -159,16 +162,9 @@ class GeneralFactory:
         return self.__meta_factories.get(version)
 
     # noinspection PyMethodMayBeStatic
-    def get_meta_type(self, meta: Dict[str, Any]) -> int:
+    def get_meta_type(self, meta: Dict[str, Any]) -> Optional[int]:
         """ get meta type(version) """
-        version = meta.get('type')
-        # if version is None:
-        #     version = meta.get('version')
-        return 0 if version is None else int(version)
-
-    # noinspection PyMethodMayBeStatic
-    def meta_has_seed(self, version: int) -> bool:
-        return (version & MetaType.MKM) == MetaType.MKM
+        return meta.get('type')
 
     def generate_meta(self, version: Union[MetaType, int], key: SignKey,
                       seed: Optional[str] = None) -> Meta:
@@ -187,31 +183,36 @@ class GeneralFactory:
             return None
         elif isinstance(meta, Meta):
             return meta
-        info = Wrapper.get_dictionary(meta)
-        # assert info is not None, 'meta error: %s' % meta
+        info = Wrapper.get_dict(meta)
+        if info is None:
+            # assert False, 'meta error: %s' % meta
+            return None
         version = self.get_meta_type(meta=info)
+        if version is None:
+            version = 0
         factory = self.get_meta_factory(version=version)
-        if factory is None:
+        if factory is None and version != 0:
             factory = self.get_meta_factory(version=0)  # unknown
-            # assert factory is not None, 'meta factory not found: %d' % version
+        # if factory is None:
+        #     # assert False, 'meta factory not found: %d' % version
+        #     return None
         return factory.parse_meta(meta=info)
 
     # noinspection PyMethodMayBeStatic
     def check_meta(self, meta: Meta) -> bool:
         key = meta.key
-        # meta.key should not be empty
-        if isinstance(key, VerifyKey):
-            if meta_has_seed(version=meta.type):
-                # check seed with signature
-                seed = meta.seed
-                fingerprint = meta.fingerprint
-                # seed and fingerprint should not be empty
-                if seed is not None and fingerprint is not None:
-                    # verify fingerprint
-                    return key.verify(data=utf8_encode(string=seed), signature=fingerprint)
-            else:
-                # this meta has no seed, so no signature too
-                return True
+        if not MetaType.has_seed(version=meta.type):
+            # this meta has no seed, so no signature too
+            return True
+            # return isinstance(key, VerifyKey)
+        # check seed with signature
+        seed = meta.seed
+        fingerprint = meta.fingerprint
+        if seed is None or fingerprint is None:
+            # seed and fingerprint should not be empty
+            return False
+        # verify fingerprint
+        return key.verify(data=utf8_encode(string=seed), signature=fingerprint)
 
     # noinspection PyMethodMayBeStatic
     def meta_match_id(self, meta: Meta, identifier: ID) -> bool:
@@ -232,7 +233,7 @@ class GeneralFactory:
             #         just compare the key.data to check matching
             return True
         # check with seed & fingerprint
-        if meta_has_seed(version=meta.type):
+        if MetaType.has_seed(version=meta.type):
             # check whether keys equal by verifying signature
             seed = utf8_encode(string=meta.seed)
             fingerprint = meta.fingerprint
@@ -249,7 +250,7 @@ class GeneralFactory:
         return self.__document_factories.get(doc_type)
 
     # noinspection PyMethodMayBeStatic
-    def get_document_type(self, document: Dict[str, Any]) -> str:
+    def get_document_type(self, document: Dict[str, Any]) -> Optional[str]:
         return document.get('type')
 
     def create_document(self, doc_type: str, identifier: ID,
@@ -263,17 +264,23 @@ class GeneralFactory:
             return None
         elif isinstance(document, Document):
             return document
-        info = Wrapper.get_dictionary(document)
-        # assert info is not None, 'document error: %s' % key
+        info = Wrapper.get_dict(document)
+        if info is None:
+            # assert False, 'document error: %s' % document
+            return None
         doc_type = self.get_document_type(document=info)
+        if doc_type is None:
+            doc_type = '*'
         factory = self.get_document_factory(doc_type=doc_type)
-        if factory is None:
+        if factory is None and doc_type != '*':
             factory = self.get_document_factory(doc_type='*')  # unknown
-            # assert factory is not None, 'document factory not found for type: %s' % doc_type
+        # if factory is None:
+        #     # assert False, 'document factory not found for type: %s' % doc_type
+        #     return None
         return factory.parse_document(document=info)
 
 
 # Singleton
-class FactoryManager:
+class AccountFactoryManager:
 
-    general_factory = GeneralFactory()
+    general_factory = AccountGeneralFactory()

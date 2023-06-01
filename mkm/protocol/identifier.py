@@ -141,14 +141,14 @@ class ID(Stringer, ABC):
 
 
 def general_factory():
-    from ..factory import FactoryManager
-    return FactoryManager.general_factory
+    from ..factory import AccountFactoryManager
+    return AccountFactoryManager.general_factory
 
 
 class IDFactory(ABC):
 
     @abstractmethod
-    def generate_id(self, meta, network: int, terminal: Optional[str] = None) -> Optional[ID]:
+    def generate_id(self, meta, network: int, terminal: Optional[str] = None) -> ID:
         """
         Generate ID
 

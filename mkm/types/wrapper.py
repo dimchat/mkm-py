@@ -77,17 +77,23 @@ class Mapper(MutableMapping[str, Any], ABC):
     def get_float(self, key: str, default: float = 0.0) -> float:
         raise NotImplemented
 
-    # @abstractmethod
-    # def get_time(self, key: str, default: float = 0.0) -> float:
-    #     raise NotImplemented
-    #
-    # @abstractmethod
-    # def set_string(self, string: Stringer):
-    #     raise NotImplemented
-    #
-    # @abstractmethod
-    # def set_map(self, dictionary: Mapper):
-    #     raise NotImplemented
+    @abstractmethod
+    def get_time(self, key: str, default: float = 0.0) -> float:
+        """ get timestamp in seconds """
+        raise NotImplemented
+
+    @abstractmethod
+    def set_time(self, key: str, time: Optional[float]):
+        """ set timestamp in seconds """
+        raise NotImplemented
+
+    @abstractmethod
+    def set_string(self, key: str, string: Optional[Stringer]):
+        raise NotImplemented
+
+    @abstractmethod
+    def set_map(self, key: str, dictionary):  # dictionary: Optional[Mapper]
+        raise NotImplemented
 
     @property
     @abstractmethod
@@ -104,7 +110,7 @@ class Mapper(MutableMapping[str, Any], ABC):
 class Wrapper:
 
     @classmethod
-    def get_string(cls, s) -> Optional[str]:
+    def get_str(cls, s) -> Optional[str]:
         """
             Get inner string
             ~~~~~~~~~~~~~~~~
@@ -115,7 +121,7 @@ class Wrapper:
             return s
 
     @classmethod
-    def get_dictionary(cls, d) -> Optional[Dict[str, Any]]:
+    def get_dict(cls, d) -> Optional[Dict[str, Any]]:
         """
             Get inner map
             ~~~~~~~~~~~~~
@@ -135,15 +141,15 @@ class Wrapper:
         if isinstance(o, Stringer):
             return o.string
         elif isinstance(o, Mapper):
-            return cls.unwrap_map(o.dictionary)
+            return cls.unwrap_dict(o.dictionary)
         elif isinstance(o, Dict):
-            return cls.unwrap_map(o)
+            return cls.unwrap_dict(o)
         elif isinstance(o, List):
             return cls.unwrap_list(o)
         return o
 
     @classmethod
-    def unwrap_map(cls, d) -> Dict[str, Any]:
+    def unwrap_dict(cls, d) -> Dict[str, Any]:
         """ Unwrap values for keys in map """
         if isinstance(d, Mapper):
             d = d.dictionary

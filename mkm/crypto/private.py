@@ -45,7 +45,7 @@ class PrivateKey(SignKey, ABC):
 
     @property
     @abstractmethod
-    def public_key(self) -> Optional[PublicKey]:
+    def public_key(self) -> PublicKey:
         """
         Get public key from private key
 
@@ -79,14 +79,14 @@ class PrivateKey(SignKey, ABC):
 
 
 def general_factory():
-    from .factory import FactoryManager
-    return FactoryManager.general_factory
+    from .factory import CryptographyKeyFactoryManager
+    return CryptographyKeyFactoryManager.general_factory
 
 
 class PrivateKeyFactory(ABC):
 
     @abstractmethod
-    def generate_private_key(self) -> Optional[PrivateKey]:
+    def generate_private_key(self) -> PrivateKey:
         """
         Generate key
 

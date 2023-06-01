@@ -108,7 +108,7 @@ class Meta(Mapper, ABC):
         raise NotImplemented
 
     @abstractmethod
-    def generate_address(self, network: int) -> Optional[Address]:
+    def generate_address(self, network: int) -> Address:
         """
         Generate Address with network ID
 
@@ -164,8 +164,8 @@ class Meta(Mapper, ABC):
 
 
 def general_factory():
-    from ..factory import FactoryManager
-    return FactoryManager.general_factory
+    from ..factory import AccountFactoryManager
+    return AccountFactoryManager.general_factory
 
 
 class MetaFactory(ABC):

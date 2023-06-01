@@ -65,6 +65,6 @@ class MetaType(IntEnum):
     ETH = 0x04    # 0000 0100
     ExETH = 0x05  # 0000 0101
 
-
-def meta_has_seed(version: int) -> bool:
-    return (version & MetaType.MKM) == MetaType.MKM
+    @classmethod
+    def has_seed(cls, version: int) -> bool:
+        return (version & cls.MKM) == cls.MKM

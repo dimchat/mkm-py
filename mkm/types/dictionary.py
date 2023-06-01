@@ -27,6 +27,8 @@ import copy
 from typing import Any, Optional, Iterator, Tuple, Dict
 from typing import Mapping, ItemsView, KeysView, ValuesView
 
+from mkm.types import Stringer
+from .converter import Converter
 from .wrapper import Mapper
 
 
@@ -76,38 +78,53 @@ class Dictionary(Mapper):
     # Override
     def get_str(self, key: str, default: Optional[str] = None) -> Optional[str]:
         value = self.__dictionary.get(key, default)
-        if value is None:
-            return None
-        elif isinstance(value, str):
-            return value
-        return str(value)
+        value = Converter.get_str(value=value)
+        return default if value is None else value
 
     # Override
     def get_bool(self, key: str, default: bool = False) -> bool:
         value = self.__dictionary.get(key, default)
-        if value is None:
-            return False
-        elif isinstance(value, bool):
-            return value
-        return bool(value)
+        value = Converter.get_bool(value=value)
+        return default if value is None else value
 
     # Override
     def get_int(self, key: str, default: int = 0) -> int:
         value = self.__dictionary.get(key, default)
-        if value is None:
-            return 0
-        elif isinstance(value, int):
-            return value
-        return int(value)
+        value = Converter.get_int(value=value)
+        return default if value is None else value
 
     # Override
     def get_float(self, key: str, default: float = 0.0) -> float:
         value = self.__dictionary.get(key, default)
-        if value is None:
-            return 0.0
-        elif isinstance(value, float):
-            return value
-        return float(value)
+        value = Converter.get_float(value=value)
+        return default if value is None else value
+
+    # Override
+    def get_time(self, key: str, default: float = 0.0) -> float:
+        value = self.__dictionary.get(key, default)
+        value = Converter.get_time(value=value)
+        return default if value is None else value
+
+    # Override
+    def set_time(self, key: str, time: Optional[float]):
+        if time is None:
+            self.__dictionary.pop(key, None)
+        else:
+            self.__dictionary[key] = time
+
+    # Override
+    def set_string(self, key: str, string: Optional[Stringer]):
+        if string is None:
+            self.__dictionary.pop(key, None)
+        else:
+            self.__dictionary[key] = string.string
+
+    # Override
+    def set_map(self, key: str, dictionary: Optional[Mapper]):
+        if dictionary is None:
+            self.__dictionary.pop(key, None)
+        else:
+            self.__dictionary[key] = dictionary.dictionary
 
     # Override
     def get(self, key: str, default: Optional[Any] = None) -> Optional[Any]:

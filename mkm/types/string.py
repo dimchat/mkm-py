@@ -209,7 +209,7 @@ class String(Stringer):
         Return a formatted version of S, using substitutions from mapping.
         The substitutions are identified by braces ('{' and '}').
         """
-        mapping = Wrapper.unwrap_map(mapping)
+        mapping = Wrapper.unwrap_dict(mapping)
         string = self.__string.format_map(map=mapping)
         return String(string=string)
 

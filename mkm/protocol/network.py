@@ -104,14 +104,14 @@ class EntityType(IntEnum):
     ANY = 0x80              # 1000 0000 (anyone@anywhere)
     EVERY = 0x81            # 1000 0001 (everyone@everywhere)
 
+    @classmethod
+    def is_user(cls, network: int) -> bool:
+        return (network & cls.GROUP) == cls.USER
 
-def entity_is_user(network: int) -> bool:
-    return (network & EntityType.GROUP) == EntityType.USER
+    @classmethod
+    def is_group(cls, network: int) -> bool:
+        return (network & cls.GROUP) == cls.GROUP
 
-
-def entity_is_group(network: int) -> bool:
-    return (network & EntityType.GROUP) == EntityType.GROUP
-
-
-def entity_is_broadcast(network: int) -> bool:
-    return (network & EntityType.ANY) == EntityType.ANY
+    @classmethod
+    def is_broadcast(cls, network: int) -> bool:
+        return (network & cls.ANY) == cls.ANY

@@ -34,35 +34,49 @@ from abc import ABC, abstractmethod
 from typing import Optional, Union, Any, Dict, List
 
 
-class DataCoder(ABC):
+class StringCoder(ABC):
     """
-        Data Coder
-        ~~~~~~~~~~
-        Hex, Base58, Base64, ...
+        String Coder
+        ~~~~~~~~~~~~
+        UTF-8, UTF-16, GBK, GB2312, ...
 
-        1. encode binary data to string;
-        2. decode string to binary data.
+        1. encode string to binary data;
+        2. decode binary data to string.
     """
 
     @abstractmethod
-    def encode(self, data: bytes) -> str:
+    def encode(self, string: str) -> bytes:
         """
-        Encode binary data to text string
+        Encode local string to binary data
+
+        :param string: local string
+        :return: binary data
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def decode(self, data: bytes) -> Optional[str]:
+        """
+        Decode binary data to local string
 
         :param data: binary data
-        :return:     text string (Base58/64, Hex, ...)
+        :return: local string
         """
         raise NotImplemented
 
-    @abstractmethod
-    def decode(self, string: str) -> Optional[bytes]:
-        """
-        Decode text string to binary data
 
-        :param string: text string (Base58/64, Hex, ...)
-        :return:       binary data
-        """
-        raise NotImplemented
+class UTF8:
+    coder: StringCoder = None
+
+    @staticmethod
+    def encode(string: str) -> bytes:
+        # assert UTF8.coder is not None, 'UTF8 parser not set yet'
+        return UTF8.coder.encode(string=string)
+
+    @staticmethod
+    def decode(data: bytes) -> Optional[str]:
+        # assert UTF8.coder is not None, 'UTF8 parser not set yet'
+        return UTF8.coder.decode(data=data)
 
 
 class ObjectCoder(ABC):
@@ -96,35 +110,143 @@ class ObjectCoder(ABC):
         raise NotImplemented
 
 
-class StringCoder(ABC):
-    """
-        String Coder
-        ~~~~~~~~~~~~
-        UTF-8, UTF-16, GBK, GB2312, ...
+class JSON:
+    coder: ObjectCoder = None
 
-        1. encode string to binary data;
-        2. decode binary data to string.
+    @staticmethod
+    def encode(obj: Any) -> str:
+        # assert JSON.coder is not None, 'JSON parser not set yet'
+        return JSON.coder.encode(obj=obj)
+
+    @staticmethod
+    def decode(string: str) -> Optional[Any]:
+        # assert JSON.coder is not None, 'JSON parser not set yet'
+        return JSON.coder.decode(string=string)
+
+
+class MapCoder(ObjectCoder, ABC):
+    """ coder for json <=> map """
+
+    # Override
+    def encode(self, obj: Dict) -> str:
+        return JSON.encode(obj=obj)
+
+    # Override
+    def decode(self, string: str) -> Optional[Dict]:
+        return JSON.decode(string=string)
+
+
+class ListCoder(ObjectCoder, ABC):
+    """ coder for json <=> list """
+
+    # Override
+    def encode(self, obj: List) -> str:
+        return JSON.encode(obj=obj)
+
+    # Override
+    def decode(self, string: str) -> Optional[List]:
+        return JSON.decode(string=string)
+
+
+class JSONMap:
+    coder = MapCoder()
+
+    @staticmethod
+    def encode(obj: Any) -> str:
+        # assert JSONMap.coder is not None, 'JSONMap parser not set yet'
+        return JSONMap.coder.encode(obj=obj)
+
+    @staticmethod
+    def decode(string: str) -> Optional[Any]:
+        # assert JSONMap.coder is not None, 'JSONMap parser not set yet'
+        return JSONMap.coder.decode(string=string)
+
+
+class JSONList:
+    coder = ListCoder()
+
+    @staticmethod
+    def encode(obj: Any) -> str:
+        # assert JSONList.coder is not None, 'JSONList parser not set yet'
+        return JSONList.coder.encode(obj=obj)
+
+    @staticmethod
+    def decode(string: str) -> Optional[Any]:
+        # assert JSONList.coder is not None, 'JSONList parser not set yet'
+        return JSONList.coder.decode(string=string)
+
+
+class DataCoder(ABC):
+    """
+        Data Coder
+        ~~~~~~~~~~
+        Hex, Base58, Base64, ...
+
+        1. encode binary data to string;
+        2. decode string to binary data.
     """
 
     @abstractmethod
-    def encode(self, string: str) -> bytes:
+    def encode(self, data: bytes) -> str:
         """
-        Encode local string to binary data
-
-        :param string: local string
-        :return: binary data
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def decode(self, data: bytes) -> Optional[str]:
-        """
-        Decode binary data to local string
+        Encode binary data to text string
 
         :param data: binary data
-        :return: local string
+        :return:     text string (Base58/64, Hex, ...)
         """
         raise NotImplemented
+
+    @abstractmethod
+    def decode(self, string: str) -> Optional[bytes]:
+        """
+        Decode text string to binary data
+
+        :param string: text string (Base58/64, Hex, ...)
+        :return:       binary data
+        """
+        raise NotImplemented
+
+
+class Hex:
+    coder: DataCoder = None
+
+    @staticmethod
+    def encode(data: bytes) -> str:
+        # assert Hex.coder is not None, 'Hex coder not set yet'
+        return Hex.coder.encode(data=data)
+
+    @staticmethod
+    def decode(string: str) -> Optional[bytes]:
+        # assert Hex.coder is not None, 'Hex coder not set yet'
+        return Hex.coder.decode(string=string)
+
+
+class Base58:
+    coder: DataCoder = None
+
+    @staticmethod
+    def encode(data: bytes) -> str:
+        # assert Base58.coder is not None, 'Base58 coder not set yet'
+        return Base58.coder.encode(data=data)
+
+    @staticmethod
+    def decode(string: str) -> Optional[bytes]:
+        # assert Base58.coder is not None, 'Base58 coder not set yet'
+        return Base58.coder.decode(string=string)
+
+
+class Base64:
+    coder: DataCoder = None
+
+    @staticmethod
+    def encode(data: bytes) -> str:
+        # assert Base64.coder is not None, 'Base64 coder not set yet'
+        return Base64.coder.encode(data=data)
+
+    @staticmethod
+    def decode(string: str) -> Optional[bytes]:
+        # assert Base64.coder is not None, 'Base64 coder not set yet'
+        return Base64.coder.decode(string=string)
 
 
 #
@@ -170,78 +292,3 @@ def utf8_encode(string: str) -> bytes:
 
 def utf8_decode(data: bytes) -> Optional[str]:
     return UTF8.decode(data=data)
-
-
-#
-#   Singleton
-#
-
-
-class Base64:
-    coder: DataCoder = None
-
-    @staticmethod
-    def encode(data: bytes) -> str:
-        # assert Base64.coder is not None, 'Base64 coder not set yet'
-        return Base64.coder.encode(data=data)
-
-    @staticmethod
-    def decode(string: str) -> Optional[bytes]:
-        # assert Base64.coder is not None, 'Base64 coder not set yet'
-        return Base64.coder.decode(string=string)
-
-
-class Base58:
-    coder: DataCoder = None
-
-    @staticmethod
-    def encode(data: bytes) -> str:
-        # assert Base58.coder is not None, 'Base58 coder not set yet'
-        return Base58.coder.encode(data=data)
-
-    @staticmethod
-    def decode(string: str) -> Optional[bytes]:
-        # assert Base58.coder is not None, 'Base58 coder not set yet'
-        return Base58.coder.decode(string=string)
-
-
-class Hex:
-    coder: DataCoder = None
-
-    @staticmethod
-    def encode(data: bytes) -> str:
-        # assert Hex.coder is not None, 'Hex coder not set yet'
-        return Hex.coder.encode(data=data)
-
-    @staticmethod
-    def decode(string: str) -> Optional[bytes]:
-        # assert Hex.coder is not None, 'Hex coder not set yet'
-        return Hex.coder.decode(string=string)
-
-
-class JSON:
-    coder: ObjectCoder = None
-
-    @staticmethod
-    def encode(obj: Any) -> str:
-        # assert JSON.coder is not None, 'JSON parser not set yet'
-        return JSON.coder.encode(obj=obj)
-
-    @staticmethod
-    def decode(string: str) -> Optional[Any]:
-        # assert JSON.coder is not None, 'JSON parser not set yet'
-        return JSON.coder.decode(string=string)
-
-
-class UTF8:
-    coder: StringCoder = None
-
-    @staticmethod
-    def encode(string: str) -> bytes:
-        # assert UTF8.coder is not None, 'UTF8 parser not set yet'
-        return UTF8.coder.encode(string=string)
-
-    @staticmethod
-    def decode(data: bytes) -> Optional[str]:
-        # assert UTF8.coder is not None, 'UTF8 parser not set yet'
-        return UTF8.coder.decode(data=data)

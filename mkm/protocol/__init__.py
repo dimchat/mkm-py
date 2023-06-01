@@ -28,8 +28,8 @@
 # SOFTWARE.
 # ==============================================================================
 
-from .network import EntityType, entity_is_user, entity_is_group, entity_is_broadcast
-from .version import MetaType, meta_has_seed
+from .network import EntityType
+from .version import MetaType
 from .address import Address, AddressFactory
 from .identifier import ID, IDFactory
 from .meta import Meta, MetaFactory
@@ -46,7 +46,4 @@ __all__ = [
     'Meta', 'MetaFactory',
     'Document', 'DocumentFactory',
     'Visa', 'Bulletin',
-
-    'entity_is_user', 'entity_is_group', 'entity_is_broadcast',
-    'meta_has_seed',
 ]

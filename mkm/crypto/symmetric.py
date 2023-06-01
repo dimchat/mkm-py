@@ -29,6 +29,7 @@ from typing import Optional, Any, Dict
 from .cryptography import EncryptKey, DecryptKey
 
 
+# noinspection PyAbstractClass
 class SymmetricKey(EncryptKey, DecryptKey, ABC):
     """This class is used to encrypt or decrypt message data
 
@@ -71,14 +72,14 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
 
 
 def general_factory():
-    from .factory import FactoryManager
-    return FactoryManager.general_factory
+    from .factory import CryptographyKeyFactoryManager
+    return CryptographyKeyFactoryManager.general_factory
 
 
 class SymmetricKeyFactory(ABC):
 
     @abstractmethod
-    def generate_symmetric_key(self) -> Optional[SymmetricKey]:
+    def generate_symmetric_key(self) -> SymmetricKey:
         """
         Generate key
 

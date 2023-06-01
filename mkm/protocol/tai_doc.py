@@ -106,7 +106,7 @@ class Document(TAI, Mapper, ABC):
 
     @classmethod
     def create(cls, doc_type: str, identifier: ID,
-               data: Optional[str] = None, signature: Union[bytes, str] = None):  # -> Document:
+               data: Optional[str] = None, signature: Union[bytes, str] = None):  # -> Optional[Document]:
         gf = general_factory()
         return gf.create_document(doc_type=doc_type, identifier=identifier, data=data, signature=signature)
 
@@ -127,8 +127,8 @@ class Document(TAI, Mapper, ABC):
 
 
 def general_factory():
-    from ..factory import FactoryManager
-    return FactoryManager.general_factory
+    from ..factory import AccountFactoryManager
+    return AccountFactoryManager.general_factory
 
 
 class DocumentFactory(ABC):

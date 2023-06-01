@@ -23,11 +23,13 @@
 # SOFTWARE.
 # ==============================================================================
 
+from .converter import Converter
 from .wrapper import Wrapper, Stringer, Mapper
 from .string import ConstantString
 from .dictionary import Dictionary
 
 __all__ = [
+    'Converter',
     'Wrapper', 'Stringer', 'Mapper',
     'ConstantString',
     'Dictionary',

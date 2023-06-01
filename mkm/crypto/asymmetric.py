@@ -28,6 +28,7 @@ from abc import ABC, abstractmethod
 from .cryptography import CryptographyKey
 
 
+# noinspection PyAbstractClass
 class AsymmetricKey(CryptographyKey, ABC):
 
     RSA = 'RSA'
