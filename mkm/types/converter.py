@@ -33,7 +33,7 @@ class Converter(ABC):
     def get_str(cls, value: Any) -> Optional[str]:
         if value is None:
             return None
-        elif value is str:
+        elif isinstance(value, str):
             # exactly
             return value
         else:
@@ -46,14 +46,14 @@ class Converter(ABC):
         """
         if value is None:
             return None
-        elif value is bool:
+        elif isinstance(value, bool):
             # exactly
             return value
-        elif value is int:
+        elif isinstance(value, int):
             return value != 0
-        elif value is float:
+        elif isinstance(value, float):
             return value != 0.0
-        elif value is str:
+        elif isinstance(value, str):
             lo = value.lower()
             return lo in true_array
         else:
@@ -63,10 +63,10 @@ class Converter(ABC):
     def get_int(cls, value: Any) -> Optional[int]:
         if value is None:
             return None
-        elif value is int:
+        elif isinstance(value, int):
             # exactly
             return value
-        elif value is bool or value is float or value is str:
+        elif isinstance(value, bool) or isinstance(value, float) or isinstance(value, str):
             return int(value)
         else:
             return 0
@@ -75,10 +75,10 @@ class Converter(ABC):
     def get_float(cls, value: Any) -> Optional[float]:
         if value is None:
             return None
-        elif value is float:
+        elif isinstance(value, float):
             # exactly
             return value
-        elif value is bool or value is int or value is str:
+        elif isinstance(value, bool) or isinstance(value, int) or isinstance(value, str):
             return float(value)
         else:
             return 0.0
