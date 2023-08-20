@@ -48,7 +48,7 @@ class Document(TAI, Mapper, ABC):
 
     @property
     @abstractmethod
-    def type(self) -> str:
+    def type(self) -> Optional[str]:
         """
         Get document type
 

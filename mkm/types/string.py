@@ -80,6 +80,12 @@ class ConstantString(Stringer):
         """ Return str(self). """
         return self.__string
 
+    # Override
+    def __repr__(self) -> str:
+        """ Return repr(self). """
+        clazz = self.__class__.__name__
+        return '<%s>%s</%s>' % (clazz, self.__string, clazz)
+
     @property  # Override
     def string(self) -> str:
         return self.__string

@@ -55,7 +55,8 @@ class Converter(ABC):
             return value != 0.0
         elif isinstance(value, str):
             lo = value.lower()
-            return lo in true_array
+            # return lo in true_array
+            return lo not in false_array
         else:
             return True
 
@@ -93,4 +94,7 @@ class Converter(ABC):
 
 true_array = [
     'true', 'yes', 'on', '1',
+]
+false_array = [
+    'false', 'no', 'off', '0', 'null', 'undefined',
 ]

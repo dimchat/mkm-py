@@ -148,7 +148,7 @@ def general_factory():
 class IDFactory(ABC):
 
     @abstractmethod
-    def generate_id(self, meta, network: int, terminal: Optional[str] = None) -> ID:
+    def generate_id(self, meta, network: int, terminal: Optional[str]) -> ID:
         """
         Generate ID
 
@@ -160,7 +160,7 @@ class IDFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def create_id(self, name: Optional[str], address: Address, terminal: Optional[str] = None) -> ID:
+    def create_id(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
         """
         Create ID
 

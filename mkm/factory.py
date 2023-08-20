@@ -95,12 +95,12 @@ class AccountGeneralFactory:
     def get_id_factory(self) -> Optional[IDFactory]:
         return self.__id_factory
 
-    def generate_id(self, meta: Meta, network: int, terminal: Optional[str] = None) -> ID:
+    def generate_id(self, meta: Meta, network: int, terminal: Optional[str]) -> ID:
         factory = self.get_id_factory()
         # assert factory is not None, 'ID factory not set'
         return factory.generate_id(meta=meta, network=network, terminal=terminal)
 
-    def create_id(self, name: Optional[str], address: Address, terminal: Optional[str] = None) -> ID:
+    def create_id(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
         factory = self.get_id_factory()
         # assert factory is not None, 'ID factory not set'
         return factory.create_id(name=name, address=address, terminal=terminal)
@@ -167,13 +167,13 @@ class AccountGeneralFactory:
         return meta.get('type')
 
     def generate_meta(self, version: Union[MetaType, int], key: SignKey,
-                      seed: Optional[str] = None) -> Meta:
+                      seed: Optional[str]) -> Meta:
         factory = self.get_meta_factory(version=version)
         # assert factory is not None, 'failed to get meta factory: %d' % version
         return factory.generate_meta(key=key, seed=seed)
 
     def create_meta(self, version: Union[MetaType, int], key: VerifyKey,
-                    seed: Optional[str] = None, fingerprint: Union[bytes, str, None] = None) -> Meta:
+                    seed: Optional[str], fingerprint: Union[bytes, str, None]) -> Meta:
         factory = self.get_meta_factory(version=version)
         # assert factory is not None, 'failed to get meta factory: %d' % version
         return factory.create_meta(key=key, seed=seed, fingerprint=fingerprint)
@@ -254,7 +254,7 @@ class AccountGeneralFactory:
         return document.get('type')
 
     def create_document(self, doc_type: str, identifier: ID,
-                        data: Optional[str] = None, signature: Union[bytes, str] = None) -> Document:
+                        data: Optional[str], signature: Union[bytes, str]) -> Document:
         factory = self.get_document_factory(doc_type=doc_type)
         # assert factory is not None, 'document factory not found for type: %s' % doc_type
         return factory.create_document(identifier=identifier, data=data, signature=signature)

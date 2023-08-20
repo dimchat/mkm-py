@@ -94,6 +94,16 @@ class Bulletin(Document, ABC):
 
     @property
     @abstractmethod
+    def founder(self) -> Optional[ID]:
+        """
+        Get group founder
+
+        :return: user ID
+        """
+        raise NotImplemented
+
+    @property
+    @abstractmethod
     def assistants(self) -> Optional[List[ID]]:
         """
         Get group assistants
@@ -110,4 +120,19 @@ class Bulletin(Document, ABC):
 
         :param bots: bot ID list
         """
+        raise NotImplemented
+
+    """
+        Times
+        ~~~~~
+    """
+
+    @property
+    @abstractmethod
+    def created_time(self) -> Optional[float]:
+        raise NotImplemented
+
+    @property
+    @abstractmethod
+    def modified_time(self) -> Optional[float]:
         raise NotImplemented
