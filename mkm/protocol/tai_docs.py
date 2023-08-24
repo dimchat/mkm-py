@@ -33,6 +33,7 @@ from typing import Optional, Union, List
 
 from ..crypto import EncryptKey, VerifyKey
 
+from .file import PortableNetworkFile
 from .identifier import ID
 from .tai_doc import Document
 
@@ -67,21 +68,21 @@ class Visa(Document, ABC):
 
     @property
     @abstractmethod
-    def avatar(self) -> Optional[str]:
+    def avatar(self) -> Optional[PortableNetworkFile]:
         """
-        Get avatar URL
+        Get avatar file
 
-        :return: URL string
+        :return: transportable file
         """
         raise NotImplemented
 
     @avatar.setter
     @abstractmethod
-    def avatar(self, url: str):
+    def avatar(self, file: PortableNetworkFile):
         """
-        Set avatar URL
+        Set avatar file/url
 
-        :param url: URL string
+        :param file: transportable file, or URL string
         """
         raise NotImplemented
 

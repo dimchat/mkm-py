@@ -28,6 +28,8 @@
 # SOFTWARE.
 # ==============================================================================
 
+from .file import PortableNetworkFile
+
 from .network import EntityType
 from .version import MetaType
 from .address import Address, AddressFactory
@@ -38,6 +40,8 @@ from .tai_docs import Visa, Bulletin
 
 __all__ = [
 
+    'PortableNetworkFile',
+
     'EntityType',
     'MetaType',
 
@@ -46,4 +50,5 @@ __all__ = [
     'Meta', 'MetaFactory',
     'Document', 'DocumentFactory',
     'Visa', 'Bulletin',
+
 ]
