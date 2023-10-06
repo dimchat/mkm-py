@@ -28,7 +28,13 @@ from .wrapper import Wrapper, Stringer, Mapper
 from .string import ConstantString
 from .dictionary import Dictionary
 
+from .x import URI, DateTime
+
+
 __all__ = [
+
+    'URI', 'DateTime',
+
     'Converter',
     'Wrapper', 'Stringer', 'Mapper',
     'ConstantString',

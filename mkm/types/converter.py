@@ -26,13 +26,15 @@
 from abc import ABC
 from typing import Any, Optional
 
+from .x import DateTime
+
 
 class Converter(ABC):
 
     @classmethod
-    def get_str(cls, value: Any) -> Optional[str]:
+    def get_str(cls, value: Any, default: Optional[str]) -> Optional[str]:
         if value is None:
-            return None
+            return default
         elif isinstance(value, str):
             # exactly
             return value
@@ -40,12 +42,12 @@ class Converter(ABC):
             return str(value)
 
     @classmethod
-    def get_bool(cls, value: Any) -> Optional[bool]:
+    def get_bool(cls, value: Any, default: Optional[bool]) -> Optional[bool]:
         """ assume value can be a config string:
             'true', 'false', 'yes', 'no', 'on', 'off', '1', '0', ...
         """
         if value is None:
-            return None
+            return default
         elif isinstance(value, bool):
             # exactly
             return value
@@ -53,48 +55,50 @@ class Converter(ABC):
             return value != 0
         elif isinstance(value, float):
             return value != 0.0
-        elif isinstance(value, str):
-            lo = value.lower()
-            # return lo in true_array
-            return lo not in false_array
-        else:
-            return True
+        text = value if isinstance(value, str) else str(value)
+        lo = text.lower()
+        return lo not in false_array
+        # return lo in true_array
 
     @classmethod
-    def get_int(cls, value: Any) -> Optional[int]:
+    def get_int(cls, value: Any, default: Optional[int]) -> Optional[int]:
         if value is None:
-            return None
+            return default
         elif isinstance(value, int):
             # exactly
             return value
-        elif isinstance(value, bool) or isinstance(value, float) or isinstance(value, str):
+        elif isinstance(value, bool) or isinstance(value, float):
             return int(value)
-        else:
-            return 0
+        text = value if isinstance(value, str) else str(value)
+        return int(text)
 
     @classmethod
-    def get_float(cls, value: Any) -> Optional[float]:
+    def get_float(cls, value: Any, default: Optional[float]) -> Optional[float]:
         if value is None:
-            return None
+            return default
         elif isinstance(value, float):
             # exactly
             return value
-        elif isinstance(value, bool) or isinstance(value, int) or isinstance(value, str):
+        elif isinstance(value, bool) or isinstance(value, int):
             return float(value)
-        else:
-            return 0.0
+        text = value if isinstance(value, str) else str(value)
+        return float(text)
 
     @classmethod
-    def get_time(cls, value: Any) -> Optional[float]:
-        """ assume value be a timestamp in seconds
-            (from 1970-01-01 00:00:00)
-        """
-        return cls.get_float(value=value)
+    def get_datetime(cls, value: Any, default: Optional[DateTime]) -> Optional[DateTime]:
+        """ assume value be a timestamp (seconds from 1970-01-01 00:00:00) """
+        if value is None:
+            return default
+        elif isinstance(value, DateTime):
+            # exactly
+            return value
+        timestamp = cls.get_float(value=value, default=0)
+        return DateTime(timestamp=timestamp)
 
 
 true_array = [
-    'true', 'yes', 'on', '1',
+    '1', 'true', 'yes', 'on',
 ]
 false_array = [
-    'false', 'no', 'off', '0', 'null', 'undefined',
+    '0', 'false', 'no', 'off', 'null', 'undefined',
 ]

@@ -26,6 +26,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Any, MutableMapping, Dict, List
 
+from .x import DateTime
+
 
 class Stringer(ABC):
     """
@@ -62,37 +64,35 @@ class Mapper(MutableMapping[str, Any], ABC):
     """
 
     @abstractmethod
-    def get_str(self, key: str, default: Optional[str] = None) -> Optional[str]:
+    def get_str(self, key: str, default: Optional[str]) -> Optional[str]:
         raise NotImplemented
 
     @abstractmethod
-    def get_bool(self, key: str, default: bool = False) -> bool:
+    def get_bool(self, key: str, default: Optional[bool]) -> Optional[bool]:
         raise NotImplemented
 
     @abstractmethod
-    def get_int(self, key: str, default: int = 0) -> int:
+    def get_int(self, key: str, default: Optional[int]) -> Optional[int]:
         raise NotImplemented
 
     @abstractmethod
-    def get_float(self, key: str, default: float = 0.0) -> float:
+    def get_float(self, key: str, default: Optional[float]) -> Optional[float]:
         raise NotImplemented
 
     @abstractmethod
-    def get_time(self, key: str, default: float = 0.0) -> float:
-        """ get timestamp in seconds """
+    def get_datetime(self, key: str, default: Optional[DateTime]) -> Optional[DateTime]:
         raise NotImplemented
 
     @abstractmethod
-    def set_time(self, key: str, time: Optional[float]):
-        """ set timestamp in seconds """
+    def set_datetime(self, key: str, value: Optional[DateTime]):
         raise NotImplemented
 
     @abstractmethod
-    def set_string(self, key: str, string: Optional[Stringer]):
+    def set_string(self, key: str, value: Optional[Stringer]):
         raise NotImplemented
 
     @abstractmethod
-    def set_map(self, key: str, dictionary):  # dictionary: Optional[Mapper]
+    def set_map(self, key: str, value):  # value: Optional[Mapper]
         raise NotImplemented
 
     @property
@@ -115,10 +115,15 @@ class Wrapper:
             Get inner string
             ~~~~~~~~~~~~~~~~
         """
-        if isinstance(s, Stringer):
+        if s is None:
+            return None
+        elif isinstance(s, Stringer):
             return s.string
         elif isinstance(s, str):
             return s
+        else:
+            # assert False, 'string error: %s' % s
+            return str(s)
 
     @classmethod
     def get_dict(cls, d) -> Optional[Dict[str, Any]]:
@@ -127,10 +132,14 @@ class Wrapper:
             ~~~~~~~~~~~~~
             Remove first wrapper
         """
-        if isinstance(d, Mapper):
+        if d is None:
+            return None
+        elif isinstance(d, Mapper):
             return d.dictionary
         elif isinstance(d, Dict):
             return d
+        else:
+            assert False, 'map error: %s' % d
 
     @classmethod
     def unwrap(cls, o) -> Any:
@@ -138,15 +147,18 @@ class Wrapper:
             Unwrap object container
             ~~~~~~~~~~~~~~~~~~~~~~~
         """
-        if isinstance(o, Stringer):
-            return o.string
+        if o is None:
+            return None
         elif isinstance(o, Mapper):
             return cls.unwrap_dict(o.dictionary)
         elif isinstance(o, Dict):
             return cls.unwrap_dict(o)
         elif isinstance(o, List):
             return cls.unwrap_list(o)
-        return o
+        elif isinstance(o, Stringer):
+            return o.string
+        else:
+            return o
 
     @classmethod
     def unwrap_dict(cls, d) -> Dict[str, Any]:

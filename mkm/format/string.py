@@ -2,7 +2,7 @@
 # ==============================================================================
 # MIT License
 #
-# Copyright (c) 2019 Albert Moky
+# Copyright (c) 2020 Albert Moky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,49 +24,62 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-
-from .cryptography import CryptographyKey
-
-
-# noinspection PyAbstractClass
-class AsymmetricKey(CryptographyKey, ABC):
-
-    RSA = 'RSA'  # -- "RSA/ECB/PKCS1Padding", "SHA256withRSA"
-    ECC = 'ECC'
+from typing import Optional
 
 
-class SignKey(AsymmetricKey, ABC):
+class StringCoder(ABC):
+    """
+        String Coder
+        ~~~~~~~~~~~~
+        UTF-8, UTF-16, GBK, GB2312, ...
 
-    @abstractmethod
-    def sign(self, data: bytes) -> bytes:
-        """
-        signature = sign(data, SK);
-
-        :param data: message data
-        :return: signature
-        """
-        raise NotImplemented
-
-
-class VerifyKey(AsymmetricKey, ABC):
+        1. encode string to binary data;
+        2. decode binary data to string.
+    """
 
     @abstractmethod
-    def verify(self, data: bytes, signature: bytes) -> bool:
+    def encode(self, string: str) -> bytes:
         """
-        OK = verify(data, signature, PK)
+        Encode local string to binary data
 
-        :param data:      message data
-        :param signature: signature of message data
-        :return: True on signature matched
+        :param string: local string
+        :return: binary data
         """
         raise NotImplemented
 
     @abstractmethod
-    def match_sign_key(self, key: SignKey) -> bool:
+    def decode(self, data: bytes) -> Optional[str]:
         """
-        OK = verify(data, sign(data, SK), PK)
+        Decode binary data to local string
 
-        :param key: private key
-        :return: True on signature matched
+        :param data: binary data
+        :return: local string
         """
         raise NotImplemented
+
+
+class UTF8:
+    coder: StringCoder = None
+
+    @staticmethod
+    def encode(string: str) -> bytes:
+        # assert UTF8.coder is not None, 'UTF8 parser not set yet'
+        return UTF8.coder.encode(string=string)
+
+    @staticmethod
+    def decode(data: bytes) -> Optional[str]:
+        # assert UTF8.coder is not None, 'UTF8 parser not set yet'
+        return UTF8.coder.decode(data=data)
+
+
+#
+#   Interfaces
+#
+
+
+def utf8_encode(string: str) -> bytes:
+    return UTF8.encode(string=string)
+
+
+def utf8_decode(data: bytes) -> Optional[str]:
+    return UTF8.decode(data=data)

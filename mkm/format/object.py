@@ -23,60 +23,8 @@
 # SOFTWARE.
 # ==============================================================================
 
-"""
-    Data Format
-    ~~~~~~~~~~~
-
-    Base64, Base58, Hex, UTF-8, JsON
-"""
-
 from abc import ABC, abstractmethod
 from typing import Optional, Union, Any, Dict, List
-
-
-class StringCoder(ABC):
-    """
-        String Coder
-        ~~~~~~~~~~~~
-        UTF-8, UTF-16, GBK, GB2312, ...
-
-        1. encode string to binary data;
-        2. decode binary data to string.
-    """
-
-    @abstractmethod
-    def encode(self, string: str) -> bytes:
-        """
-        Encode local string to binary data
-
-        :param string: local string
-        :return: binary data
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def decode(self, data: bytes) -> Optional[str]:
-        """
-        Decode binary data to local string
-
-        :param data: binary data
-        :return: local string
-        """
-        raise NotImplemented
-
-
-class UTF8:
-    coder: StringCoder = None
-
-    @staticmethod
-    def encode(string: str) -> bytes:
-        # assert UTF8.coder is not None, 'UTF8 parser not set yet'
-        return UTF8.coder.encode(string=string)
-
-    @staticmethod
-    def decode(data: bytes) -> Optional[str]:
-        # assert UTF8.coder is not None, 'UTF8 parser not set yet'
-        return UTF8.coder.decode(data=data)
 
 
 class ObjectCoder(ABC):
@@ -176,106 +124,9 @@ class JSONList:
         return JSONList.coder.decode(string=string)
 
 
-class DataCoder(ABC):
-    """
-        Data Coder
-        ~~~~~~~~~~
-        Hex, Base58, Base64, ...
-
-        1. encode binary data to string;
-        2. decode string to binary data.
-    """
-
-    @abstractmethod
-    def encode(self, data: bytes) -> str:
-        """
-        Encode binary data to text string
-
-        :param data: binary data
-        :return:     text string (Base58/64, Hex, ...)
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def decode(self, string: str) -> Optional[bytes]:
-        """
-        Decode text string to binary data
-
-        :param string: text string (Base58/64, Hex, ...)
-        :return:       binary data
-        """
-        raise NotImplemented
-
-
-class Hex:
-    coder: DataCoder = None
-
-    @staticmethod
-    def encode(data: bytes) -> str:
-        # assert Hex.coder is not None, 'Hex coder not set yet'
-        return Hex.coder.encode(data=data)
-
-    @staticmethod
-    def decode(string: str) -> Optional[bytes]:
-        # assert Hex.coder is not None, 'Hex coder not set yet'
-        return Hex.coder.decode(string=string)
-
-
-class Base58:
-    coder: DataCoder = None
-
-    @staticmethod
-    def encode(data: bytes) -> str:
-        # assert Base58.coder is not None, 'Base58 coder not set yet'
-        return Base58.coder.encode(data=data)
-
-    @staticmethod
-    def decode(string: str) -> Optional[bytes]:
-        # assert Base58.coder is not None, 'Base58 coder not set yet'
-        return Base58.coder.decode(string=string)
-
-
-class Base64:
-    coder: DataCoder = None
-
-    @staticmethod
-    def encode(data: bytes) -> str:
-        # assert Base64.coder is not None, 'Base64 coder not set yet'
-        return Base64.coder.encode(data=data)
-
-    @staticmethod
-    def decode(string: str) -> Optional[bytes]:
-        # assert Base64.coder is not None, 'Base64 coder not set yet'
-        return Base64.coder.decode(string=string)
-
-
 #
 #   Interfaces
 #
-
-
-def base64_encode(data: bytes) -> str:
-    return Base64.encode(data)
-
-
-def base64_decode(string: str) -> Optional[bytes]:
-    return Base64.decode(string)
-
-
-def base58_encode(data: bytes) -> str:
-    return Base58.encode(data)
-
-
-def base58_decode(string: str) -> Optional[bytes]:
-    return Base58.decode(string)
-
-
-def hex_encode(data: bytes) -> str:
-    return Hex.encode(data)
-
-
-def hex_decode(string: str) -> Optional[bytes]:
-    return Hex.decode(string)
 
 
 def json_encode(obj: Union[Dict, List]) -> str:
@@ -284,11 +135,3 @@ def json_encode(obj: Union[Dict, List]) -> str:
 
 def json_decode(string: str) -> Union[Dict, List, None]:
     return JSON.decode(string=string)
-
-
-def utf8_encode(string: str) -> bytes:
-    return UTF8.encode(string=string)
-
-
-def utf8_decode(data: bytes) -> Optional[str]:
-    return UTF8.decode(data=data)

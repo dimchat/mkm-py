@@ -25,6 +25,7 @@
 
 from typing import Optional, Any, Dict
 
+from ..types import Converter
 from ..types import Wrapper
 
 from .cryptography import EncryptKey, DecryptKey
@@ -50,8 +51,9 @@ class CryptographyKeyGeneralFactory:
 
     def keys_match(self, encrypt_key: EncryptKey, decrypt_key: DecryptKey) -> bool:
         """ check by encryption """
-        ciphertext = encrypt_key.encrypt(data=self.promise)
-        plaintext = decrypt_key.decrypt(data=ciphertext)
+        extra = {}
+        ciphertext = encrypt_key.encrypt(data=self.promise, extra=extra)
+        plaintext = decrypt_key.decrypt(data=ciphertext, params=extra)
         return plaintext == self.promise
 
     def asymmetric_keys_match(self, sign_key: SignKey, verify_key: VerifyKey) -> bool:
@@ -60,9 +62,10 @@ class CryptographyKeyGeneralFactory:
         return verify_key.verify(data=self.promise, signature=signature)
 
     # noinspection PyMethodMayBeStatic
-    def get_key_algorithm(self, key: Dict[str, Any]) -> Optional[str]:
+    def get_key_algorithm(self, key: Dict[str, Any], default: Optional[str]) -> Optional[str]:
         """ get key algorithm name """
-        return key.get('algorithm')
+        value = key.get('algorithm')
+        return Converter.get_str(value=value, default=default)
 
     #
     #   SymmetricKey
@@ -88,9 +91,7 @@ class CryptographyKeyGeneralFactory:
         if info is None:
             # assert False, 'key error: %s' % key
             return None
-        algorithm = self.get_key_algorithm(key=info)
-        if algorithm is None:
-            algorithm = '*'
+        algorithm = self.get_key_algorithm(key=info, default='*')
         factory = self.get_symmetric_key_factory(algorithm=algorithm)
         if factory is None and algorithm != '*':
             factory = self.get_symmetric_key_factory(algorithm='*')  # unknown
@@ -118,9 +119,7 @@ class CryptographyKeyGeneralFactory:
         if info is None:
             # assert False, 'key error: %s' % key
             return None
-        algorithm = self.get_key_algorithm(key=info)
-        if algorithm is None:
-            algorithm = '*'
+        algorithm = self.get_key_algorithm(key=info, default='*')
         factory = self.get_public_key_factory(algorithm=algorithm)
         if factory is None and algorithm != '*':
             factory = self.get_public_key_factory(algorithm='*')  # unknown
@@ -153,9 +152,7 @@ class CryptographyKeyGeneralFactory:
         if info is None:
             # assert False, 'key error: %s' % key
             return None
-        algorithm = self.get_key_algorithm(key=info)
-        if algorithm is None:
-            algorithm = '*'
+        algorithm = self.get_key_algorithm(key=info, default='*')
         factory = self.get_private_key_factory(algorithm=algorithm)
         if factory is None and algorithm != '*':
             factory = self.get_private_key_factory(algorithm='*')  # unknown

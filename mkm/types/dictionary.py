@@ -27,7 +27,8 @@ import copy
 from typing import Any, Optional, Iterator, Tuple, Dict
 from typing import Mapping, ItemsView, KeysView, ValuesView
 
-from mkm.types import Stringer
+from .x import DateTime
+from .string import Stringer
 from .converter import Converter
 from .wrapper import Mapper
 
@@ -76,55 +77,50 @@ class Dictionary(Mapper):
         return Dictionary(dictionary=dictionary)
 
     # Override
-    def get_str(self, key: str, default: Optional[str] = None) -> Optional[str]:
-        value = self.__dictionary.get(key, default)
-        value = Converter.get_str(value=value)
-        return default if value is None else value
+    def get_str(self, key: str, default: Optional[str]) -> Optional[str]:
+        value = self.__dictionary.get(key)
+        return Converter.get_str(value=value, default=default)
 
     # Override
-    def get_bool(self, key: str, default: bool = False) -> bool:
-        value = self.__dictionary.get(key, default)
-        value = Converter.get_bool(value=value)
-        return default if value is None else value
+    def get_bool(self, key: str, default: Optional[bool]) -> Optional[bool]:
+        value = self.__dictionary.get(key)
+        return Converter.get_bool(value=value, default=default)
 
     # Override
-    def get_int(self, key: str, default: int = 0) -> int:
-        value = self.__dictionary.get(key, default)
-        value = Converter.get_int(value=value)
-        return default if value is None else value
+    def get_int(self, key: str, default: Optional[int]) -> Optional[int]:
+        value = self.__dictionary.get(key)
+        return Converter.get_int(value=value, default=default)
 
     # Override
-    def get_float(self, key: str, default: float = 0.0) -> float:
-        value = self.__dictionary.get(key, default)
-        value = Converter.get_float(value=value)
-        return default if value is None else value
+    def get_float(self, key: str, default: Optional[float]) -> Optional[float]:
+        value = self.__dictionary.get(key)
+        return Converter.get_float(value=value, default=default)
 
     # Override
-    def get_time(self, key: str, default: float = 0.0) -> float:
-        value = self.__dictionary.get(key, default)
-        value = Converter.get_time(value=value)
-        return default if value is None else value
+    def get_datetime(self, key: str, default: Optional[DateTime]) -> Optional[DateTime]:
+        value = self.__dictionary.get(key)
+        return Converter.get_datetime(value=value, default=default)
 
     # Override
-    def set_time(self, key: str, time: Optional[float]):
-        if time is None:
+    def set_datetime(self, key: str, value: Optional[DateTime]):
+        if value is None:
             self.__dictionary.pop(key, None)
         else:
-            self.__dictionary[key] = time
+            self.__dictionary[key] = value.timestamp
 
     # Override
-    def set_string(self, key: str, string: Optional[Stringer]):
-        if string is None:
+    def set_string(self, key: str, value: Optional[Stringer]):
+        if value is None:
             self.__dictionary.pop(key, None)
         else:
-            self.__dictionary[key] = string.string
+            self.__dictionary[key] = value.string
 
     # Override
-    def set_map(self, key: str, dictionary: Optional[Mapper]):
-        if dictionary is None:
+    def set_map(self, key: str, value):  # value: Optional[Mapper]
+        if value is None:
             self.__dictionary.pop(key, None)
         else:
-            self.__dictionary[key] = dictionary.dictionary
+            self.__dictionary[key] = value.dictionary
 
     # Override
     def get(self, key: str, default: Optional[Any] = None) -> Optional[Any]:

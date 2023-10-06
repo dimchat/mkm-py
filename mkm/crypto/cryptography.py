@@ -24,7 +24,7 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Dict
 
 from ..types import Mapper
 
@@ -66,13 +66,16 @@ class CryptographyKey(Mapper, ABC):
 class EncryptKey(CryptographyKey, ABC):
 
     @abstractmethod
-    def encrypt(self, data: bytes) -> bytes:
+    def encrypt(self, data: bytes, extra: Optional[Dict]) -> bytes:
         """
-        ciphertext = encrypt(plaintext, PW)
-        ciphertext = encrypt(plaintext, PK)
+        1. Symmetric Key:
+            ciphertext = encrypt(plaintext, PW)
+        2. Asymmetric Public Key:
+            ciphertext = encrypt(plaintext, PK)
 
-        :param data: plaintext
-        :return:     ciphertext
+        :param data:  plaintext
+        :param extra: store extra variables ('IV' for 'AES')
+        :return: ciphertext
         """
         raise NotImplemented
 
@@ -80,22 +83,25 @@ class EncryptKey(CryptographyKey, ABC):
 class DecryptKey(CryptographyKey, ABC):
 
     @abstractmethod
-    def decrypt(self, data: bytes) -> Optional[bytes]:
+    def decrypt(self, data: bytes, params: Optional[Dict]) -> Optional[bytes]:
         """
-        plaintext = decrypt(ciphertext, PW);
-        plaintext = decrypt(ciphertext, SK);
+        1. Symmetric Key:
+            plaintext = decrypt(ciphertext, PW);
+        2. Asymmetric Private Key:
+            plaintext = decrypt(ciphertext, SK);
 
-        :param data: ciphertext
-        :return:     plaintext
+        :param data:   ciphertext
+        :param params: extra params ('IV' for 'AES')
+        :return: plaintext
         """
         raise NotImplemented
 
     @abstractmethod
-    def match(self, key: EncryptKey) -> bool:
+    def match_encrypt_key(self, key: EncryptKey) -> bool:
         """
-        OK = decrypt(encrypt(data, SK), PK) == data
+        OK = decrypt(encrypt(data, PK), SK) == data
 
-        :param key: encrypt key
-        :return:    False on error
+        :param key: encrypt (public) key
+        :return: False on error
         """
         raise NotImplemented

@@ -27,7 +27,7 @@
     Data Digest
     ~~~~~~~~~~~
 
-    MD5, SHA-256, RipeMD-160
+    MD5, SHA1, SHA-256, Keccak256, RipeMD-160, ...
 """
 
 from abc import ABC, abstractmethod
