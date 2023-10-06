@@ -50,7 +50,7 @@ class PublicKey(VerifyKey, ABC):
     @classmethod
     def parse(cls, key: Any):  # -> Optional[PublicKey]:
         gf = general_factory()
-        return gf.parse_public_key(key=key)
+        return gf.parse_public_key(key)
 
     @classmethod
     def factory(cls, algorithm: str):  # -> Optional[PublicKeyFactory]:

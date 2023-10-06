@@ -45,8 +45,6 @@ __all__ = [
     #
     #   Protocol
     #
-    'PortableNetworkFile',
-
     'EntityType', 'MetaType',
     'Address', 'AddressFactory',
     'ID', 'IDFactory',

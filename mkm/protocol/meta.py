@@ -73,7 +73,7 @@ class Meta(Mapper, ABC):
 
     @property
     @abstractmethod
-    def key(self) -> VerifyKey:
+    def public_key(self) -> VerifyKey:
         """
         Public key (used for signature)
 
@@ -117,35 +117,57 @@ class Meta(Mapper, ABC):
         """
         raise NotImplemented
 
-    @classmethod
-    def check(cls, meta) -> bool:
-        gf = general_factory()
-        return gf.check_meta(meta=meta)
+    #
+    #   Validation
+    #
+
+    @property
+    @abstractmethod
+    def valid(self) -> bool:
+        """
+        Check meta valid
+        (must call this when received a new meta from network)
+
+        :return: True on valid
+        """
+        raise NotImplemented
 
     @classmethod
-    def match_id(cls, meta, identifier: ID) -> bool:
-        gf = general_factory()
-        return gf.meta_match_id(meta=meta, identifier=identifier)
+    def match_identifier(cls, identifier: ID) -> bool:
+        """
+        Check whether meta match with entity ID
+        (must call this when received a new meta from network)
+
+        :param identifier: entity ID
+        :return: True on matched
+        """
+        raise NotImplemented
 
     @classmethod
-    def match_key(cls, meta, key: VerifyKey) -> bool:
-        gf = general_factory()
-        return gf.meta_match_key(meta=meta, key=key)
+    def match_public_key(cls, key: VerifyKey) -> bool:
+        """
+        Check whether meta match with public key
+
+        :param key: public key
+        :return: True on matched
+        """
+        raise NotImplemented
 
     #
     #   Factory methods
     #
 
     @classmethod
-    def generate(cls, version: Union[MetaType, int], key: SignKey, seed: Optional[str] = None):  # -> Optional[Meta]:
+    def generate(cls, version: Union[MetaType, int], private_key: SignKey,
+                 seed: Optional[str] = None):  # -> Optional[Meta]:
         gf = general_factory()
-        return gf.generate_meta(version=version, key=key, seed=seed)
+        return gf.generate_meta(version, private_key, seed=seed)
 
     @classmethod
-    def create(cls, version: Union[MetaType, int], key: VerifyKey,
+    def create(cls, version: Union[MetaType, int], public_key: VerifyKey,
                seed: Optional[str] = None, fingerprint: Union[bytes, str, None] = None):  # -> Optional[Meta]:
         gf = general_factory()
-        return gf.create_meta(version=version, key=key, seed=seed, fingerprint=fingerprint)
+        return gf.create_meta(version, public_key, seed=seed, fingerprint=fingerprint)
 
     @classmethod
     def parse(cls, meta: Any):  # -> Optional[Meta]:
@@ -155,12 +177,12 @@ class Meta(Mapper, ABC):
     @classmethod
     def factory(cls, version: Union[MetaType, int]):  # -> Optional[MetaFactory]:
         gf = general_factory()
-        return gf.get_meta_factory(version=version)
+        return gf.get_meta_factory(version)
 
     @classmethod
     def register(cls, version: Union[MetaType, int], factory):
         gf = general_factory()
-        gf.set_meta_factory(version=version, factory=factory)
+        gf.set_meta_factory(version, factory=factory)
 
 
 def general_factory():
@@ -171,24 +193,24 @@ def general_factory():
 class MetaFactory(ABC):
 
     @abstractmethod
-    def generate_meta(self, key: SignKey, seed: Optional[str]) -> Meta:
+    def generate_meta(self, private_key: SignKey, seed: Optional[str]) -> Meta:
         """
         Generate meta
 
-        :param key:  private key
-        :param seed: ID.name
+        :param private_key: asymmetric private key
+        :param seed:        ID.name
         :return: Meta
         """
         raise NotImplemented
 
     @abstractmethod
-    def create_meta(self, key: VerifyKey, seed: Optional[str], fingerprint: Union[bytes, str, None]) -> Meta:
+    def create_meta(self, public_key: VerifyKey, seed: Optional[str], fingerprint: Union[bytes, str, None]) -> Meta:
         """
         Create meta
 
-        :param key:         public key
+        :param public_key:  asymmetric public key
         :param seed:        ID.name
-        :param fingerprint: sKey.sign(seed)
+        :param fingerprint: private_key.sign(seed)
         :return: Meta
         """
         raise NotImplemented

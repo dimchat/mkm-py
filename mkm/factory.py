@@ -30,9 +30,9 @@
 
 from typing import Optional, Union, Any, List, Dict
 
+from .types import Converter
 from .types import Wrapper
 from .crypto import SignKey, VerifyKey
-from .crypto import utf8_encode
 from .protocol import Address, AddressFactory
 from .protocol import ID, IDFactory
 from .protocol import Meta, MetaType, MetaFactory
@@ -162,21 +162,22 @@ class AccountGeneralFactory:
         return self.__meta_factories.get(version)
 
     # noinspection PyMethodMayBeStatic
-    def get_meta_type(self, meta: Dict[str, Any]) -> Optional[int]:
+    def get_meta_type(self, meta: Dict[str, Any], default: Optional[int]) -> Optional[int]:
         """ get meta type(version) """
-        return meta.get('type')
+        value = meta.get('type')
+        return Converter.get_int(value=value, default=default)
 
-    def generate_meta(self, version: Union[MetaType, int], key: SignKey,
+    def generate_meta(self, version: Union[MetaType, int], private_key: SignKey,
                       seed: Optional[str]) -> Meta:
-        factory = self.get_meta_factory(version=version)
+        factory = self.get_meta_factory(version)
         # assert factory is not None, 'failed to get meta factory: %d' % version
-        return factory.generate_meta(key=key, seed=seed)
+        return factory.generate_meta(private_key, seed=seed)
 
-    def create_meta(self, version: Union[MetaType, int], key: VerifyKey,
+    def create_meta(self, version: Union[MetaType, int], public_key: VerifyKey,
                     seed: Optional[str], fingerprint: Union[bytes, str, None]) -> Meta:
-        factory = self.get_meta_factory(version=version)
+        factory = self.get_meta_factory(version)
         # assert factory is not None, 'failed to get meta factory: %d' % version
-        return factory.create_meta(key=key, seed=seed, fingerprint=fingerprint)
+        return factory.create_meta(public_key, seed=seed, fingerprint=fingerprint)
 
     def parse_meta(self, meta: Any) -> Optional[Meta]:
         if meta is None:
@@ -187,57 +188,14 @@ class AccountGeneralFactory:
         if info is None:
             # assert False, 'meta error: %s' % meta
             return None
-        version = self.get_meta_type(meta=info)
-        if version is None:
-            version = 0
-        factory = self.get_meta_factory(version=version)
+        version = self.get_meta_type(meta=info, default=0)
+        factory = self.get_meta_factory(version)
         if factory is None and version != 0:
-            factory = self.get_meta_factory(version=0)  # unknown
+            factory = self.get_meta_factory(0)  # unknown
         # if factory is None:
         #     # assert False, 'meta factory not found: %d' % version
         #     return None
         return factory.parse_meta(meta=info)
-
-    # noinspection PyMethodMayBeStatic
-    def check_meta(self, meta: Meta) -> bool:
-        key = meta.key
-        if not MetaType.has_seed(version=meta.type):
-            # this meta has no seed, so no signature too
-            return True
-            # return isinstance(key, VerifyKey)
-        # check seed with signature
-        seed = meta.seed
-        fingerprint = meta.fingerprint
-        if seed is None or fingerprint is None:
-            # seed and fingerprint should not be empty
-            return False
-        # verify fingerprint
-        return key.verify(data=utf8_encode(string=seed), signature=fingerprint)
-
-    # noinspection PyMethodMayBeStatic
-    def meta_match_id(self, meta: Meta, identifier: ID) -> bool:
-        """ Check whether meta match with entity ID
-            (must call this when received a new meta from network) """
-        # check ID.name
-        if meta.seed == identifier.name:
-            # check ID.address
-            old = identifier.address
-            gen = Address.generate(meta=meta, network=old.type)
-            return old == gen
-
-    # noinspection PyMethodMayBeStatic
-    def meta_match_key(self, meta: Meta, key: VerifyKey) -> bool:
-        """ Check whether meta match with public key """
-        if key == meta.key:
-            # NOTICE: ID with BTC/ETH address has no username, so
-            #         just compare the key.data to check matching
-            return True
-        # check with seed & fingerprint
-        if MetaType.has_seed(version=meta.type):
-            # check whether keys equal by verifying signature
-            seed = utf8_encode(string=meta.seed)
-            fingerprint = meta.fingerprint
-            return key.verify(data=seed, signature=fingerprint)
 
     #
     #   Document
@@ -250,12 +208,13 @@ class AccountGeneralFactory:
         return self.__document_factories.get(doc_type)
 
     # noinspection PyMethodMayBeStatic
-    def get_document_type(self, document: Dict[str, Any]) -> Optional[str]:
-        return document.get('type')
+    def get_document_type(self, document: Dict[str, Any], default: Optional[str]) -> Optional[str]:
+        value = document.get('type')
+        return Converter.get_str(value=value, default=default)
 
     def create_document(self, doc_type: str, identifier: ID,
                         data: Optional[str], signature: Union[bytes, str]) -> Document:
-        factory = self.get_document_factory(doc_type=doc_type)
+        factory = self.get_document_factory(doc_type)
         # assert factory is not None, 'document factory not found for type: %s' % doc_type
         return factory.create_document(identifier=identifier, data=data, signature=signature)
 
@@ -268,12 +227,10 @@ class AccountGeneralFactory:
         if info is None:
             # assert False, 'document error: %s' % document
             return None
-        doc_type = self.get_document_type(document=info)
-        if doc_type is None:
-            doc_type = '*'
-        factory = self.get_document_factory(doc_type=doc_type)
+        doc_type = self.get_document_type(document=info, default='*')
+        factory = self.get_document_factory(doc_type)
         if factory is None and doc_type != '*':
-            factory = self.get_document_factory(doc_type='*')  # unknown
+            factory = self.get_document_factory('*')  # unknown
         # if factory is None:
         #     # assert False, 'document factory not found for type: %s' % doc_type
         #     return None

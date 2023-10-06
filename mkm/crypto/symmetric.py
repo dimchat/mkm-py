@@ -58,7 +58,7 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
     @classmethod
     def parse(cls, key: Any):  # -> Optional[SymmetricKey]:
         gf = general_factory()
-        return gf.parse_symmetric_key(key=key)
+        return gf.parse_symmetric_key(key)
 
     @classmethod
     def factory(cls, algorithm: str):  # -> Optional[SymmetricKeyFactory]:

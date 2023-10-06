@@ -31,6 +31,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Union, Any, Dict
 
+from ..types import DateTime
 from ..types import Mapper
 
 from .identifier import ID
@@ -38,6 +39,18 @@ from .tai import TAI
 
 
 class Document(TAI, Mapper, ABC):
+    """
+        User/Group Profile
+        ~~~~~~~~~~~~~~~~~~
+        This class is used to generate entity profile
+
+            data format: {
+                ID        : "EntityID",        // entity ID
+                type      : "visa",            // "bulletin", ...
+                data      : "{JSON}",          // data = json_encode(info)
+                signature : "{BASE64_ENCODE}"  // signature = sign(data, SK);
+            }
+    """
 
     #
     #  Document types
@@ -68,7 +81,7 @@ class Document(TAI, Mapper, ABC):
 
     @property
     @abstractmethod
-    def time(self) -> float:
+    def time(self) -> Optional[DateTime]:
         """
         Get sign time
 
@@ -81,7 +94,7 @@ class Document(TAI, Mapper, ABC):
     #
     @property
     @abstractmethod
-    def name(self) -> str:
+    def name(self) -> Optional[str]:
         """
         Get entity name
 
@@ -108,7 +121,7 @@ class Document(TAI, Mapper, ABC):
     def create(cls, doc_type: str, identifier: ID,
                data: Optional[str] = None, signature: Union[bytes, str] = None):  # -> Optional[Document]:
         gf = general_factory()
-        return gf.create_document(doc_type=doc_type, identifier=identifier, data=data, signature=signature)
+        return gf.create_document(doc_type, identifier=identifier, data=data, signature=signature)
 
     @classmethod
     def parse(cls, document: Any):  # -> Optional[Document]:
@@ -118,12 +131,12 @@ class Document(TAI, Mapper, ABC):
     @classmethod
     def register(cls, doc_type: str, factory):
         gf = general_factory()
-        gf.set_document_factory(doc_type=doc_type, factory=factory)
+        gf.set_document_factory(doc_type, factory=factory)
 
     @classmethod
     def factory(cls, doc_type: str):  # -> Optional[DocumentFactory]:
         gf = general_factory()
-        return gf.get_document_factory(doc_type=doc_type)
+        return gf.get_document_factory(doc_type)
 
 
 def general_factory():

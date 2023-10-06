@@ -46,7 +46,7 @@ class ID(Stringer, ABC):
         fields:
             name     - entity name, the seed of fingerprint to generate address
             address  - a string to identify an entity
-            terminal - entity login resource(device), OPTIONAL
+            terminal - location (device), RESERVED
     """
 
     @property

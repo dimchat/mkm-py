@@ -63,13 +63,13 @@ class Address(Stringer, ABC):
     @property
     @abstractmethod
     def is_user(self) -> bool:
-        # return entity_is_user(network=self.type)
+        # return entity_is_user(self.type)
         raise NotImplemented
 
     @property
     @abstractmethod
     def is_group(self) -> bool:
-        # return entity_is_group(network=self.type)
+        # return entity_is_group(self.type)
         raise NotImplemented
 
     #

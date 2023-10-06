@@ -91,14 +91,14 @@ class CryptographyKeyGeneralFactory:
         if info is None:
             # assert False, 'key error: %s' % key
             return None
-        algorithm = self.get_key_algorithm(key=info, default='*')
+        algorithm = self.get_key_algorithm(info, default='*')
         factory = self.get_symmetric_key_factory(algorithm=algorithm)
         if factory is None and algorithm != '*':
             factory = self.get_symmetric_key_factory(algorithm='*')  # unknown
         # if factory is None:
         #     # assert False, 'key algorithm not support: %s' % algorithm
         #     return None
-        return factory.parse_symmetric_key(key=info)
+        return factory.parse_symmetric_key(info)
 
     #
     #   PublicKey
@@ -119,14 +119,14 @@ class CryptographyKeyGeneralFactory:
         if info is None:
             # assert False, 'key error: %s' % key
             return None
-        algorithm = self.get_key_algorithm(key=info, default='*')
+        algorithm = self.get_key_algorithm(info, default='*')
         factory = self.get_public_key_factory(algorithm=algorithm)
         if factory is None and algorithm != '*':
             factory = self.get_public_key_factory(algorithm='*')  # unknown
         # if factory is None:
         #     # assert False, 'key algorithm not support: %s' % algorithm
         #     return None
-        return factory.parse_public_key(key=info)
+        return factory.parse_public_key(info)
 
     #
     #   PrivateKey
@@ -152,14 +152,14 @@ class CryptographyKeyGeneralFactory:
         if info is None:
             # assert False, 'key error: %s' % key
             return None
-        algorithm = self.get_key_algorithm(key=info, default='*')
+        algorithm = self.get_key_algorithm(info, default='*')
         factory = self.get_private_key_factory(algorithm=algorithm)
         if factory is None and algorithm != '*':
             factory = self.get_private_key_factory(algorithm='*')  # unknown
         # if factory is None:
         #     # assert False, 'key algorithm not support: %s' % algorithm
         #     return None
-        return factory.parse_private_key(key=info)
+        return factory.parse_private_key(info)
 
 
 # Singleton

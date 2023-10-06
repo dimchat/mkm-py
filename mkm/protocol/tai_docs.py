@@ -29,11 +29,11 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Union, List
+from typing import Optional, List
 
-from ..crypto import EncryptKey, VerifyKey
+from ..crypto import EncryptKey
+from ..format import PortableNetworkFile
 
-from .file import PortableNetworkFile
 from .identifier import ID
 from .tai_doc import Document
 
@@ -48,7 +48,7 @@ class Visa(Document, ABC):
 
     @property
     @abstractmethod
-    def key(self) -> Union[EncryptKey, VerifyKey, None]:
+    def public_key(self) -> Optional[EncryptKey]:
         """
         Get public key to encrypt message for user
 
@@ -56,13 +56,13 @@ class Visa(Document, ABC):
         """
         raise NotImplemented
 
-    @key.setter
+    @public_key.setter
     @abstractmethod
-    def key(self, value: Union[EncryptKey, VerifyKey]):
+    def public_key(self, key: EncryptKey):
         """
         Set public key for other user to encrypt message
 
-        :param value: public key as visa.key
+        :param key: public key as visa.key
         """
         raise NotImplemented
 
@@ -70,19 +70,19 @@ class Visa(Document, ABC):
     @abstractmethod
     def avatar(self) -> Optional[PortableNetworkFile]:
         """
-        Get avatar file
+        Get avatar URL
 
-        :return: transportable file
+        :return: PNF(URL)
         """
         raise NotImplemented
 
     @avatar.setter
     @abstractmethod
-    def avatar(self, file: PortableNetworkFile):
+    def avatar(self, url: PortableNetworkFile):
         """
-        Set avatar file/url
+        Set avatar URL
 
-        :param file: transportable file, or URL string
+        :param url: PNF(URL)
         """
         raise NotImplemented
 
@@ -121,19 +121,4 @@ class Bulletin(Document, ABC):
 
         :param bots: bot ID list
         """
-        raise NotImplemented
-
-    """
-        Times
-        ~~~~~
-    """
-
-    @property
-    @abstractmethod
-    def created_time(self) -> Optional[float]:
-        raise NotImplemented
-
-    @property
-    @abstractmethod
-    def modified_time(self) -> Optional[float]:
         raise NotImplemented
