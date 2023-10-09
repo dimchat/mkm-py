@@ -106,4 +106,5 @@ class DateTime:
 
     @classmethod
     def current_timestamp(cls) -> float:
+        """ Return the current time in seconds since the Epoch. """
         return time.time()

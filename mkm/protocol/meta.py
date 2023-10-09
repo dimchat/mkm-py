@@ -33,6 +33,7 @@ from typing import Optional, Union, Any, Dict
 
 from ..types import Mapper
 from ..crypto import VerifyKey, SignKey
+from ..format import TransportableData
 
 from .version import MetaType
 from .address import Address
@@ -108,7 +109,7 @@ class Meta(Mapper, ABC):
         raise NotImplemented
 
     @abstractmethod
-    def generate_address(self, network: int) -> Address:
+    def generate_address(self, network: int = None) -> Address:
         """
         Generate Address with network ID
 
@@ -165,7 +166,7 @@ class Meta(Mapper, ABC):
 
     @classmethod
     def create(cls, version: Union[MetaType, int], public_key: VerifyKey,
-               seed: Optional[str] = None, fingerprint: Union[bytes, str, None] = None):  # -> Optional[Meta]:
+               seed: Optional[str] = None, fingerprint: Optional[TransportableData] = None):  # -> Optional[Meta]:
         gf = general_factory()
         return gf.create_meta(version, public_key, seed=seed, fingerprint=fingerprint)
 
@@ -204,7 +205,7 @@ class MetaFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def create_meta(self, public_key: VerifyKey, seed: Optional[str], fingerprint: Union[bytes, str, None]) -> Meta:
+    def create_meta(self, public_key: VerifyKey, seed: Optional[str], fingerprint: Optional[TransportableData]) -> Meta:
         """
         Create meta
 

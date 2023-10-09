@@ -55,7 +55,7 @@ class TransportableData(Mapper, ABC):
 
     @property
     @abstractmethod
-    def algorithm(self) -> str:
+    def algorithm(self) -> Optional[str]:
         """
         Get data encode algorithm
 
@@ -65,7 +65,7 @@ class TransportableData(Mapper, ABC):
 
     @property
     @abstractmethod
-    def data(self) -> bytes:
+    def data(self) -> Optional[bytes]:
         """
         Get original data
 
@@ -87,7 +87,7 @@ class TransportableData(Mapper, ABC):
 
     @property
     @abstractmethod
-    def object(self) -> object:
+    def object(self) -> Any:
         """
         to_json()
 
@@ -100,7 +100,7 @@ class TransportableData(Mapper, ABC):
     #
 
     @classmethod
-    def encode(cls, data: bytes) -> object:
+    def encode(cls, data: bytes) -> Any:
         ted = cls.create(data=data)
         # assert isinstance(ted, TransportableData), 'should not happen'
         return ted.object

@@ -30,6 +30,8 @@ from ..types import Mapper
 from ..types import URI
 from ..crypto import DecryptKey
 
+from .encode import TransportableData
+
 
 class PortableNetworkFile(Mapper, ABC):
     """
@@ -76,7 +78,7 @@ class PortableNetworkFile(Mapper, ABC):
 
     @filename.setter
     @abstractmethod
-    def filename(self, string: str):
+    def filename(self, string: Optional[str]):
         raise NotImplemented
 
     #
@@ -99,12 +101,12 @@ class PortableNetworkFile(Mapper, ABC):
     #
     @property
     @abstractmethod
-    def password(self) -> DecryptKey:
+    def password(self) -> Optional[DecryptKey]:
         raise NotImplemented
 
     @password.setter
     @abstractmethod
-    def password(self, key: DecryptKey):
+    def password(self, key: Optional[DecryptKey]):
         raise NotImplemented
 
     @abstractmethod
@@ -121,7 +123,7 @@ class PortableNetworkFile(Mapper, ABC):
 
     @property
     @abstractmethod
-    def object(self) -> object:
+    def object(self) -> Any:
         """
         to_json()
 
@@ -139,11 +141,12 @@ class PortableNetworkFile(Mapper, ABC):
 
     @classmethod
     def create_from_data(cls, data: bytes, filename: Optional[str]):
-        return cls.create(data=data, filename=filename)
+        ted = TransportableData.create(data=data)
+        return cls.create(data=ted, filename=filename)
 
     @classmethod
-    def create(cls, data: bytes = None, filename: Optional[str] = None,
-               url: URI = None, password: Optional[DecryptKey] = None):  # -> PortableNetworkFile:
+    def create(cls, data: Optional[TransportableData] = None, filename: Optional[str] = None,
+               url: Optional[URI] = None, password: Optional[DecryptKey] = None):  # -> PortableNetworkFile:
         gf = general_factory()
         return gf.create_portable_network_file(data=data, filename=filename, url=url, password=password)
 
@@ -172,7 +175,7 @@ class PortableNetworkFileFactory(ABC):
     """ PNF factory """
 
     @abstractmethod
-    def create_portable_network_file(self, data: Optional[bytes], filename: Optional[str],
+    def create_portable_network_file(self, data: Optional[TransportableData], filename: Optional[str],
                                      url: Optional[URI], password: Optional[DecryptKey]) -> PortableNetworkFile:
         """
         Create PNF

@@ -105,7 +105,7 @@ class FormatGeneralFactory:
 
     def create_transportable_data(self, algorithm: str, data: bytes) -> TransportableData:
         factory = self.get_transportable_data_factory(algorithm=algorithm)
-        # assert factory is not None, 'data algorithm not support: %s' % algorithm
+        assert factory is not None, 'data algorithm not support: %s' % algorithm
         return factory.create_transportable_data(data=data)
 
     def parse_transportable_data(self, ted: Any) -> Optional[TransportableData]:
@@ -120,10 +120,10 @@ class FormatGeneralFactory:
             return None
         algorithm = self.get_data_algorithm(info, default='*')
         factory = self.get_transportable_data_factory(algorithm=algorithm)
-        if factory is None and algorithm != '*':
+        if factory is None:
+            assert algorithm != '*', 'TED factory not ready'
             factory = self.get_transportable_data_factory(algorithm='*')  # unknown
-        # if factory is None:
-        #     assert False, 'cannot parse TED: %s' % ted
+            assert factory is not None, 'default TED factory not found'
         return factory.parse_transportable_data(info)
 
     #
@@ -136,10 +136,10 @@ class FormatGeneralFactory:
     def get_portable_network_file_factory(self) -> Optional[PortableNetworkFileFactory]:
         return self.__pnf_factory
 
-    def create_portable_network_file(self, data: Optional[bytes], filename: Optional[str],
+    def create_portable_network_file(self, data: Optional[TransportableData], filename: Optional[str],
                                      url: Optional[URI], password: Optional[DecryptKey]) -> PortableNetworkFile:
         factory = self.get_portable_network_file_factory()
-        # assert factory is not None, 'PNF factory not ready'
+        assert factory is not None, 'PNF factory not ready'
         return factory.create_portable_network_file(data=data, filename=filename, url=url, password=password)
 
     def parse_portable_network_file(self, pnf: Any) -> Optional[PortableNetworkFile]:
@@ -153,7 +153,7 @@ class FormatGeneralFactory:
             # assert False, 'PNF error: %s' % pnf
             return None
         factory = self.get_portable_network_file_factory()
-        # assert factory is not None, 'PNF factory not ready'
+        assert factory is not None, 'PNF factory not ready'
         return factory.parse_portable_network_file(info)
 
 

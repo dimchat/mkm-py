@@ -79,7 +79,7 @@ class CryptographyKeyGeneralFactory:
 
     def generate_symmetric_key(self, algorithm: str) -> Optional[SymmetricKey]:
         factory = self.get_symmetric_key_factory(algorithm=algorithm)
-        # assert factory is not None, 'key algorithm not support: %s' % algorithm
+        assert factory is not None, 'key algorithm not support: %s' % algorithm
         return factory.generate_symmetric_key()
 
     def parse_symmetric_key(self, key: Any) -> Optional[SymmetricKey]:
@@ -91,14 +91,13 @@ class CryptographyKeyGeneralFactory:
         if info is None:
             # assert False, 'key error: %s' % key
             return None
-        algorithm = self.get_key_algorithm(info, default='*')
+        algorithm = self.get_key_algorithm(key=info, default='*')
+        assert algorithm != '*', 'symmetric key error: %s' % key
         factory = self.get_symmetric_key_factory(algorithm=algorithm)
-        if factory is None and algorithm != '*':
+        if factory is None:
             factory = self.get_symmetric_key_factory(algorithm='*')  # unknown
-        # if factory is None:
-        #     # assert False, 'key algorithm not support: %s' % algorithm
-        #     return None
-        return factory.parse_symmetric_key(info)
+            assert factory is not None, 'default symmetric key factory not found'
+        return factory.parse_symmetric_key(key=info)
 
     #
     #   PublicKey
@@ -119,14 +118,13 @@ class CryptographyKeyGeneralFactory:
         if info is None:
             # assert False, 'key error: %s' % key
             return None
-        algorithm = self.get_key_algorithm(info, default='*')
+        algorithm = self.get_key_algorithm(key=info, default='*')
+        assert algorithm != '*', 'public key error: %s' % key
         factory = self.get_public_key_factory(algorithm=algorithm)
-        if factory is None and algorithm != '*':
+        if factory is None:
             factory = self.get_public_key_factory(algorithm='*')  # unknown
-        # if factory is None:
-        #     # assert False, 'key algorithm not support: %s' % algorithm
-        #     return None
-        return factory.parse_public_key(info)
+            assert factory is not None, 'default public key factory not found'
+        return factory.parse_public_key(key=info)
 
     #
     #   PrivateKey
@@ -140,7 +138,7 @@ class CryptographyKeyGeneralFactory:
 
     def generate_private_key(self, algorithm: str) -> Optional[PrivateKey]:
         factory = self.get_private_key_factory(algorithm=algorithm)
-        # assert factory is not None, 'key algorithm not support: %s' % algorithm
+        assert factory is not None, 'key algorithm not support: %s' % algorithm
         return factory.generate_private_key()
 
     def parse_private_key(self, key: Any) -> Optional[PrivateKey]:
@@ -152,14 +150,13 @@ class CryptographyKeyGeneralFactory:
         if info is None:
             # assert False, 'key error: %s' % key
             return None
-        algorithm = self.get_key_algorithm(info, default='*')
+        algorithm = self.get_key_algorithm(key=info, default='*')
+        assert algorithm != '*', 'private key error: %s' % key
         factory = self.get_private_key_factory(algorithm=algorithm)
-        if factory is None and algorithm != '*':
+        if factory is None:
             factory = self.get_private_key_factory(algorithm='*')  # unknown
-        # if factory is None:
-        #     # assert False, 'key algorithm not support: %s' % algorithm
-        #     return None
-        return factory.parse_private_key(info)
+            assert factory is not None, 'default private key factory not found'
+        return factory.parse_private_key(key=info)
 
 
 # Singleton

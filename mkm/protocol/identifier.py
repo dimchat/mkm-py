@@ -97,7 +97,7 @@ class ID(Stringer, ABC):
         :return: ID list
         """
         gf = general_factory()
-        return gf.convert_id_list(array=array)
+        return gf.convert_identifiers(array=array)
 
     @classmethod
     def revert(cls, array) -> List[str]:
@@ -108,36 +108,36 @@ class ID(Stringer, ABC):
         :return: string array
         """
         gf = general_factory()
-        return gf.revert_id_list(array=array)
+        return gf.revert_identifiers(array=array)
 
     #
     #   Factory methods
     #
 
     @classmethod
-    def generate(cls, meta, network: int, terminal: Optional[str] = None):  # -> ID:
+    def generate(cls, meta, network: int = None, terminal: Optional[str] = None):  # -> ID:
         gf = general_factory()
-        return gf.generate_id(meta=meta, network=network, terminal=terminal)
+        return gf.generate_identifier(meta=meta, network=network, terminal=terminal)
 
     @classmethod
     def create(cls, name: Optional[str], address: Address, terminal: Optional[str] = None):  # -> ID:
         gf = general_factory()
-        return gf.create_id(name=name, address=address, terminal=terminal)
+        return gf.create_identifier(name=name, address=address, terminal=terminal)
 
     @classmethod
     def parse(cls, identifier: Any):  # -> Optional[ID]:
         gf = general_factory()
-        return gf.parse_id(identifier=identifier)
+        return gf.parse_identifier(identifier=identifier)
 
     @classmethod
     def factory(cls):  # -> Optional[IDFactory]:
         gf = general_factory()
-        return gf.get_id_factory()
+        return gf.get_identifier_factory()
 
     @classmethod
     def register(cls, factory):
         gf = general_factory()
-        gf.set_id_factory(factory=factory)
+        gf.set_identifier_factory(factory=factory)
 
 
 def general_factory():
@@ -148,7 +148,7 @@ def general_factory():
 class IDFactory(ABC):
 
     @abstractmethod
-    def generate_id(self, meta, network: int, terminal: Optional[str]) -> ID:
+    def generate_identifier(self, meta, network: Optional[int], terminal: Optional[str]) -> ID:
         """
         Generate ID
 
@@ -160,7 +160,7 @@ class IDFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def create_id(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
+    def create_identifier(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
         """
         Create ID
 
@@ -172,7 +172,7 @@ class IDFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def parse_id(self, identifier: str) -> Optional[ID]:
+    def parse_identifier(self, identifier: str) -> Optional[ID]:
         """
         Parse string object to ID
 

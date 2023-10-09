@@ -57,8 +57,8 @@ class Converter(ABC):
             return value != 0.0
         text = value if isinstance(value, str) else str(value)
         lo = text.lower()
-        return lo not in false_array
-        # return lo in true_array
+        return lo not in FALSE_LIST
+        # return lo in TRUE_LIST
 
     @classmethod
     def get_int(cls, value: Any, default: Optional[int]) -> Optional[int]:
@@ -96,9 +96,9 @@ class Converter(ABC):
         return DateTime(timestamp=timestamp)
 
 
-true_array = [
+TRUE_LIST = [
     '1', 'true', 'yes', 'on',
 ]
-false_array = [
+FALSE_LIST = [
     '0', 'false', 'no', 'off', 'null', 'undefined',
 ]

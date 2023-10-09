@@ -29,10 +29,11 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Union, Any, Dict
+from typing import Optional, Any, Dict
 
 from ..types import DateTime
 from ..types import Mapper
+from ..format import TransportableData
 
 from .identifier import ID
 from .tai import TAI
@@ -119,7 +120,7 @@ class Document(TAI, Mapper, ABC):
 
     @classmethod
     def create(cls, doc_type: str, identifier: ID,
-               data: Optional[str] = None, signature: Union[bytes, str] = None):  # -> Optional[Document]:
+               data: Optional[str] = None, signature: Optional[TransportableData] = None):  # -> Optional[Document]:
         gf = general_factory()
         return gf.create_document(doc_type, identifier=identifier, data=data, signature=signature)
 
@@ -147,7 +148,7 @@ def general_factory():
 class DocumentFactory(ABC):
 
     @abstractmethod
-    def create_document(self, identifier: ID, data: Optional[str], signature: Union[bytes, str, None]) -> Document:
+    def create_document(self, identifier: ID, data: Optional[str], signature: Optional[TransportableData]) -> Document:
         """
         1. Create a new empty document with entity ID
 

@@ -32,7 +32,9 @@ from typing import Optional, Union, Any, List, Dict
 
 from .types import Converter
 from .types import Wrapper
+from .format import TransportableData
 from .crypto import SignKey, VerifyKey
+
 from .protocol import Address, AddressFactory
 from .protocol import ID, IDFactory
 from .protocol import Meta, MetaType, MetaFactory
@@ -62,14 +64,14 @@ class AccountGeneralFactory:
     def get_address_factory(self) -> Optional[AddressFactory]:
         return self.__address_factory
 
-    def generate_address(self, meta: Meta, network: int) -> Address:
+    def generate_address(self, meta: Meta, network: int = None) -> Address:
         factory = self.get_address_factory()
-        # assert factory is not None, 'address factory not set'
+        assert factory is not None, 'address factory not set'
         return factory.generate_address(meta=meta, network=network)
 
-    def create_address(self, address: str) -> Optional[AddressFactory]:
+    def create_address(self, address: str) -> Optional[Address]:
         factory = self.get_address_factory()
-        # assert factory is not None, 'address factory not set'
+        assert factory is not None, 'address factory not set'
         return factory.create_address(address=address)
 
     def parse_address(self, address: Any) -> Optional[Address]:
@@ -82,30 +84,30 @@ class AccountGeneralFactory:
             # assert False, 'address error: %s' % address
             return None
         factory = self.get_address_factory()
-        # assert factory is not None, 'address factory not set'
+        assert factory is not None, 'address factory not set'
         return factory.parse_address(address=string)
 
     #
     #   ID
     #
 
-    def set_id_factory(self, factory: IDFactory):
+    def set_identifier_factory(self, factory: IDFactory):
         self.__id_factory = factory
 
-    def get_id_factory(self) -> Optional[IDFactory]:
+    def get_identifier_factory(self) -> Optional[IDFactory]:
         return self.__id_factory
 
-    def generate_id(self, meta: Meta, network: int, terminal: Optional[str]) -> ID:
-        factory = self.get_id_factory()
-        # assert factory is not None, 'ID factory not set'
-        return factory.generate_id(meta=meta, network=network, terminal=terminal)
+    def generate_identifier(self, meta: Meta, network: Optional[int], terminal: Optional[str]) -> ID:
+        factory = self.get_identifier_factory()
+        assert factory is not None, 'ID factory not set'
+        return factory.generate_identifier(meta=meta, network=network, terminal=terminal)
 
-    def create_id(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
-        factory = self.get_id_factory()
-        # assert factory is not None, 'ID factory not set'
-        return factory.create_id(name=name, address=address, terminal=terminal)
+    def create_identifier(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
+        factory = self.get_identifier_factory()
+        assert factory is not None, 'ID factory not set'
+        return factory.create_identifier(name=name, address=address, terminal=terminal)
 
-    def parse_id(self, identifier: Any) -> Optional[ID]:
+    def parse_identifier(self, identifier: Any) -> Optional[ID]:
         if identifier is None:
             return None
         elif isinstance(identifier, ID):
@@ -114,11 +116,11 @@ class AccountGeneralFactory:
         if string is None:
             # assert False, 'ID error: %s' % identifier
             return None
-        factory = self.get_id_factory()
-        # assert factory is not None, 'ID factory not set'
-        return factory.parse_id(identifier=string)
+        factory = self.get_identifier_factory()
+        assert factory is not None, 'ID factory not set'
+        return factory.parse_identifier(identifier=string)
 
-    def convert_id_list(self, array: List[str]) -> List[ID]:
+    def convert_identifiers(self, array: List[str]) -> List[ID]:
         """
         Convert ID list from string array
 
@@ -127,7 +129,7 @@ class AccountGeneralFactory:
         """
         result = []
         for item in array:
-            identifier = self.parse_id(identifier=item)
+            identifier = self.parse_identifier(identifier=item)
             if identifier is None:
                 # id error
                 continue
@@ -135,7 +137,7 @@ class AccountGeneralFactory:
         return result
 
     # noinspection PyMethodMayBeStatic
-    def revert_id_list(self, array: List[ID]) -> List[str]:
+    def revert_identifiers(self, array: List[ID]) -> List[str]:
         """
         Revert ID list to string array
 
@@ -151,7 +153,7 @@ class AccountGeneralFactory:
     #   Meta
     #
 
-    def set_meta_factory(self, version: Union[MetaType, int], factory):
+    def set_meta_factory(self, version: Union[MetaType, int], factory: MetaFactory):
         if isinstance(version, MetaType):
             version = version.value
         self.__meta_factories[version] = factory
@@ -170,13 +172,13 @@ class AccountGeneralFactory:
     def generate_meta(self, version: Union[MetaType, int], private_key: SignKey,
                       seed: Optional[str]) -> Meta:
         factory = self.get_meta_factory(version)
-        # assert factory is not None, 'failed to get meta factory: %d' % version
+        assert factory is not None, 'failed to get meta factory: %d' % version
         return factory.generate_meta(private_key, seed=seed)
 
     def create_meta(self, version: Union[MetaType, int], public_key: VerifyKey,
-                    seed: Optional[str], fingerprint: Union[bytes, str, None]) -> Meta:
+                    seed: Optional[str], fingerprint: Optional[TransportableData]) -> Meta:
         factory = self.get_meta_factory(version)
-        # assert factory is not None, 'failed to get meta factory: %d' % version
+        assert factory is not None, 'failed to get meta factory: %d' % version
         return factory.create_meta(public_key, seed=seed, fingerprint=fingerprint)
 
     def parse_meta(self, meta: Any) -> Optional[Meta]:
@@ -189,19 +191,18 @@ class AccountGeneralFactory:
             # assert False, 'meta error: %s' % meta
             return None
         version = self.get_meta_type(meta=info, default=0)
+        assert version > 0, 'meta error: %s' % meta
         factory = self.get_meta_factory(version)
-        if factory is None and version != 0:
+        if factory is None:
             factory = self.get_meta_factory(0)  # unknown
-        # if factory is None:
-        #     # assert False, 'meta factory not found: %d' % version
-        #     return None
+            assert factory is not None, 'default meta factory not found'
         return factory.parse_meta(meta=info)
 
     #
     #   Document
     #
 
-    def set_document_factory(self, doc_type: str, factory):
+    def set_document_factory(self, doc_type: str, factory: DocumentFactory):
         self.__document_factories[doc_type] = factory
 
     def get_document_factory(self, doc_type: str) -> Optional[DocumentFactory]:
@@ -213,9 +214,9 @@ class AccountGeneralFactory:
         return Converter.get_str(value=value, default=default)
 
     def create_document(self, doc_type: str, identifier: ID,
-                        data: Optional[str], signature: Union[bytes, str]) -> Document:
+                        data: Optional[str], signature: Optional[TransportableData]) -> Document:
         factory = self.get_document_factory(doc_type)
-        # assert factory is not None, 'document factory not found for type: %s' % doc_type
+        assert factory is not None, 'document factory not found for type: %s' % doc_type
         return factory.create_document(identifier=identifier, data=data, signature=signature)
 
     def parse_document(self, document: Any) -> Optional[Document]:
@@ -229,11 +230,10 @@ class AccountGeneralFactory:
             return None
         doc_type = self.get_document_type(document=info, default='*')
         factory = self.get_document_factory(doc_type)
-        if factory is None and doc_type != '*':
+        if factory is None:
+            assert doc_type != '*', 'document factory not ready: %s' % document
             factory = self.get_document_factory('*')  # unknown
-        # if factory is None:
-        #     # assert False, 'document factory not found for type: %s' % doc_type
-        #     return None
+            assert factory is not None, 'default document factory not found'
         return factory.parse_document(document=info)
 
 

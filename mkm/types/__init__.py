@@ -25,7 +25,7 @@
 
 from .converter import Converter
 from .wrapper import Wrapper, Stringer, Mapper
-from .string import ConstantString
+from .string import ConstantString  # , String
 from .dictionary import Dictionary
 
 from .x import URI, DateTime
@@ -37,6 +37,6 @@ __all__ = [
 
     'Converter',
     'Wrapper', 'Stringer', 'Mapper',
-    'ConstantString',
+    'ConstantString',  # 'String',
     'Dictionary',
 ]

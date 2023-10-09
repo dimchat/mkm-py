@@ -33,6 +33,7 @@ from .version import MetaType
 from .address import Address, AddressFactory
 from .identifier import ID, IDFactory
 from .meta import Meta, MetaFactory
+# from .tai import TAI
 from .tai_doc import Document, DocumentFactory
 from .tai_docs import Visa, Bulletin
 
@@ -44,6 +45,7 @@ __all__ = [
     'Address', 'AddressFactory',
     'ID', 'IDFactory',
     'Meta', 'MetaFactory',
+    # 'TAI',
     'Document', 'DocumentFactory',
     'Visa', 'Bulletin',
 

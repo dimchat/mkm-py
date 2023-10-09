@@ -34,6 +34,7 @@ from .address import BroadcastAddress
 from .address import ANYWHERE, EVERYWHERE
 from .identifier import Identifier
 from .identifier import ANYONE, EVERYONE, FOUNDER
+from .factory import AccountGeneralFactory, AccountFactoryManager
 
 
 name = "MingKeMing"
@@ -49,6 +50,7 @@ __all__ = [
     'Address', 'AddressFactory',
     'ID', 'IDFactory',
     'Meta', 'MetaFactory',
+    # 'TAI',
     'Document', 'DocumentFactory',
     'Visa', 'Bulletin',
 
@@ -57,5 +59,8 @@ __all__ = [
     #
     'BroadcastAddress',
     'Identifier',
+    'AccountGeneralFactory', 'AccountFactoryManager',
+
     'ANYWHERE', 'EVERYWHERE', 'ANYONE', 'EVERYONE', 'FOUNDER',
+
 ]

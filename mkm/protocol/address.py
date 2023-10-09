@@ -77,7 +77,7 @@ class Address(Stringer, ABC):
     #
 
     @classmethod
-    def generate(cls, meta, network: int):  # -> Address:
+    def generate(cls, meta, network: int = None):  # -> Address:
         gf = general_factory()
         return gf.generate_address(meta=meta, network=network)
 
@@ -110,7 +110,7 @@ def general_factory():
 class AddressFactory(ABC):
 
     @abstractmethod
-    def generate_address(self, meta, network: int) -> Address:
+    def generate_address(self, meta, network: int = None) -> Address:
         """
         Generate address with meta & type
 
