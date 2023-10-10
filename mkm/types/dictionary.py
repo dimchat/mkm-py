@@ -116,7 +116,7 @@ class Dictionary(Mapper):
             self.__dictionary[key] = value.string
 
     # Override
-    def set_map(self, key: str, value):  # value: Optional[Mapper]
+    def set_map(self, key: str, value: Optional[Mapper]):
         if value is None:
             self.__dictionary.pop(key, None)
         else:

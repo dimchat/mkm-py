@@ -41,8 +41,78 @@ class DateTime:
         """ seconds from 1970-01-01 00:00:00 """
         return self.__timestamp
 
+    def before(self, other) -> bool:
+        """ Return self<value. """
+        if isinstance(other, DateTime):
+            other = other.timestamp
+        return self.__timestamp < other
+
+    def after(self, other) -> bool:
+        """ Return self>value. """
+        if isinstance(other, DateTime):
+            other = other.timestamp
+        return self.__timestamp > other
+
+    # Override
+    def __lt__(self, other) -> bool:
+        """ Return self<value. """
+        if isinstance(other, DateTime):
+            other = other.timestamp
+        return self.__timestamp < other
+
+    # Override
+    def __gt__(self, other) -> bool:
+        """ Return self>value. """
+        if isinstance(other, DateTime):
+            other = other.timestamp
+        return self.__timestamp > other
+
+    # Override
+    def __le__(self, other) -> bool:
+        """ Return self<=value. """
+        if isinstance(other, DateTime):
+            other = other.timestamp
+        return self.__timestamp <= other
+
+    # Override
+    def __ge__(self, other) -> bool:
+        """ Return self>=value. """
+        if isinstance(other, DateTime):
+            other = other.timestamp
+        return self.__timestamp >= other
+
+    # Override
+    def __eq__(self, other) -> bool:
+        """ Return self==value. """
+        if isinstance(other, DateTime):
+            other = other.timestamp
+        return self.__timestamp == other
+
+    # Override
+    def __ne__(self, other) -> bool:
+        """ Return self!=value. """
+        if isinstance(other, DateTime):
+            other = other.timestamp
+        return self.__timestamp != other
+
+    # Override
+    def __hash__(self) -> int:
+        """ Return hash(self). """
+        return hash(self.__timestamp)
+
+    # Override
+    def __int__(self) -> int:
+        """ Return int(self). """
+        return int(self.__timestamp)
+
+    # Override
+    def __float__(self) -> float:
+        """ Return float(self). """
+        return self.__timestamp
+
     # Override
     def __str__(self):
+        """ Return str(self). """
         return time.strftime('%Y-%m-%d %H:%M:%S', self.localtime)
 
     # Override

@@ -133,8 +133,8 @@ class Meta(Mapper, ABC):
         """
         raise NotImplemented
 
-    @classmethod
-    def match_identifier(cls, identifier: ID) -> bool:
+    @abstractmethod
+    def match_identifier(self, identifier: ID) -> bool:
         """
         Check whether meta match with entity ID
         (must call this when received a new meta from network)
@@ -144,8 +144,8 @@ class Meta(Mapper, ABC):
         """
         raise NotImplemented
 
-    @classmethod
-    def match_public_key(cls, key: VerifyKey) -> bool:
+    @abstractmethod
+    def match_public_key(self, key: VerifyKey) -> bool:
         """
         Check whether meta match with public key
 
