@@ -28,7 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from typing import Optional, Union, Any, List, Dict
+from typing import Optional, Any, List, Dict
 
 from .types import Converter
 from .types import Wrapper
@@ -37,7 +37,7 @@ from .crypto import SignKey, VerifyKey
 
 from .protocol import Address, AddressFactory
 from .protocol import ID, IDFactory
-from .protocol import Meta, MetaType, MetaFactory
+from .protocol import Meta, MetaFactory
 from .protocol import Document, DocumentFactory
 
 
@@ -153,14 +153,10 @@ class AccountGeneralFactory:
     #   Meta
     #
 
-    def set_meta_factory(self, version: Union[MetaType, int], factory: MetaFactory):
-        if isinstance(version, MetaType):
-            version = version.value
+    def set_meta_factory(self, version: int, factory: MetaFactory):
         self.__meta_factories[version] = factory
 
-    def get_meta_factory(self, version: Union[MetaType, int]) -> Optional[MetaFactory]:
-        if isinstance(version, MetaType):
-            version = version.value
+    def get_meta_factory(self, version: int) -> Optional[MetaFactory]:
         return self.__meta_factories.get(version)
 
     # noinspection PyMethodMayBeStatic
@@ -169,13 +165,13 @@ class AccountGeneralFactory:
         value = meta.get('type')
         return Converter.get_int(value=value, default=default)
 
-    def generate_meta(self, version: Union[MetaType, int], private_key: SignKey,
+    def generate_meta(self, version: int, private_key: SignKey,
                       seed: Optional[str]) -> Meta:
         factory = self.get_meta_factory(version)
         assert factory is not None, 'failed to get meta factory: %d' % version
         return factory.generate_meta(private_key, seed=seed)
 
-    def create_meta(self, version: Union[MetaType, int], public_key: VerifyKey,
+    def create_meta(self, version: int, public_key: VerifyKey,
                     seed: Optional[str], fingerprint: Optional[TransportableData]) -> Meta:
         factory = self.get_meta_factory(version)
         assert factory is not None, 'failed to get meta factory: %d' % version

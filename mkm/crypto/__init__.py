@@ -57,5 +57,6 @@ __all__ = [
     'SymmetricKey', 'SymmetricKeyFactory',
     'PublicKey', 'PublicKeyFactory',
     'PrivateKey', 'PrivateKeyFactory',
-    'CryptographyKeyGeneralFactory', 'CryptographyKeyFactoryManager'
+
+    'CryptographyKeyGeneralFactory', 'CryptographyKeyFactoryManager',
 ]

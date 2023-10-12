@@ -117,6 +117,7 @@ class DateTime:
 
     # Override
     def __repr__(self) -> str:
+        """ Return repr(self). """
         return time.strftime('%a %b %d %H:%M:%S %Y', self.localtime)
 
     @property

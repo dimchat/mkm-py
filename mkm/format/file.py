@@ -156,14 +156,14 @@ class PortableNetworkFile(Mapper, ABC):
         return gf.parse_portable_network_file(pnf)
 
     @classmethod
-    def factory(cls, algorithm: str):  # -> Optional[PortableNetworkFileFactory]:
+    def factory(cls):  # -> Optional[PortableNetworkFileFactory]:
         gf = general_factory()
-        return gf.get_portable_network_file_factory(algorithm=algorithm)
+        return gf.get_portable_network_file_factory()
 
     @classmethod
-    def register(cls, algorithm: str, factory):
+    def register(cls, factory):
         gf = general_factory()
-        gf.set_portable_network_file_factory(algorithm=algorithm, factory=factory)
+        gf.set_portable_network_file_factory(factory=factory)
 
 
 def general_factory():
