@@ -24,7 +24,7 @@
 # ==============================================================================
 
 import time
-
+from typing import Union, Any
 
 URI = str
 
@@ -45,54 +45,56 @@ class DateTime:
         """ Return self<value. """
         if isinstance(other, DateTime):
             other = other.timestamp
+        # assert isinstance(other, float), 'other time error: %s' % other
         return self.__timestamp < other
 
     def after(self, other) -> bool:
         """ Return self>value. """
         if isinstance(other, DateTime):
             other = other.timestamp
+        # assert isinstance(other, float), 'other time error: %s' % other
         return self.__timestamp > other
 
     # Override
     def __lt__(self, other) -> bool:
         """ Return self<value. """
-        if isinstance(other, DateTime):
-            other = other.timestamp
+        if not isinstance(other, float):
+            other = float(other)
         return self.__timestamp < other
 
     # Override
     def __gt__(self, other) -> bool:
         """ Return self>value. """
-        if isinstance(other, DateTime):
-            other = other.timestamp
+        if not isinstance(other, float):
+            other = float(other)
         return self.__timestamp > other
 
     # Override
     def __le__(self, other) -> bool:
         """ Return self<=value. """
-        if isinstance(other, DateTime):
-            other = other.timestamp
+        if not isinstance(other, float):
+            other = float(other)
         return self.__timestamp <= other
 
     # Override
     def __ge__(self, other) -> bool:
         """ Return self>=value. """
-        if isinstance(other, DateTime):
-            other = other.timestamp
+        if not isinstance(other, float):
+            other = float(other)
         return self.__timestamp >= other
 
     # Override
     def __eq__(self, other) -> bool:
         """ Return self==value. """
-        if isinstance(other, DateTime):
-            other = other.timestamp
+        if not isinstance(other, float):
+            other = float(other)
         return self.__timestamp == other
 
     # Override
     def __ne__(self, other) -> bool:
         """ Return self!=value. """
-        if isinstance(other, DateTime):
-            other = other.timestamp
+        if not isinstance(other, float):
+            other = float(other)
         return self.__timestamp != other
 
     # Override
@@ -109,6 +111,34 @@ class DateTime:
     def __float__(self) -> float:
         """ Return float(self). """
         return self.__timestamp
+
+    # Override
+    def __add__(self, other) -> float:
+        """ Return self+value. """
+        if not isinstance(other, float):
+            other = float(other)
+        return self.__timestamp + other
+
+    # Override
+    def __radd__(self, other) -> float:
+        """ Return value+self. """
+        if not isinstance(other, float):
+            other = float(other)
+        return other + self.__timestamp
+
+    # Override
+    def __sub__(self, other) -> float:
+        """ Return self-value. """
+        if not isinstance(other, float):
+            other = float(other)
+        return self.__timestamp - other
+
+    # Override
+    def __rsub__(self, other) -> float:
+        """ Return value-self. """
+        if not isinstance(other, float):
+            other = float(other)
+        return other - self.__timestamp
 
     # Override
     def __str__(self):
@@ -171,6 +201,23 @@ class DateTime:
     #
 
     @classmethod
+    def parse(cls, value: Any):
+        """ parse timestamp value (seconds from 1970-01-01 00:00:00) """
+        if value is None:
+            return None
+        elif isinstance(value, DateTime):
+            # exactly
+            return value
+        elif isinstance(value, float):
+            # assuming it is a timestamp value in seconds
+            return DateTime(timestamp=value)
+        elif isinstance(value, int):
+            # assuming it is a timestamp value in seconds
+            return DateTime(timestamp=float(value))
+        else:
+            raise TypeError('invalid time value: %s' % value)
+
+    @classmethod
     def now(cls):
         seconds = time.time()
         return DateTime(timestamp=seconds)
@@ -179,3 +226,7 @@ class DateTime:
     def current_timestamp(cls) -> float:
         """ Return the current time in seconds since the Epoch. """
         return time.time()
+
+    @classmethod
+    def sleep(cls, seconds: Union[float, int]):
+        time.sleep(seconds)
