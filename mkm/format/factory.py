@@ -75,7 +75,9 @@ class FormatGeneralFactory:
         elif isinstance(data, Dict):
             return data
         text = data if isinstance(data, str) else str(data)
-        if text.startswith('{') and text.endswith('}'):
+        if len(text) == 0:
+            return None
+        elif text.startswith('{') and text.endswith('}'):
             return JSONMap.decode(string=text)
         array = self.split(text=text)
         if len(array) == 1:

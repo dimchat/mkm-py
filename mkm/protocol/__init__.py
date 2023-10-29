@@ -35,7 +35,6 @@ from .identifier import ID, IDFactory
 from .meta import Meta, MetaFactory
 # from .tai import TAI
 from .tai_doc import Document, DocumentFactory
-from .tai_docs import Visa, Bulletin
 
 __all__ = [
 
@@ -47,6 +46,5 @@ __all__ = [
     'Meta', 'MetaFactory',
     # 'TAI',
     'Document', 'DocumentFactory',
-    'Visa', 'Bulletin',
 
 ]

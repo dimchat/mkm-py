@@ -56,9 +56,8 @@ class Document(TAI, Mapper, ABC):
     #
     #  Document types
     #
-    VISA = 'visa'          # for login/communication
-    PROFILE = 'profile'    # for user info
-    BULLETIN = 'bulletin'  # for group info
+    VISA = 'visa'          # for user info (communicate key)
+    BULLETIN = 'bulletin'  # for group info (owner, assistants)
 
     @property
     @abstractmethod

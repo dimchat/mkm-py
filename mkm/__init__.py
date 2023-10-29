@@ -52,7 +52,6 @@ __all__ = [
     'Meta', 'MetaFactory',
     # 'TAI',
     'Document', 'DocumentFactory',
-    'Visa', 'Bulletin',
 
     #
     #   Core

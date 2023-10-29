@@ -159,18 +159,13 @@ class Meta(Mapper, ABC):
     #
 
     @classmethod
-    def generate(cls, version: Union[int, MetaType], private_key: SignKey,
-                 seed: Optional[str] = None):  # -> Optional[Meta]:
-        if isinstance(version, MetaType):
-            version = version.value
+    def generate(cls, version: int, private_key: SignKey, seed: str = None):  # -> Optional[Meta]:
         gf = general_factory()
         return gf.generate_meta(version, private_key, seed=seed)
 
     @classmethod
-    def create(cls, version: Union[int, MetaType], public_key: VerifyKey,
-               seed: Optional[str] = None, fingerprint: Optional[TransportableData] = None):  # -> Optional[Meta]:
-        if isinstance(version, MetaType):
-            version = version.value
+    def create(cls, version: int, public_key: VerifyKey,
+               seed: str = None, fingerprint: TransportableData = None):  # -> Optional[Meta]:
         gf = general_factory()
         return gf.create_meta(version, public_key, seed=seed, fingerprint=fingerprint)
 
@@ -180,9 +175,7 @@ class Meta(Mapper, ABC):
         return gf.parse_meta(meta=meta)
 
     @classmethod
-    def factory(cls, version: Union[int, MetaType]):  # -> Optional[MetaFactory]:
-        if isinstance(version, MetaType):
-            version = version.value
+    def factory(cls, version: int):  # -> Optional[MetaFactory]:
         gf = general_factory()
         return gf.get_meta_factory(version)
 
