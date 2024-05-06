@@ -23,13 +23,13 @@
 # SOFTWARE.
 # ==============================================================================
 
-import copy
 from typing import Any, Optional, Iterator, Tuple, Dict
 from typing import Mapping, ItemsView, KeysView, ValuesView
 
 from .x import DateTime
 from .string import Stringer
 from .converter import Converter
+from .copier import Copier
 from .wrapper import Mapper
 
 
@@ -55,7 +55,7 @@ class Dictionary(Mapper):
     # Override
     def copy_dictionary(self, deep_copy: bool = False) -> Dict:
         if deep_copy:
-            copy.deepcopy(self.__dictionary)
+            return Copier.deep_copy(self.__dictionary)
         else:
             return self.__dictionary.copy()
 

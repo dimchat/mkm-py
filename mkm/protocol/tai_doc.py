@@ -57,6 +57,7 @@ class Document(TAI, Mapper, ABC):
     #  Document types
     #
     VISA = 'visa'          # for user info (communicate key)
+    PROFILE = 'profile'    # for user profile (reserved)
     BULLETIN = 'bulletin'  # for group info (owner, assistants)
 
     @property

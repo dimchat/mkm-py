@@ -56,6 +56,9 @@ class Converter(ABC):
         elif isinstance(value, float):
             return value != 0.0
         text = value if isinstance(value, str) else str(value)
+        text = text.strip()
+        if len(text) == 0:
+            return False
         lo = text.lower()
         return lo not in FALSE_LIST
         # return lo in TRUE_LIST

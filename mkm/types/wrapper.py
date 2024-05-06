@@ -176,7 +176,7 @@ class Wrapper:
     def unwrap_list(cls, a) -> List[Any]:
         """ Unwrap values in the array """
         array = []
-        for value in a:
-            naked = cls.unwrap(value)
+        for item in a:
+            naked = cls.unwrap(item)
             array.append(naked)
         return array
