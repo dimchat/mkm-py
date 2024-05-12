@@ -57,11 +57,15 @@ class Converter(ABC):
             return value != 0.0
         text = value if isinstance(value, str) else str(value)
         text = text.strip()
-        if len(text) == 0:
+        size = len(text)
+        if size == 0:
             return False
-        lo = text.lower()
-        return lo not in FALSE_LIST
-        # return lo in TRUE_LIST
+        elif size > MAX_BOOLEAN_LEN:
+            return True
+        else:
+            text = text.lower()
+        # assert lo in BOOLEAN_STATES, 'Not a boolean: %s' % value
+        return BOOLEAN_STATES.get(text, True)
 
     @classmethod
     def get_int(cls, value: Any, default: Optional[int]) -> Optional[int]:
@@ -99,9 +103,11 @@ class Converter(ABC):
         return DateTime(timestamp=timestamp)
 
 
-TRUE_LIST = [
-    '1', 'true', 'yes', 'on',
-]
-FALSE_LIST = [
-    '0', 'false', 'no', 'off', 'null', 'undefined',
-]
+BOOLEAN_STATES = {
+    '1': True, 'yes': True, 'true': True, 'on': True,
+
+    '0': False, 'no': False, 'false': False, 'off': False,
+    '+0': False, '-0': False, '+0.0': False, '-0.0': False,
+    'none': False, 'null': False, 'undefined': False,
+}
+MAX_BOOLEAN_LEN = len('undefined')
