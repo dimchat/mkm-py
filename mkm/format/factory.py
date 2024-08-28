@@ -45,7 +45,7 @@ class FormatGeneralFactory:
     # noinspection PyMethodMayBeStatic
     def split(self, text: str) -> List[str]:
         """
-        Split text string to array: ["{TEXT}", "{algorithm}"]
+        Split text string to array: ["{TEXT}", "{algorithm}", "{content-type}"]
 
         :param text: '{TEXT}', or
                      'base64,{BASE64_ENCODE}', or
@@ -56,18 +56,28 @@ class FormatGeneralFactory:
         if pos1 > 0:
             # [URL]
             return [text]
-        pos1 = text.find(';') + 1
+        else:
+            # skip 'data:'
+            pos1 = text.find(':') + 1
+        array = []
+        # seeking for 'content-type'
+        pos2 = text.find(';', pos1)
+        if pos2 > pos1:
+            array.append(text[pos1:pos2])
+            pos1 = pos2 + 1
+        # seeking for 'algorithm'
         pos2 = text.find(',', pos1)
         if pos2 > pos1:
-            # [data, algorithm]
-            alg = text[pos1:pos2]
-            pos2 += 1  # skip ','
-            data = text[pos2:]
-            return [data, alg]
-        # [data]
-        if pos1 > 0:
-            text = text[pos1:]
-        return [text]
+            array.insert(0, text[pos1:pos2])
+            pos1 = pos2 + 1
+        # OK
+        if pos1 == 0:
+            # [data]
+            array.insert(0, text)
+        else:
+            # [data, algorithm, type]
+            array.insert(0, text[pos1:])
+        return array
 
     def decode(self, data: Any, default_key: str) -> Optional[Dict]:
         if isinstance(data, Mapper):
@@ -79,16 +89,21 @@ class FormatGeneralFactory:
             return None
         elif text.startswith('{') and text.endswith('}'):
             return JSONMap.decode(string=text)
+        info = {}
         array = self.split(text=text)
-        if len(array) == 1:
-            return {
-                default_key: array[0],
-            }
-        assert len(array) == 2, 'split error: %s => %s' % (text, array)
-        return {
-            'algorithm': array[1],
-            'data': array[0],
-        }
+        size = len(array)
+        if size == 1:
+            info[default_key] = array[0]
+        else:
+            assert size > 1, 'split error: %s => %s' % (text, array)
+            info['data'] = array[0]
+            info['algorithm'] = array[1]
+            if size > 2:
+                # 'data:...;...,...'
+                info['content-type'] = array[2]
+                if text.startswith('data:'):
+                    info['URL'] = text
+        return info
 
     #
     #   TED - Transportable Encoded Data

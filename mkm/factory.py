@@ -80,9 +80,7 @@ class AccountGeneralFactory:
         elif isinstance(address, Address):
             return address
         string = Wrapper.get_str(address)
-        if string is None:
-            # assert False, 'address error: %s' % address
-            return None
+        assert string is not None, 'address error: %s' % address
         factory = self.get_address_factory()
         assert factory is not None, 'address factory not set'
         return factory.parse_address(address=string)
@@ -113,14 +111,12 @@ class AccountGeneralFactory:
         elif isinstance(identifier, ID):
             return identifier
         string = Wrapper.get_str(identifier)
-        if string is None:
-            # assert False, 'ID error: %s' % identifier
-            return None
+        assert string is not None, 'ID error: %s' % identifier
         factory = self.get_identifier_factory()
         assert factory is not None, 'ID factory not set'
         return factory.parse_identifier(identifier=string)
 
-    def convert_identifiers(self, array: List[str]) -> List[ID]:
+    def convert_identifiers(self, array: List) -> List[ID]:
         """
         Convert ID list from string array
 
