@@ -53,18 +53,6 @@ class BroadcastAddress(ConstantString, Address):
     def type(self) -> int:
         return self.__type
 
-    @property  # Override
-    def is_broadcast(self) -> bool:
-        return True
-
-    @property  # Override
-    def is_user(self) -> bool:
-        return self.type == EntityType.ANY
-
-    @property  # Override
-    def is_group(self) -> bool:
-        return self.type == EntityType.EVERY
-
 
 ANYWHERE = BroadcastAddress(address='anywhere', network=EntityType.ANY)
 EVERYWHERE = BroadcastAddress(address='everywhere', network=EntityType.EVERY)

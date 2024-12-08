@@ -48,28 +48,10 @@ class Address(Stringer, ABC):
     @abstractmethod
     def type(self) -> int:
         """
-        Get network ID for address
+        Get address type (integer as EntityType)
 
-        :return: integer as EntityType
+        :return: 0 ~ 255
         """
-        raise NotImplemented
-
-    @property
-    @abstractmethod
-    def is_broadcast(self) -> bool:
-        # return isinstance(self, BroadcastAddress)
-        raise NotImplemented
-
-    @property
-    @abstractmethod
-    def is_user(self) -> bool:
-        # return entity_is_user(self.type)
-        raise NotImplemented
-
-    @property
-    @abstractmethod
-    def is_group(self) -> bool:
-        # return entity_is_group(self.type)
         raise NotImplemented
 
     #

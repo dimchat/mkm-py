@@ -94,22 +94,22 @@ class TAI(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def get_property(self, key: str) -> Optional[Any]:
+    def get_property(self, name: str) -> Optional[Any]:
         """
         Get property value with key
 
-        :param key: property key
+        :param name: property key
         :return: property value
         """
         raise NotImplemented
 
     @abstractmethod
-    def set_property(self, key: str, value: Optional[Any]):
+    def set_property(self, name: str, value: Optional[Any]):
         """
         Update property with key and data
         (this will clear 'data' and 'signature')
 
-        :param key:   property key
+        :param name:  property key
         :param value: property value
         """
         raise NotImplemented

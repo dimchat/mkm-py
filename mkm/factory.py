@@ -28,7 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from typing import Optional, Any, List, Dict
+from typing import Optional, Iterable, Any, List, Dict
 
 from .types import Converter
 from .types import Wrapper
@@ -49,8 +49,8 @@ class AccountGeneralFactory:
         self.__address_factory: Optional[AddressFactory] = None
         # IDFactory
         self.__id_factory: Optional[IDFactory] = None
-        # int(type) -> MetaFactory
-        self.__meta_factories: Dict[int, MetaFactory] = {}
+        # str(type) -> MetaFactory
+        self.__meta_factories: Dict[str, MetaFactory] = {}
         # str(type) -> DocumentFactory
         self.__document_factories: Dict[str, DocumentFactory] = {}
 
@@ -116,7 +116,7 @@ class AccountGeneralFactory:
         assert factory is not None, 'ID factory not set'
         return factory.parse_identifier(identifier=string)
 
-    def convert_identifiers(self, array: List) -> List[ID]:
+    def convert_identifiers(self, array: Iterable) -> List[ID]:
         """
         Convert ID list from string array
 
@@ -133,7 +133,7 @@ class AccountGeneralFactory:
         return result
 
     # noinspection PyMethodMayBeStatic
-    def revert_identifiers(self, array: List[ID]) -> List[str]:
+    def revert_identifiers(self, array: Iterable[ID]) -> List[str]:
         """
         Revert ID list to string array
 
@@ -149,25 +149,34 @@ class AccountGeneralFactory:
     #   Meta
     #
 
-    def set_meta_factory(self, version: int, factory: MetaFactory):
+    def set_meta_factory(self, version: str, factory: MetaFactory):
         self.__meta_factories[version] = factory
 
-    def get_meta_factory(self, version: int) -> Optional[MetaFactory]:
+    def get_meta_factory(self, version: str) -> Optional[MetaFactory]:
         return self.__meta_factories.get(version)
 
     # noinspection PyMethodMayBeStatic
-    def get_meta_type(self, meta: Dict[str, Any], default: Optional[int]) -> Optional[int]:
+    def get_meta_type(self, meta: Dict[str, Any], default: Optional[str]) -> Optional[str]:
         """ get meta type(version) """
         value = meta.get('type')
-        return Converter.get_int(value=value, default=default)
+        return Converter.get_str(value=value, default=default)
 
-    def generate_meta(self, version: int, private_key: SignKey,
+    # def has_meta_seed(self, meta: Dict[str, Any]) -> bool:
+    #     version = self.get_meta_type(meta=meta, default='')
+    #     return version == '1' or type == 'MKM'
+    #
+    # def get_meta_seed(self, meta: Dict[str, Any]) -> Optional[str]:
+    #     if self.has_meta_seed(meta=meta):
+    #         value = meta.get('seed')
+    #         return Converter.get_str(value=value, default='')
+
+    def generate_meta(self, version: str, private_key: SignKey,
                       seed: Optional[str]) -> Meta:
         factory = self.get_meta_factory(version)
         assert factory is not None, 'failed to get meta factory: %d' % version
         return factory.generate_meta(private_key, seed=seed)
 
-    def create_meta(self, version: int, public_key: VerifyKey,
+    def create_meta(self, version: str, public_key: VerifyKey,
                     seed: Optional[str], fingerprint: Optional[TransportableData]) -> Meta:
         factory = self.get_meta_factory(version)
         assert factory is not None, 'failed to get meta factory: %d' % version
@@ -182,11 +191,10 @@ class AccountGeneralFactory:
         if info is None:
             # assert False, 'meta error: %s' % meta
             return None
-        version = self.get_meta_type(meta=info, default=0)
-        assert version > 0, 'meta error: %s' % meta
+        version = self.get_meta_type(meta=info, default='*')
         factory = self.get_meta_factory(version)
         if factory is None:
-            factory = self.get_meta_factory(0)  # unknown
+            factory = self.get_meta_factory('*')  # unknown
             assert factory is not None, 'default meta factory not found'
         return factory.parse_meta(meta=info)
 

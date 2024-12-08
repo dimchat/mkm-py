@@ -28,23 +28,24 @@
 # SOFTWARE.
 # ==============================================================================
 
-from .network import EntityType
-from .version import MetaType
+from .entity import EntityType
 from .address import Address, AddressFactory
 from .identifier import ID, IDFactory
 from .meta import Meta, MetaFactory
-# from .tai import TAI
+from .tai import TAI
 from .tai_doc import Document, DocumentFactory
 
 __all__ = [
 
     'EntityType',
-    'MetaType',
 
     'Address', 'AddressFactory',
+
     'ID', 'IDFactory',
+
     'Meta', 'MetaFactory',
-    # 'TAI',
+
+    'TAI',
     'Document', 'DocumentFactory',
 
 ]

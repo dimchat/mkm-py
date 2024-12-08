@@ -31,7 +31,7 @@
 from typing import Optional
 
 from .types import ConstantString
-from .protocol import ID, Address
+from .protocol import ID, Address, EntityType
 
 from .address import ANYWHERE, EVERYWHERE
 
@@ -58,19 +58,40 @@ class Identifier(ConstantString, ID):
 
     @property  # Override
     def type(self) -> int:
-        return self.address.type
+        return self.__address.type
 
     @property  # Override
     def is_broadcast(self) -> bool:
-        return self.address.is_broadcast
+        network = self.type
+        return EntityType.is_broadcast(network=network)
 
     @property  # Override
     def is_user(self) -> bool:
-        return self.address.is_user
+        network = self.type
+        return EntityType.is_user(network=network)
 
     @property  # Override
     def is_group(self) -> bool:
-        return self.address.is_group
+        network = self.type
+        return EntityType.is_group(network=network)
+
+    #
+    #   Factory
+    #
+
+    @classmethod
+    def new(cls, name: Optional[str], address: Address, terminal: Optional[str] = None) -> ID:
+        identifier = cls.concat(name=name, address=address, terminal=terminal)
+        return Identifier(identifier=identifier, name=name, address=address, terminal=terminal)
+
+    @classmethod
+    def concat(cls, name: Optional[str], address: Address, terminal: Optional[str] = None) -> str:
+        string = str(address)
+        if name is not None and len(name) > 0:
+            string = name + '@' + string
+        if terminal is not None and len(terminal) > 0:
+            string = string + '/' + terminal
+        return string
 
 
 """
@@ -78,8 +99,8 @@ class Identifier(ConstantString, ID):
     ~~~~~~~~~~~~~~~~
 """
 
-ANYONE = Identifier(identifier='anyone@anywhere', name='anyone', address=ANYWHERE)
-EVERYONE = Identifier(identifier='everyone@everywhere', name='everyone', address=EVERYWHERE)
+ANYONE = Identifier.new(name='anyone', address=ANYWHERE)
+EVERYONE = Identifier.new(name='everyone', address=EVERYWHERE)
 
 # DIM Founder
-FOUNDER = Identifier(identifier='moky@anywhere', name='moky', address=ANYWHERE)
+FOUNDER = Identifier.new(name='moky', address=ANYWHERE)

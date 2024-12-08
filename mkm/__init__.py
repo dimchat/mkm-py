@@ -46,7 +46,7 @@ __all__ = [
     #
     #   Protocol
     #
-    'EntityType', 'MetaType',
+    'EntityType',
     'Address', 'AddressFactory',
     'ID', 'IDFactory',
     'Meta', 'MetaFactory',
@@ -60,6 +60,7 @@ __all__ = [
     'Identifier',
     'AccountGeneralFactory', 'AccountFactoryManager',
 
-    'ANYWHERE', 'EVERYWHERE', 'ANYONE', 'EVERYONE', 'FOUNDER',
+    'ANYWHERE', 'EVERYWHERE',
+    'ANYONE', 'EVERYONE', 'FOUNDER',
 
 ]

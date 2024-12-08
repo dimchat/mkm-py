@@ -29,7 +29,7 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, List, Any
+from typing import Optional, Iterable, List, Any
 
 from ..types import Stringer
 
@@ -73,23 +73,27 @@ class ID(Stringer, ABC):
     @property
     @abstractmethod
     def is_broadcast(self) -> bool:
-        # return self.address.is_broadcast
+        # return EntityType.is_broadcast(type)
         raise NotImplemented
 
     @property
     @abstractmethod
     def is_user(self) -> bool:
-        # return self.address.is_user
+        # return EntityType.is_user(type)
         raise NotImplemented
 
     @property
     @abstractmethod
     def is_group(self) -> bool:
-        # return self.address.is_group
+        # return EntityType.is_group(type)
         raise NotImplemented
 
+    #
+    #   Conveniences
+    #
+
     @classmethod
-    def convert(cls, array: List[str]):  # -> List[ID]:
+    def convert(cls, array: Iterable[str]):  # -> List[ID]:
         """
         Convert ID list from string array
 

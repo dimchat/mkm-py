@@ -29,13 +29,12 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Union, Any, Dict
+from typing import Optional, Any, Dict
 
 from ..types import Mapper
 from ..crypto import VerifyKey, SignKey
 from ..format import TransportableData
 
-from .version import MetaType
 from .address import Address
 from .identifier import ID
 
@@ -57,17 +56,24 @@ class Meta(Mapper, ABC):
             fingerprint = sign(seed, SK);
     """
 
+    #
+    #  MetaType
+    #  ~~~~~~~~
+    #  Meta algorithm names
+    #
+    MKM = 'MKM'  # '1'
+    BTC = 'BTC'  # '2'
+    ETH = 'ETH'  # '4'
+
     @property
     @abstractmethod
-    def type(self) -> int:
+    def type(self) -> str:
         """
         Meta algorithm version
 
-            0x01 - username@address
-            0x02 - btc_address
-            0x03 - username@btc_address
-            0x04 - eth_address
-            0x05 - username@eth_address
+            1 = MKM : username@address (default)
+            2 = BTC : btc_address
+            4 = ETH : eth_address
             ...
         """
         raise NotImplemented
@@ -159,12 +165,12 @@ class Meta(Mapper, ABC):
     #
 
     @classmethod
-    def generate(cls, version: int, private_key: SignKey, seed: str = None):  # -> Optional[Meta]:
+    def generate(cls, version: str, private_key: SignKey, seed: str = None):  # -> Optional[Meta]:
         gf = general_factory()
         return gf.generate_meta(version, private_key, seed=seed)
 
     @classmethod
-    def create(cls, version: int, public_key: VerifyKey,
+    def create(cls, version: str, public_key: VerifyKey,
                seed: str = None, fingerprint: TransportableData = None):  # -> Optional[Meta]:
         gf = general_factory()
         return gf.create_meta(version, public_key, seed=seed, fingerprint=fingerprint)
@@ -175,14 +181,12 @@ class Meta(Mapper, ABC):
         return gf.parse_meta(meta=meta)
 
     @classmethod
-    def factory(cls, version: int):  # -> Optional[MetaFactory]:
+    def factory(cls, version: str):  # -> Optional[MetaFactory]:
         gf = general_factory()
         return gf.get_meta_factory(version)
 
     @classmethod
-    def register(cls, version: Union[int, MetaType], factory):
-        if isinstance(version, MetaType):
-            version = version.value
+    def register(cls, version: str, factory):
         gf = general_factory()
         gf.set_meta_factory(version, factory=factory)
 
