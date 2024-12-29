@@ -34,6 +34,7 @@ from typing import Optional, Iterable, List, Any
 from ..types import Stringer
 
 from .address import Address
+from .helpers import AccountExtensions
 
 
 class ID(Stringer, ABC):
@@ -93,15 +94,16 @@ class ID(Stringer, ABC):
     #
 
     @classmethod
-    def convert(cls, array: Iterable[str]):  # -> List[ID]:
+    def convert(cls, array: Iterable):  # -> List[ID]:
         """
         Convert ID list from string array
 
         :param array: string array
         :return: ID list
         """
-        gf = general_factory()
-        return gf.convert_identifiers(array=array)
+        helper = AccountExtensions.id_helper
+        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+        return helper.convert_identifiers(array=array)
 
     @classmethod
     def revert(cls, array) -> List[str]:
@@ -111,8 +113,9 @@ class ID(Stringer, ABC):
         :param array: ID list
         :return: string array
         """
-        gf = general_factory()
-        return gf.revert_identifiers(array=array)
+        helper = AccountExtensions.id_helper
+        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+        return helper.revert_identifiers(array=array)
 
     #
     #   Factory methods
@@ -120,36 +123,37 @@ class ID(Stringer, ABC):
 
     @classmethod
     def generate(cls, meta, network: int = None, terminal: Optional[str] = None):  # -> ID:
-        gf = general_factory()
-        return gf.generate_identifier(meta=meta, network=network, terminal=terminal)
+        helper = AccountExtensions.id_helper
+        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+        return helper.generate_identifier(meta=meta, network=network, terminal=terminal)
 
     @classmethod
     def create(cls, name: Optional[str], address: Address, terminal: Optional[str] = None):  # -> ID:
-        gf = general_factory()
-        return gf.create_identifier(name=name, address=address, terminal=terminal)
+        helper = AccountExtensions.id_helper
+        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+        return helper.create_identifier(name=name, address=address, terminal=terminal)
 
     @classmethod
     def parse(cls, identifier: Any):  # -> Optional[ID]:
-        gf = general_factory()
-        return gf.parse_identifier(identifier=identifier)
+        helper = AccountExtensions.id_helper
+        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+        return helper.parse_identifier(identifier=identifier)
 
     @classmethod
-    def factory(cls):  # -> Optional[IDFactory]:
-        gf = general_factory()
-        return gf.get_identifier_factory()
+    def get_factory(cls):  # -> Optional[IDFactory]:
+        helper = AccountExtensions.id_helper
+        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+        return helper.get_identifier_factory()
 
     @classmethod
-    def register(cls, factory):
-        gf = general_factory()
-        gf.set_identifier_factory(factory=factory)
-
-
-def general_factory():
-    from ..factory import AccountFactoryManager
-    return AccountFactoryManager.general_factory
+    def set_factory(cls, factory):
+        helper = AccountExtensions.id_helper
+        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+        helper.set_identifier_factory(factory=factory)
 
 
 class IDFactory(ABC):
+    """ ID Factory """
 
     @abstractmethod
     def generate_identifier(self, meta, network: Optional[int], terminal: Optional[str]) -> ID:
@@ -183,4 +187,36 @@ class IDFactory(ABC):
         :param identifier: ID string
         :return: ID
         """
+        raise NotImplemented
+
+
+class IdentifierHelper(ABC):
+    """ General Helper """
+
+    @abstractmethod
+    def set_identifier_factory(self, factory: IDFactory):
+        raise NotImplemented
+
+    @abstractmethod
+    def get_identifier_factory(self) -> Optional[IDFactory]:
+        raise NotImplemented
+
+    @abstractmethod
+    def generate_identifier(self, meta, network: Optional[int], terminal: Optional[str]) -> ID:
+        raise NotImplemented
+
+    @abstractmethod
+    def create_identifier(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
+        raise NotImplemented
+
+    @abstractmethod
+    def parse_identifier(self, identifier: Any) -> Optional[ID]:
+        raise NotImplemented
+
+    @abstractmethod
+    def convert_identifiers(self, array: Iterable) -> List[ID]:
+        raise NotImplemented
+
+    @abstractmethod
+    def revert_identifiers(self, array: Iterable[ID]) -> List[str]:
         raise NotImplemented

@@ -50,7 +50,7 @@ class BroadcastAddress(ConstantString, Address):
         self.__type = network
 
     @property  # Override
-    def type(self) -> int:
+    def network(self) -> int:
         return self.__type
 
 

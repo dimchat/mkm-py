@@ -28,6 +28,8 @@ from typing import Optional, Any, Dict
 
 from ..types import Mapper
 
+from .helpers import FormatExtensions
+
 
 class TransportableData(Mapper, ABC):
     """
@@ -106,8 +108,8 @@ class TransportableData(Mapper, ABC):
         return ted.object
 
     @classmethod
-    def decode(cls, ted: Any) -> Optional[bytes]:
-        ted = cls.parse(ted)
+    def decode(cls, encoded: Any) -> Optional[bytes]:
+        ted = cls.parse(encoded)
         if ted is not None:  # isinstance(ted, TransportableData):
             return ted.data
 
@@ -119,28 +121,27 @@ class TransportableData(Mapper, ABC):
     def create(cls, data: bytes, algorithm: str = None):  # -> TransportableData;
         if algorithm is None:
             algorithm = cls.DEFAULT
-        gf = general_factory()
-        return gf.create_transportable_data(data=data, algorithm=algorithm)
+        helper = FormatExtensions.ted_helper
+        assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+        return helper.create_transportable_data(data=data, algorithm=algorithm)
 
     @classmethod
     def parse(cls, ted: Any):  # -> Optional[TransportableData]:
-        gf = general_factory()
-        return gf.parse_transportable_data(ted)
+        helper = FormatExtensions.ted_helper
+        assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+        return helper.parse_transportable_data(ted)
 
     @classmethod
-    def factory(cls, algorithm: str):  # -> Optional[TransportableDataFactory]:
-        gf = general_factory()
-        return gf.get_transportable_data_factory(algorithm=algorithm)
+    def get_factory(cls, algorithm: str):  # -> Optional[TransportableDataFactory]:
+        helper = FormatExtensions.ted_helper
+        assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+        return helper.get_transportable_data_factory(algorithm=algorithm)
 
     @classmethod
-    def register(cls, algorithm: str, factory):
-        gf = general_factory()
-        gf.set_transportable_data_factory(algorithm=algorithm, factory=factory)
-
-
-def general_factory():
-    from .factory import FormatFactoryManager
-    return FormatFactoryManager.general_factory
+    def set_factory(cls, algorithm: str, factory):
+        helper = FormatExtensions.ted_helper
+        assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+        helper.set_transportable_data_factory(algorithm=algorithm, factory=factory)
 
 
 class TransportableDataFactory(ABC):
@@ -164,4 +165,24 @@ class TransportableDataFactory(ABC):
         :param ted: TED info
         :return: TED object
         """
+        raise NotImplemented
+
+
+class TransportableDataHelper(ABC):
+    """ General Helper """
+
+    @abstractmethod
+    def set_transportable_data_factory(self, algorithm: str, factory: TransportableDataFactory):
+        raise NotImplemented
+
+    @abstractmethod
+    def get_transportable_data_factory(self, algorithm: str) -> Optional[TransportableDataFactory]:
+        raise NotImplemented
+
+    @abstractmethod
+    def create_transportable_data(self, algorithm: str, data: bytes) -> TransportableData:
+        raise NotImplemented
+
+    @abstractmethod
+    def parse_transportable_data(self, ted: Any) -> Optional[TransportableData]:
         raise NotImplemented

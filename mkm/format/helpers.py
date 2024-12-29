@@ -2,7 +2,7 @@
 # ==============================================================================
 # MIT License
 #
-# Copyright (c) 2019 Albert Moky
+# Copyright (c) 2024 Albert Moky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,46 +23,16 @@
 # SOFTWARE.
 # ==============================================================================
 
+
 """
-    Crypto
-    ~~~~~~
-
-    Crypto Keys: SymmetricKey, PrivateKey, PublicKey
+    Format FactoryManager
+    ~~~~~~~~~~~~~~~~~~~~~
 """
 
-from .digest import *
 
-from .cryptography import CryptographyKey, EncryptKey, DecryptKey
-from .asymmetric import AsymmetricKey, SignKey, VerifyKey
-from .symmetric import SymmetricKey, SymmetricKeyFactory
-from .public import PublicKey, PublicKeyFactory
-from .private import PrivateKey, PrivateKeyFactory
+# protected
+class FormatExtensions:
 
-# from .symmetric import SymmetricKeyHelper
-# from .public import PublicKeyHelper
-# from .private import PrivateKeyHelper
-# from .helpers import CryptoExtensions
+    ted_helper = None  # TransportableDataHelper
 
-name = "Crypto"
-
-__author__ = 'Albert Moky'
-
-__all__ = [
-
-    # Data Digest
-    'DataDigester',
-    'MD5', 'SHA1', 'SHA256', 'KECCAK256', 'RIPEMD160',
-
-    'md5', 'sha1', 'sha256', 'keccak256', 'ripemd160',
-
-    # Crypto
-    'CryptographyKey', 'EncryptKey', 'DecryptKey',
-    'AsymmetricKey', 'SignKey', 'VerifyKey',
-    'SymmetricKey', 'SymmetricKeyFactory',
-    'PublicKey', 'PublicKeyFactory',
-    'PrivateKey', 'PrivateKeyFactory',
-
-    # 'SymmetricKeyHelper', 'PublicKeyHelper', 'PrivateKeyHelper',
-    # 'CryptoExtensions',
-
-]
+    pnf_helper = None  # PortableNetworkFileHelper

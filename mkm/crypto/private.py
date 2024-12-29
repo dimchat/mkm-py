@@ -28,6 +28,7 @@ from typing import Optional, Any, Dict
 
 from .asymmetric import SignKey
 from .public import PublicKey
+from .helpers import CryptoExtensions
 
 
 class PrivateKey(SignKey, ABC):
@@ -59,31 +60,31 @@ class PrivateKey(SignKey, ABC):
 
     @classmethod
     def generate(cls, algorithm: str):  # -> Optional[PrivateKey]:
-        gf = general_factory()
-        return gf.generate_private_key(algorithm=algorithm)
+        helper = CryptoExtensions.private_helper
+        assert isinstance(helper, PrivateKeyHelper), 'private helper error: %s' % helper
+        return helper.generate_private_key(algorithm=algorithm)
 
     @classmethod
     def parse(cls, key: Any):  # -> Optional[PrivateKey]:
-        gf = general_factory()
-        return gf.parse_private_key(key)
+        helper = CryptoExtensions.private_helper
+        assert isinstance(helper, PrivateKeyHelper), 'private helper error: %s' % helper
+        return helper.parse_private_key(key)
 
     @classmethod
-    def factory(cls, algorithm: str):  # -> Optional[PrivateKeyFactory]:
-        gf = general_factory()
-        return gf.get_private_key_factory(algorithm=algorithm)
+    def get_factory(cls, algorithm: str):  # -> Optional[PrivateKeyFactory]:
+        helper = CryptoExtensions.private_helper
+        assert isinstance(helper, PrivateKeyHelper), 'private helper error: %s' % helper
+        return helper.get_private_key_factory(algorithm=algorithm)
 
     @classmethod
-    def register(cls, algorithm: str, factory):
-        gf = general_factory()
-        gf.set_private_key_factory(algorithm=algorithm, factory=factory)
-
-
-def general_factory():
-    from .factory import CryptographyKeyFactoryManager
-    return CryptographyKeyFactoryManager.general_factory
+    def set_factory(cls, algorithm: str, factory):
+        helper = CryptoExtensions.private_helper
+        assert isinstance(helper, PrivateKeyHelper), 'private helper error: %s' % helper
+        helper.set_private_key_factory(algorithm=algorithm, factory=factory)
 
 
 class PrivateKeyFactory(ABC):
+    """ Key Factory """
 
     @abstractmethod
     def generate_private_key(self) -> PrivateKey:
@@ -102,4 +103,24 @@ class PrivateKeyFactory(ABC):
         :param key: key info
         :return: PrivateKey
         """
+        raise NotImplemented
+
+
+class PrivateKeyHelper(ABC):
+    """ General Helper """
+
+    @abstractmethod
+    def set_private_key_factory(self, algorithm: str, factory: PrivateKeyFactory):
+        raise NotImplemented
+
+    @abstractmethod
+    def get_private_key_factory(self, algorithm: str) -> Optional[PrivateKeyFactory]:
+        raise NotImplemented
+
+    @abstractmethod
+    def generate_private_key(self, algorithm: str) -> Optional[PrivateKey]:
+        raise NotImplemented
+
+    @abstractmethod
+    def parse_private_key(self, key: Any) -> Optional[PrivateKey]:
         raise NotImplemented

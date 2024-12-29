@@ -74,8 +74,10 @@ class Converter(ABC):
         elif isinstance(value, int):
             # exactly
             return value
-        elif isinstance(value, bool) or isinstance(value, float):
+        elif isinstance(value, float):
             return int(value)
+        elif isinstance(value, bool):
+            return 1 if value else 0
         text = value if isinstance(value, str) else str(value)
         return int(text)
 
@@ -86,8 +88,10 @@ class Converter(ABC):
         elif isinstance(value, float):
             # exactly
             return value
-        elif isinstance(value, bool) or isinstance(value, int):
+        elif isinstance(value, int):
             return float(value)
+        elif isinstance(value, bool):
+            return 1.0 if value else 0.0
         text = value if isinstance(value, str) else str(value)
         return float(text)
 
@@ -99,8 +103,8 @@ class Converter(ABC):
         elif isinstance(value, DateTime):
             # exactly
             return value
-        timestamp = cls.get_float(value=value, default=0)
-        return DateTime(timestamp=timestamp)
+        seconds = cls.get_float(value=value, default=0)
+        return DateTime(timestamp=seconds)
 
 
 BOOLEAN_STATES = {

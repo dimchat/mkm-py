@@ -27,6 +27,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Any, Dict
 
 from .asymmetric import VerifyKey
+from .helpers import CryptoExtensions
 
 
 # noinspection PyAbstractClass
@@ -49,23 +50,21 @@ class PublicKey(VerifyKey, ABC):
 
     @classmethod
     def parse(cls, key: Any):  # -> Optional[PublicKey]:
-        gf = general_factory()
-        return gf.parse_public_key(key)
+        helper = CryptoExtensions.symmetric_helper
+        assert isinstance(helper, PublicKeyHelper), 'public helper error: %s' % helper
+        return helper.parse_public_key(key)
 
     @classmethod
-    def factory(cls, algorithm: str):  # -> Optional[PublicKeyFactory]:
-        gf = general_factory()
-        return gf.get_public_key_factory(algorithm=algorithm)
+    def get_factory(cls, algorithm: str):  # -> Optional[PublicKeyFactory]:
+        helper = CryptoExtensions.symmetric_helper
+        assert isinstance(helper, PublicKeyHelper), 'public helper error: %s' % helper
+        return helper.get_public_key_factory(algorithm=algorithm)
 
     @classmethod
-    def register(cls, algorithm: str, factory):
-        gf = general_factory()
-        gf.set_public_key_factory(algorithm=algorithm, factory=factory)
-
-
-def general_factory():
-    from .factory import CryptographyKeyFactoryManager
-    return CryptographyKeyFactoryManager.general_factory
+    def set_factory(cls, algorithm: str, factory):
+        helper = CryptoExtensions.symmetric_helper
+        assert isinstance(helper, PublicKeyHelper), 'public helper error: %s' % helper
+        helper.set_public_key_factory(algorithm=algorithm, factory=factory)
 
 
 class PublicKeyFactory(ABC):
@@ -78,4 +77,19 @@ class PublicKeyFactory(ABC):
         :param key: key info
         :return: PublicKey
         """
+        raise NotImplemented
+
+
+class PublicKeyHelper(ABC):
+
+    @abstractmethod
+    def set_public_key_factory(self, algorithm: str, factory: PublicKeyFactory):
+        raise NotImplemented
+
+    @abstractmethod
+    def get_public_key_factory(self, algorithm: str) -> Optional[PublicKeyFactory]:
+        raise NotImplemented
+
+    @abstractmethod
+    def parse_public_key(self, key: Any) -> Optional[PublicKey]:
         raise NotImplemented

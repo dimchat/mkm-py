@@ -35,17 +35,26 @@ from .meta import Meta, MetaFactory
 from .tai import TAI
 from .tai_doc import Document, DocumentFactory
 
+# from .address import AddressHelper
+# from .identifier import IdentifierHelper
+# from .meta import MetaHelper
+# from .tai_doc import DocumentHelper
+# from .helpers import AccountExtensions
+
 __all__ = [
 
     'EntityType',
+    'ID', 'IDFactory',
 
     'Address', 'AddressFactory',
-
-    'ID', 'IDFactory',
 
     'Meta', 'MetaFactory',
 
     'TAI',
     'Document', 'DocumentFactory',
+
+    # 'AddressHelper', 'IdentifierHelper',
+    # 'MetaHelper', 'DocumentHelper',
+    # 'AccountExtensions',
 
 ]

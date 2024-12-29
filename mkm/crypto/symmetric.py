@@ -27,6 +27,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Any, Dict
 
 from .cryptography import EncryptKey, DecryptKey
+from .helpers import CryptoExtensions
 
 
 # noinspection PyAbstractClass
@@ -52,31 +53,31 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
 
     @classmethod
     def generate(cls, algorithm: str):  # -> Optional[SymmetricKey]:
-        gf = general_factory()
-        return gf.generate_symmetric_key(algorithm=algorithm)
+        helper = CryptoExtensions.symmetric_helper
+        assert isinstance(helper, SymmetricKeyHelper), 'symmetric helper error: %s' % helper
+        return helper.generate_symmetric_key(algorithm=algorithm)
 
     @classmethod
     def parse(cls, key: Any):  # -> Optional[SymmetricKey]:
-        gf = general_factory()
-        return gf.parse_symmetric_key(key)
+        helper = CryptoExtensions.symmetric_helper
+        assert isinstance(helper, SymmetricKeyHelper), 'symmetric helper error: %s' % helper
+        return helper.parse_symmetric_key(key)
 
     @classmethod
-    def factory(cls, algorithm: str):  # -> Optional[SymmetricKeyFactory]:
-        gf = general_factory()
-        return gf.get_symmetric_key_factory(algorithm=algorithm)
+    def get_factory(cls, algorithm: str):  # -> Optional[SymmetricKeyFactory]:
+        helper = CryptoExtensions.symmetric_helper
+        assert isinstance(helper, SymmetricKeyHelper), 'symmetric helper error: %s' % helper
+        return helper.get_symmetric_key_factory(algorithm=algorithm)
 
     @classmethod
-    def register(cls, algorithm: str, factory):
-        gf = general_factory()
-        gf.set_symmetric_key_factory(algorithm=algorithm, factory=factory)
-
-
-def general_factory():
-    from .factory import CryptographyKeyFactoryManager
-    return CryptographyKeyFactoryManager.general_factory
+    def set_factory(cls, algorithm: str, factory):
+        helper = CryptoExtensions.symmetric_helper
+        assert isinstance(helper, SymmetricKeyHelper), 'symmetric helper error: %s' % helper
+        helper.set_symmetric_key_factory(algorithm=algorithm, factory=factory)
 
 
 class SymmetricKeyFactory(ABC):
+    """ Key Factory """
 
     @abstractmethod
     def generate_symmetric_key(self) -> SymmetricKey:
@@ -95,4 +96,24 @@ class SymmetricKeyFactory(ABC):
         :param key: key info
         :return: SymmetricKey
         """
+        raise NotImplemented
+
+
+class SymmetricKeyHelper(ABC):
+    """ General Helper """
+
+    @abstractmethod
+    def set_symmetric_key_factory(self, algorithm: str, factory: SymmetricKeyFactory):
+        raise NotImplemented
+
+    @abstractmethod
+    def get_symmetric_key_factory(self, algorithm: str) -> Optional[SymmetricKeyFactory]:
+        raise NotImplemented
+
+    @abstractmethod
+    def generate_symmetric_key(self, algorithm: str) -> Optional[SymmetricKey]:
+        raise NotImplemented
+
+    @abstractmethod
+    def parse_symmetric_key(self, key: Any) -> Optional[SymmetricKey]:
         raise NotImplemented

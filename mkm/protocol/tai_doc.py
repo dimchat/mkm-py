@@ -37,6 +37,7 @@ from ..format import TransportableData
 
 from .identifier import ID
 from .tai import TAI
+from .helpers import AccountExtensions
 
 
 class Document(TAI, Mapper, ABC):
@@ -121,31 +122,31 @@ class Document(TAI, Mapper, ABC):
     @classmethod
     def create(cls, doc_type: str, identifier: ID,
                data: Optional[str] = None, signature: Optional[TransportableData] = None):  # -> Optional[Document]:
-        gf = general_factory()
-        return gf.create_document(doc_type, identifier=identifier, data=data, signature=signature)
+        helper = AccountExtensions.doc_helper
+        assert isinstance(helper, DocumentHelper), 'document helper error: %s' % helper
+        return helper.create_document(doc_type, identifier=identifier, data=data, signature=signature)
 
     @classmethod
     def parse(cls, document: Any):  # -> Optional[Document]:
-        gf = general_factory()
-        return gf.parse_document(document=document)
+        helper = AccountExtensions.doc_helper
+        assert isinstance(helper, DocumentHelper), 'document helper error: %s' % helper
+        return helper.parse_document(document=document)
 
     @classmethod
-    def register(cls, doc_type: str, factory):
-        gf = general_factory()
-        gf.set_document_factory(doc_type, factory=factory)
+    def get_factory(cls, doc_type: str):  # -> Optional[DocumentFactory]:
+        helper = AccountExtensions.doc_helper
+        assert isinstance(helper, DocumentHelper), 'document helper error: %s' % helper
+        return helper.get_document_factory(doc_type)
 
     @classmethod
-    def factory(cls, doc_type: str):  # -> Optional[DocumentFactory]:
-        gf = general_factory()
-        return gf.get_document_factory(doc_type)
-
-
-def general_factory():
-    from ..factory import AccountFactoryManager
-    return AccountFactoryManager.general_factory
+    def set_factory(cls, doc_type: str, factory):
+        helper = AccountExtensions.doc_helper
+        assert isinstance(helper, DocumentHelper), 'document helper error: %s' % helper
+        helper.set_document_factory(doc_type, factory=factory)
 
 
 class DocumentFactory(ABC):
+    """ Document Factory """
 
     @abstractmethod
     def create_document(self, identifier: ID, data: Optional[str], signature: Optional[TransportableData]) -> Document:
@@ -169,4 +170,25 @@ class DocumentFactory(ABC):
         :param document:
         :return:
         """
+        raise NotImplemented
+
+
+class DocumentHelper(ABC):
+    """ General Helper """
+
+    @abstractmethod
+    def set_document_factory(self, doc_type: str, factory: DocumentFactory):
+        raise NotImplemented
+
+    @abstractmethod
+    def get_document_factory(self, doc_type: str) -> Optional[DocumentFactory]:
+        raise NotImplemented
+
+    @abstractmethod
+    def create_document(self, doc_type: str, identifier: ID,
+                        data: Optional[str], signature: Optional[TransportableData]) -> Document:
+        raise NotImplemented
+
+    @abstractmethod
+    def parse_document(self, document: Any) -> Optional[Document]:
         raise NotImplemented

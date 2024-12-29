@@ -32,7 +32,28 @@ from .dictionary import Dictionary
 from .x import URI, DateTime
 
 
+class Singleton(object):
+
+    __instances = {}
+
+    def __init__(self, cls):
+        self.__cls = cls
+
+    def __call__(self, *args, **kwargs):
+        cls = self.__cls
+        instance = self.__instances.get(cls, None)
+        if instance is None:
+            instance = cls(*args, **kwargs)
+            self.__instances[cls] = instance
+        return instance
+
+    def __getattr__(self, key):
+        return getattr(self.__cls, key, None)
+
+
 __all__ = [
+
+    'Singleton',
 
     'URI', 'DateTime',
 

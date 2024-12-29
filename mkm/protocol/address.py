@@ -33,6 +33,8 @@ from typing import Any, Optional
 
 from ..types import Stringer
 
+from .helpers import AccountExtensions
+
 
 class Address(Stringer, ABC):
     """This class is used to build address for ID
@@ -41,14 +43,14 @@ class Address(Stringer, ABC):
         ~~~~~~~~~~~~~~~~~~
 
         properties:
-            type - network ID
+            network - network id
     """
 
     @property
     @abstractmethod
-    def type(self) -> int:
+    def network(self) -> int:
         """
-        Get address type (integer as EntityType)
+        Get address type
 
         :return: 0 ~ 255
         """
@@ -60,36 +62,31 @@ class Address(Stringer, ABC):
 
     @classmethod
     def generate(cls, meta, network: int = None):  # -> Address:
-        gf = general_factory()
-        return gf.generate_address(meta=meta, network=network)
-
-    @classmethod
-    def create(cls, address: str):  # -> Optional[Address]:
-        gf = general_factory()
-        return gf.create_address(address=address)
+        helper = AccountExtensions.address_helper
+        assert isinstance(helper, AddressHelper), 'address helper error: %s' % helper
+        return helper.generate_address(meta=meta, network=network)
 
     @classmethod
     def parse(cls, address: Any):  # -> Optional[Address]:
-        gf = general_factory()
-        return gf.parse_address(address=address)
+        helper = AccountExtensions.address_helper
+        assert isinstance(helper, AddressHelper), 'address helper error: %s' % helper
+        return helper.parse_address(address=address)
 
     @classmethod
-    def factory(cls):  # -> Optional[AddressFactory]:
-        gf = general_factory()
-        return gf.get_address_factory()
+    def get_factory(cls):  # -> Optional[AddressFactory]:
+        helper = AccountExtensions.address_helper
+        assert isinstance(helper, AddressHelper), 'address helper error: %s' % helper
+        return helper.get_address_factory()
 
     @classmethod
-    def register(cls, factory):
-        gf = general_factory()
-        gf.set_address_factory(factory=factory)
-
-
-def general_factory():
-    from ..factory import AccountFactoryManager
-    return AccountFactoryManager.general_factory
+    def set_factory(cls, factory):
+        helper = AccountExtensions.address_helper
+        assert isinstance(helper, AddressHelper), 'address helper error: %s' % helper
+        helper.set_address_factory(factory=factory)
 
 
 class AddressFactory(ABC):
+    """ Address Factory """
 
     @abstractmethod
     def generate_address(self, meta, network: int = None) -> Address:
@@ -103,16 +100,6 @@ class AddressFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def create_address(self, address: str) -> Optional[Address]:
-        """
-        Create address from string
-
-        :param address: address string
-        :return: Address
-        """
-        raise NotImplemented
-
-    @abstractmethod
     def parse_address(self, address: str) -> Optional[Address]:
         """
         Parse string object to address
@@ -120,4 +107,24 @@ class AddressFactory(ABC):
         :param address: address string
         :return: Address
         """
+        raise NotImplemented
+
+
+class AddressHelper(ABC):
+    """ General Helper """
+
+    @abstractmethod
+    def set_address_factory(self, factory: AddressFactory):
+        raise NotImplemented
+
+    @abstractmethod
+    def get_address_factory(self) -> Optional[AddressFactory]:
+        raise NotImplemented
+
+    @abstractmethod
+    def generate_address(self, meta, network: int = None) -> Address:
+        raise NotImplemented
+
+    @abstractmethod
+    def parse_address(self, address: Any) -> Optional[Address]:
         raise NotImplemented

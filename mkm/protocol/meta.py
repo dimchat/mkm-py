@@ -36,7 +36,7 @@ from ..crypto import VerifyKey, SignKey
 from ..format import TransportableData
 
 from .address import Address
-from .identifier import ID
+from .helpers import AccountExtensions
 
 
 class Meta(Mapper, ABC):
@@ -114,16 +114,6 @@ class Meta(Mapper, ABC):
         """
         raise NotImplemented
 
-    @abstractmethod
-    def generate_address(self, network: int = None) -> Address:
-        """
-        Generate Address with network ID
-
-        :param network:  Address.type
-        :return: Address
-        """
-        raise NotImplemented
-
     #
     #   Validation
     #
@@ -140,23 +130,12 @@ class Meta(Mapper, ABC):
         raise NotImplemented
 
     @abstractmethod
-    def match_identifier(self, identifier: ID) -> bool:
+    def generate_address(self, network: int = None) -> Address:
         """
-        Check whether meta match with entity ID
-        (must call this when received a new meta from network)
+        Generate Address with network ID
 
-        :param identifier: entity ID
-        :return: True on matched
-        """
-        raise NotImplemented
-
-    @abstractmethod
-    def match_public_key(self, key: VerifyKey) -> bool:
-        """
-        Check whether meta match with public key
-
-        :param key: public key
-        :return: True on matched
+        :param network:  Address.type
+        :return: Address
         """
         raise NotImplemented
 
@@ -166,37 +145,38 @@ class Meta(Mapper, ABC):
 
     @classmethod
     def generate(cls, version: str, private_key: SignKey, seed: str = None):  # -> Optional[Meta]:
-        gf = general_factory()
-        return gf.generate_meta(version, private_key, seed=seed)
+        helper = AccountExtensions.meta_helper
+        assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
+        return helper.generate_meta(version, private_key, seed=seed)
 
     @classmethod
     def create(cls, version: str, public_key: VerifyKey,
                seed: str = None, fingerprint: TransportableData = None):  # -> Optional[Meta]:
-        gf = general_factory()
-        return gf.create_meta(version, public_key, seed=seed, fingerprint=fingerprint)
+        helper = AccountExtensions.meta_helper
+        assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
+        return helper.create_meta(version, public_key, seed=seed, fingerprint=fingerprint)
 
     @classmethod
     def parse(cls, meta: Any):  # -> Optional[Meta]:
-        gf = general_factory()
-        return gf.parse_meta(meta=meta)
+        helper = AccountExtensions.meta_helper
+        assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
+        return helper.parse_meta(meta=meta)
 
     @classmethod
-    def factory(cls, version: str):  # -> Optional[MetaFactory]:
-        gf = general_factory()
-        return gf.get_meta_factory(version)
+    def get_factory(cls, version: str):  # -> Optional[MetaFactory]:
+        helper = AccountExtensions.meta_helper
+        assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
+        return helper.get_meta_factory(version)
 
     @classmethod
-    def register(cls, version: str, factory):
-        gf = general_factory()
-        gf.set_meta_factory(version, factory=factory)
-
-
-def general_factory():
-    from ..factory import AccountFactoryManager
-    return AccountFactoryManager.general_factory
+    def set_factory(cls, version: str, factory):
+        helper = AccountExtensions.meta_helper
+        assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
+        helper.set_meta_factory(version, factory=factory)
 
 
 class MetaFactory(ABC):
+    """ Meta Factory """
 
     @abstractmethod
     def generate_meta(self, private_key: SignKey, seed: Optional[str]) -> Meta:
@@ -229,4 +209,29 @@ class MetaFactory(ABC):
         :param meta: meta info
         :return: Meta
         """
+        raise NotImplemented
+
+
+class MetaHelper(ABC):
+    """ General Helper """
+
+    @abstractmethod
+    def set_meta_factory(self, version: str, factory: MetaFactory):
+        raise NotImplemented
+
+    @abstractmethod
+    def get_meta_factory(self, version: str) -> Optional[MetaFactory]:
+        raise NotImplemented
+
+    @abstractmethod
+    def generate_meta(self, version: str, private_key: SignKey, seed: Optional[str]) -> Meta:
+        raise NotImplemented
+
+    @abstractmethod
+    def create_meta(self, version: str, public_key: VerifyKey,
+                    seed: Optional[str], fingerprint: Optional[TransportableData]) -> Meta:
+        raise NotImplemented
+
+    @abstractmethod
+    def parse_meta(self, meta: Any) -> Optional[Meta]:
         raise NotImplemented

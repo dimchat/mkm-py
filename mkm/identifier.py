@@ -58,7 +58,7 @@ class Identifier(ConstantString, ID):
 
     @property  # Override
     def type(self) -> int:
-        return self.__address.type
+        return self.__address.network
 
     @property  # Override
     def is_broadcast(self) -> bool:
