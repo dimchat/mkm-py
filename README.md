@@ -6,7 +6,7 @@
 [![Issues](https://img.shields.io/github/issues/dimchat/mkm-py)](https://github.com/dimchat/mkm-py/issues)
 [![Repo Size](https://img.shields.io/github/repo-size/dimchat/mkm-py)](https://github.com/dimchat/mkm-py/archive/refs/heads/main.zip)
 [![Tags](https://img.shields.io/github/tag/dimchat/mkm-py)](https://github.com/dimchat/mkm-py/tags)
-[![Version](https://img.shields.io/pypi/v/mkm)](https://pub.dev/packages/mkm)
+[![Version](https://img.shields.io/pypi/v/mkm)](https://pypi.org/project/mkm)
 
 [![Watchers](https://img.shields.io/github/watchers/dimchat/mkm-py)](https://github.com/dimchat/mkm-py/watchers)
 [![Forks](https://img.shields.io/github/forks/dimchat/mkm-py)](https://github.com/dimchat/mkm-py/forks)
@@ -180,5 +180,5 @@ you must verify it with the consensus algorithm before accepting its **public ke
 
 ----
 
-Copyright &copy; 2023 Albert Moky
+Copyright &copy; 2018 Albert Moky
 [![Followers](https://img.shields.io/github/followers/moky)](https://github.com/moky?tab=followers)

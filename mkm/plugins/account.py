@@ -35,6 +35,7 @@ from ..protocol.tai_doc import DocumentHelper
 from ..protocol.helpers import AccountExtensions
 
 
+# class GeneralAccountHelper(AddressHelper, IdentifierHelper, MetaHelper, DocumentHelper, ABC):
 class GeneralAccountHelper(ABC):
     """ Account GeneralFactory """
 

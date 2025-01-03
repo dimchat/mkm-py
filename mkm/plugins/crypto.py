@@ -37,6 +37,7 @@ from ..crypto.public import PublicKeyHelper
 from ..crypto.helpers import CryptoExtensions
 
 
+# class GeneralCryptoHelper(SymmetricKeyHelper, PrivateKeyHelper, PublicKeyHelper, ABC):
 class GeneralCryptoHelper(ABC):
     """ CryptographyKey GeneralFactory """
 

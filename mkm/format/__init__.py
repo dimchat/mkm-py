@@ -57,7 +57,10 @@ __author__ = 'Albert Moky'
 
 __all__ = [
 
-    # Data Format
+    #
+    #   Format
+    #
+
     'DataCoder', 'Hex', 'Base58', 'Base64',
     'ObjectCoder', 'JSON',
     'MapCoder', 'JSONMap',
@@ -70,9 +73,19 @@ __all__ = [
     'json_encode', 'json_decode',
     'utf8_encode', 'utf8_decode',
 
-    # TED, PNF
-    'TransportableData', 'TransportableDataFactory',
-    'PortableNetworkFile', 'PortableNetworkFileFactory',
+    'TransportableData',
+    'PortableNetworkFile',
+
+    #
+    #   Factories
+    #
+
+    'TransportableDataFactory',
+    'PortableNetworkFileFactory',
+
+    #
+    #   Plugins
+    #
 
     # 'TransportableDataHelper', 'PortableNetworkFileHelper',
     # 'FormatExtensions',

@@ -49,18 +49,33 @@ __author__ = 'Albert Moky'
 
 __all__ = [
 
-    # Data Digest
+    #
+    #   Data Digest
+    #
+
     'DataDigester',
     'MD5', 'SHA1', 'SHA256', 'KECCAK256', 'RIPEMD160',
 
     'md5', 'sha1', 'sha256', 'keccak256', 'ripemd160',
 
-    # Crypto
-    'CryptographyKey', 'EncryptKey', 'DecryptKey',
-    'AsymmetricKey', 'SignKey', 'VerifyKey',
-    'SymmetricKey', 'SymmetricKeyFactory',
-    'PublicKey', 'PublicKeyFactory',
-    'PrivateKey', 'PrivateKeyFactory',
+    #
+    #   Crypto
+    #
+
+    'CryptographyKey',
+    'EncryptKey', 'DecryptKey', 'SignKey', 'VerifyKey',
+    'SymmetricKey', 'AsymmetricKey',
+    'PrivateKey', 'PublicKey',
+
+    #
+    #   Factories
+    #
+
+    'SymmetricKeyFactory', 'PrivateKeyFactory', 'PublicKeyFactory',
+
+    #
+    #   Plugins
+    #
 
     # 'SymmetricKeyHelper', 'PublicKeyHelper', 'PrivateKeyHelper',
     # 'CryptoExtensions',

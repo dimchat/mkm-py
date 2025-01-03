@@ -33,6 +33,7 @@ from ..format.file import PortableNetworkFileHelper
 from ..format.helpers import FormatExtensions
 
 
+# class GeneralFormatHelper(TransportableDataHelper, PortableNetworkFileHelper, ABC):
 class GeneralFormatHelper(ABC):
     """ Format GeneralFactory """
 

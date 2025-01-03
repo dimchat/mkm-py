@@ -44,14 +44,15 @@ from .tai_doc import Document, DocumentFactory
 __all__ = [
 
     'EntityType',
-    'ID', 'IDFactory',
-
-    'Address', 'AddressFactory',
-
-    'Meta', 'MetaFactory',
-
+    'Address',   # 'AddressFactory',
+    'ID',        # 'IDFactory',
+    'Meta',      # 'MetaFactory',
     'TAI',
-    'Document', 'DocumentFactory',
+    'Document',  # 'DocumentFactory',
+
+    #
+    #   Plugins
+    #
 
     # 'AddressHelper', 'IdentifierHelper',
     # 'MetaHelper', 'DocumentHelper',

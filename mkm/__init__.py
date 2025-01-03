@@ -30,6 +30,11 @@
 
 from .protocol import *
 
+from .protocol.address import AddressFactory
+from .protocol.identifier import IDFactory
+from .protocol.meta import MetaFactory
+from .protocol.tai_doc import DocumentFactory
+
 from .identifier import Identifier
 from .identifier import ANYONE, EVERYONE, FOUNDER
 from .address import ANYWHERE, EVERYWHERE
@@ -45,16 +50,27 @@ __all__ = [
     #
     #   Protocol
     #
+
     'EntityType',
-    'ID', 'IDFactory',
-    'Address', 'AddressFactory',
-    'Meta', 'MetaFactory',
+    'Address',
+    'ID',
+    'Meta',
     # 'TAI',
-    'Document', 'DocumentFactory',
+    'Document',
+
+    #
+    #   Factories
+    #
+
+    'AddressFactory',
+    'IDFactory',
+    'MetaFactory',
+    'DocumentFactory',
 
     #
     #   Core
     #
+
     'Identifier',
 
     'ANYONE', 'EVERYONE', 'FOUNDER',
