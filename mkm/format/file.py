@@ -141,9 +141,8 @@ class PortableNetworkFile(Mapper, ABC):
         return cls.create(url=url, password=password)
 
     @classmethod
-    def create_from_data(cls, data: bytes, filename: Optional[str]):
-        ted = TransportableData.create(data=data)
-        return cls.create(data=ted, filename=filename)
+    def create_from_data(cls, data: TransportableData, filename: Optional[str]):
+        return cls.create(data=data, filename=filename)
 
     @classmethod
     def create(cls, data: Optional[TransportableData] = None, filename: Optional[str] = None,

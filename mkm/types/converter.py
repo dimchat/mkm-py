@@ -29,23 +29,20 @@ from typing import Any, Optional
 from .x import DateTime
 
 
-class Converter(ABC):
+# noinspection PyMethodMayBeStatic
+class DataConverter:
 
-    @classmethod
-    def get_str(cls, value: Any, default: Optional[str]) -> Optional[str]:
+    def get_str(self, value: Any, default: Optional[str]) -> Optional[str]:
         if value is None:
             return default
         elif isinstance(value, str):
             # exactly
             return value
         else:
+            # assert False, 'not a string value: %s' % value
             return str(value)
 
-    @classmethod
-    def get_bool(cls, value: Any, default: Optional[bool]) -> Optional[bool]:
-        """ assume value can be a config string:
-            'true', 'false', 'yes', 'no', 'on', 'off', '1', '0', ...
-        """
+    def get_bool(self, value: Any, default: Optional[bool]) -> Optional[bool]:
         if value is None:
             return default
         elif isinstance(value, bool):
@@ -55,20 +52,15 @@ class Converter(ABC):
             return value != 0
         elif isinstance(value, float):
             return value != 0.0
-        text = value if isinstance(value, str) else str(value)
-        text = text.strip()
-        size = len(text)
-        if size == 0:
-            return False
-        elif size > MAX_BOOLEAN_LEN:
-            return True
         else:
-            text = text.lower()
-        # assert lo in BOOLEAN_STATES, 'Not a boolean: %s' % value
-        return BOOLEAN_STATES.get(text, True)
+            text = value if isinstance(value, str) else str(value)
+        text = text.strip()
+        if len(text) > MAX_BOOLEAN_LEN:
+            return None
+        text = text.lower()
+        return BOOLEAN_STATES.get(text)
 
-    @classmethod
-    def get_int(cls, value: Any, default: Optional[int]) -> Optional[int]:
+    def get_int(self, value: Any, default: Optional[int]) -> Optional[int]:
         if value is None:
             return default
         elif isinstance(value, int):
@@ -78,11 +70,14 @@ class Converter(ABC):
             return int(value)
         elif isinstance(value, bool):
             return 1 if value else 0
-        text = value if isinstance(value, str) else str(value)
-        return int(text)
+        else:
+            text = value if isinstance(value, str) else str(value)
+        try:
+            return int(text)
+        except ValueError:
+            return None
 
-    @classmethod
-    def get_float(cls, value: Any, default: Optional[float]) -> Optional[float]:
+    def get_float(self, value: Any, default: Optional[float]) -> Optional[float]:
         if value is None:
             return default
         elif isinstance(value, float):
@@ -92,19 +87,25 @@ class Converter(ABC):
             return float(value)
         elif isinstance(value, bool):
             return 1.0 if value else 0.0
-        text = value if isinstance(value, str) else str(value)
-        return float(text)
+        else:
+            text = value if isinstance(value, str) else str(value)
+        try:
+            return float(text)
+        except ValueError:
+            return None
 
-    @classmethod
-    def get_datetime(cls, value: Any, default: Optional[DateTime]) -> Optional[DateTime]:
-        """ assume value be a timestamp (seconds from 1970-01-01 00:00:00) """
+    def get_datetime(self, value: Any, default: Optional[DateTime]) -> Optional[DateTime]:
         if value is None:
             return default
         elif isinstance(value, DateTime):
             # exactly
             return value
-        seconds = cls.get_float(value=value, default=0)
-        return DateTime(timestamp=seconds)
+        seconds = self.get_float(value=value, default=None)
+        if seconds is None or seconds < 0:
+            # ValueError
+            return None
+        else:
+            return DateTime(timestamp=seconds)
 
 
 BOOLEAN_STATES = {
@@ -115,3 +116,32 @@ BOOLEAN_STATES = {
     'none': False, 'null': False, 'undefined': False,
 }
 MAX_BOOLEAN_LEN = len('undefined')
+
+
+class Converter(ABC):
+
+    converter = DataConverter()
+
+    @classmethod
+    def get_str(cls, value: Any, default: Optional[str]) -> Optional[str]:
+        return cls.converter.get_str(value=value, default=default)
+
+    @classmethod
+    def get_bool(cls, value: Any, default: Optional[bool]) -> Optional[bool]:
+        """ assume value can be a config string:
+            'true', 'false', 'yes', 'no', 'on', 'off', '1', '0', ...
+        """
+        return cls.converter.get_bool(value=value, default=default)
+
+    @classmethod
+    def get_int(cls, value: Any, default: Optional[int]) -> Optional[int]:
+        return cls.converter.get_int(value=value, default=default)
+
+    @classmethod
+    def get_float(cls, value: Any, default: Optional[float]) -> Optional[float]:
+        return cls.converter.get_float(value=value, default=default)
+
+    @classmethod
+    def get_datetime(cls, value: Any, default: Optional[DateTime]) -> Optional[DateTime]:
+        """ assume value be a timestamp (seconds from 1970-01-01 00:00:00) """
+        return cls.converter.get_datetime(value=value, default=default)

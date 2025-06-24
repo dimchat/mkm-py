@@ -29,7 +29,7 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any, Dict
+from typing import Optional, Iterable, Any, List, Dict
 
 from ..types import DateTime
 from ..types import Mapper
@@ -47,29 +47,11 @@ class Document(TAI, Mapper, ABC):
         This class is used to generate entity profile
 
             data format: {
-                ID        : "EntityID",        // entity ID
-                type      : "visa",            // "bulletin", ...
+                did       : "EntityID",        // entity ID
                 data      : "{JSON}",          // data = json_encode(info)
                 signature : "{BASE64_ENCODE}"  // signature = sign(data, SK);
             }
     """
-
-    #
-    #  Document types
-    #
-    VISA = 'visa'          # for user info (communicate key)
-    PROFILE = 'profile'    # for user profile (reserved)
-    BULLETIN = 'bulletin'  # for group info (owner, assistants)
-
-    @property
-    @abstractmethod
-    def type(self) -> Optional[str]:
-        """
-        Get document type
-
-        :return: doc type
-        """
-        raise NotImplemented
 
     @property
     @abstractmethod
@@ -81,6 +63,10 @@ class Document(TAI, Mapper, ABC):
         """
         raise NotImplemented
 
+    #
+    #  properties getter/setter
+    #
+
     @property
     @abstractmethod
     def time(self) -> Optional[DateTime]:
@@ -91,9 +77,6 @@ class Document(TAI, Mapper, ABC):
         """
         raise NotImplemented
 
-    #
-    #  properties getter/setter
-    #
     @property
     @abstractmethod
     def name(self) -> Optional[str]:
@@ -114,6 +97,29 @@ class Document(TAI, Mapper, ABC):
         :return:
         """
         raise NotImplemented
+
+    #
+    #   Conveniences
+    #
+
+    @classmethod
+    def convert(cls, array: Iterable):  # -> List[Document]:
+        documents = []
+        for item in array:
+            doc = cls.parse(document=item)
+            if doc is None:
+                # document error
+                continue
+            documents.append(doc)
+        return documents
+
+    @classmethod
+    def revert(cls, array: Iterable) -> List[Dict]:
+        documents = []
+        for item in array:
+            assert isinstance(item, Document), 'document error: %s' % item
+            documents.append(item.dictionary)
+        return documents
 
     #
     #   Factory Methods

@@ -31,8 +31,9 @@ from .cryptography import CryptographyKey
 # noinspection PyAbstractClass
 class AsymmetricKey(CryptographyKey, ABC):
 
-    RSA = 'RSA'  # -- "RSA/ECB/PKCS1Padding", "SHA256withRSA"
-    ECC = 'ECC'
+    # RSA = 'RSA'  # -- "RSA/ECB/PKCS1Padding", "SHA256withRSA"
+    # ECC = 'ECC'
+    pass
 
 
 class SignKey(AsymmetricKey, ABC):
@@ -40,7 +41,7 @@ class SignKey(AsymmetricKey, ABC):
     @abstractmethod
     def sign(self, data: bytes) -> bytes:
         """
-        signature = sign(data, SK);
+        signature = sign(data, SK)
 
         :param data: message data
         :return: signature
@@ -64,7 +65,8 @@ class VerifyKey(AsymmetricKey, ABC):
     @abstractmethod
     def match_sign_key(self, key: SignKey) -> bool:
         """
-        OK = verify(data, sign(data, SK), PK)
+        signature = sign(data, SK)
+        OK = verify(data, signature, PK)
 
         :param key: private key
         :return: True on signature matched

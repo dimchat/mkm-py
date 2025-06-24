@@ -56,15 +56,6 @@ class Meta(Mapper, ABC):
             fingerprint = sign(seed, SK);
     """
 
-    #
-    #  MetaType
-    #  ~~~~~~~~
-    #  Meta algorithm names
-    #
-    MKM = 'MKM'  # '1'
-    BTC = 'BTC'  # '2'
-    ETH = 'ETH'  # '4'
-
     @property
     @abstractmethod
     def type(self) -> str:

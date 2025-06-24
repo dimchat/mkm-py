@@ -47,13 +47,10 @@ class TransportableData(Mapper, ABC):
             }
     """
 
-    #
-    #   encode algorithm
-    #
-    DEFAULT = 'base64'
-    BASE_64 = 'base64'
-    BASE_58 = 'base58'
-    HEX = 'hex'
+    # DEFAULT = 'base64'
+    # BASE_64 = 'base64'
+    # BASE_58 = 'base58'
+    # HEX = 'hex'
 
     @property
     @abstractmethod
@@ -102,8 +99,8 @@ class TransportableData(Mapper, ABC):
     #
 
     @classmethod
-    def encode(cls, data: bytes) -> Any:
-        ted = cls.create(data=data)
+    def encode(cls, data: bytes, algorithm: str) -> Any:
+        ted = cls.create(data=data, algorithm=algorithm)
         # assert isinstance(ted, TransportableData), 'should not happen'
         return ted.object
 
@@ -118,9 +115,7 @@ class TransportableData(Mapper, ABC):
     #
 
     @classmethod
-    def create(cls, data: bytes, algorithm: str = None):  # -> TransportableData;
-        if algorithm is None:
-            algorithm = cls.DEFAULT
+    def create(cls, data: bytes, algorithm: str):  # -> TransportableData;
         helper = FormatExtensions.ted_helper
         assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
         return helper.create_transportable_data(data=data, algorithm=algorithm)

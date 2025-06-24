@@ -101,21 +101,27 @@ class ID(Stringer, ABC):
         :param array: string array
         :return: ID list
         """
-        helper = AccountExtensions.id_helper
-        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
-        return helper.convert_identifiers(array=array)
+        members = []
+        for item in array:
+            did = cls.parse(identifier=item)
+            if did is None:
+                # id error
+                continue
+            members.append(did)
+        return members
 
     @classmethod
-    def revert(cls, array) -> List[str]:
+    def revert(cls, array: Iterable) -> List[str]:
         """
         Revert ID list to string array
 
         :param array: ID list
         :return: string array
         """
-        helper = AccountExtensions.id_helper
-        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
-        return helper.revert_identifiers(array=array)
+        members = []
+        for item in array:
+            members.append(str(item))
+        return members
 
     #
     #   Factory methods
@@ -211,12 +217,4 @@ class IdentifierHelper(ABC):
 
     @abstractmethod
     def parse_identifier(self, identifier: Any) -> Optional[ID]:
-        raise NotImplemented
-
-    @abstractmethod
-    def convert_identifiers(self, array: Iterable) -> List[ID]:
-        raise NotImplemented
-
-    @abstractmethod
-    def revert_identifiers(self, array: Iterable[ID]) -> List[str]:
         raise NotImplemented

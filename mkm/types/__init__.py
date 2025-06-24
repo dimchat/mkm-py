@@ -23,7 +23,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from .converter import Converter
+from .converter import Converter, DataConverter
 from .copier import Copier
 from .wrapper import Wrapper, Stringer, Mapper
 from .string import ConstantString, String
@@ -57,7 +57,8 @@ __all__ = [
 
     'URI', 'DateTime',
 
-    'Converter', 'Copier',
+    'Converter', 'DataConverter',
+    'Copier',
     'Wrapper', 'Stringer', 'Mapper',
     'ConstantString',  # 'String',
     'Dictionary',

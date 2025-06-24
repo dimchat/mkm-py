@@ -86,9 +86,9 @@ class DecryptKey(CryptographyKey, ABC):
     def decrypt(self, data: bytes, params: Optional[Dict]) -> Optional[bytes]:
         """
         1. Symmetric Key:
-            plaintext = decrypt(ciphertext, PW);
+            plaintext = decrypt(ciphertext, PW)
         2. Asymmetric Private Key:
-            plaintext = decrypt(ciphertext, SK);
+            plaintext = decrypt(ciphertext, SK)
 
         :param data:   ciphertext
         :param params: extra params ('IV' for 'AES')
@@ -99,7 +99,8 @@ class DecryptKey(CryptographyKey, ABC):
     @abstractmethod
     def match_encrypt_key(self, key: EncryptKey) -> bool:
         """
-        OK = decrypt(encrypt(data, PK), SK) == data
+        CT = encrypt(data, PK)
+        OK = decrypt(CT, SK) == data
 
         :param key: encrypt (public) key
         :return: False on error

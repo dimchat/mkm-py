@@ -44,8 +44,8 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
         }
     """
 
-    AES = 'AES'  # -- "AES/CBC/PKCS7Padding"
-    DES = 'DES'
+    # AES = 'AES'  # -- "AES/CBC/PKCS7Padding"
+    # DES = 'DES'
 
     #
     #  Factory methods
