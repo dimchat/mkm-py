@@ -114,12 +114,12 @@ class Document(TAI, Mapper, ABC):
         return documents
 
     @classmethod
-    def revert(cls, array: Iterable) -> List[Dict]:
-        documents = []
-        for item in array:
-            assert isinstance(item, Document), 'document error: %s' % item
-            documents.append(item.dictionary)
-        return documents
+    def revert(cls, documents: Iterable) -> List[Dict]:
+        array = []
+        for doc in documents:
+            assert isinstance(doc, Document), 'document error: %s' % doc
+            array.append(doc.dictionary)
+        return array
 
     #
     #   Factory Methods

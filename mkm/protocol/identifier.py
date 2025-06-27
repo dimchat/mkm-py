@@ -111,17 +111,18 @@ class ID(Stringer, ABC):
         return members
 
     @classmethod
-    def revert(cls, array: Iterable) -> List[str]:
+    def revert(cls, identifiers: Iterable) -> List[str]:
         """
         Revert ID list to string array
 
-        :param array: ID list
+        :param identifiers: ID list
         :return: string array
         """
-        members = []
-        for item in array:
-            members.append(str(item))
-        return members
+        array = []
+        for did in identifiers:
+            assert isinstance(did, ID), 'ID error: %s' % did
+            array.append(str(did))
+        return array
 
     #
     #   Factory methods

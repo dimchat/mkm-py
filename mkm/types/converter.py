@@ -55,10 +55,16 @@ class DataConverter:
         else:
             text = value if isinstance(value, str) else str(value)
         text = text.strip()
-        if len(text) > MAX_BOOLEAN_LEN:
-            return None
+        size = len(text)
+        if size == 0:
+            return False
+        elif size > MAX_BOOLEAN_LEN:
+            raise ValueError('bool value error: "%s"' % value)
         text = text.lower()
-        return BOOLEAN_STATES.get(text)
+        state = BOOLEAN_STATES.get(text)
+        if state is None:
+            raise ValueError('bool value error: "%s"' % value)
+        return state
 
     def get_int(self, value: Any, default: Optional[int]) -> Optional[int]:
         if value is None:
@@ -72,10 +78,7 @@ class DataConverter:
             return 1 if value else 0
         else:
             text = value if isinstance(value, str) else str(value)
-        try:
             return int(text)
-        except ValueError:
-            return None
 
     def get_float(self, value: Any, default: Optional[float]) -> Optional[float]:
         if value is None:
@@ -89,10 +92,7 @@ class DataConverter:
             return 1.0 if value else 0.0
         else:
             text = value if isinstance(value, str) else str(value)
-        try:
             return float(text)
-        except ValueError:
-            return None
 
     def get_datetime(self, value: Any, default: Optional[DateTime]) -> Optional[DateTime]:
         if value is None:
@@ -102,8 +102,7 @@ class DataConverter:
             return value
         seconds = self.get_float(value=value, default=None)
         if seconds is None or seconds < 0:
-            # ValueError
-            return None
+            raise ValueError('Timestamp error: "%s"' % value)
         else:
             return DateTime(timestamp=seconds)
 
