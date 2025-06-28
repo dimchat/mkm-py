@@ -23,15 +23,38 @@
 # SOFTWARE.
 # ==============================================================================
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any, Optional
 
 from .x import DateTime
 
 
-# noinspection PyMethodMayBeStatic
-class DataConverter:
+class DataConverter(ABC):
 
+    @abstractmethod
+    def get_str(self, value: Any, default: Optional[str]) -> Optional[str]:
+        raise NotImplemented
+
+    @abstractmethod
+    def get_bool(self, value: Any, default: Optional[bool]) -> Optional[bool]:
+        raise NotImplemented
+
+    @abstractmethod
+    def get_int(self, value: Any, default: Optional[int]) -> Optional[int]:
+        raise NotImplemented
+
+    @abstractmethod
+    def get_float(self, value: Any, default: Optional[float]) -> Optional[float]:
+        raise NotImplemented
+
+    @abstractmethod
+    def get_datetime(self, value: Any, default: Optional[DateTime]) -> Optional[DateTime]:
+        raise NotImplemented
+
+
+class BaseConverter(DataConverter):
+
+    # Override
     def get_str(self, value: Any, default: Optional[str]) -> Optional[str]:
         if value is None:
             return default
@@ -42,6 +65,7 @@ class DataConverter:
             # assert False, 'not a string value: %s' % value
             return str(value)
 
+    # Override
     def get_bool(self, value: Any, default: Optional[bool]) -> Optional[bool]:
         if value is None:
             return default
@@ -66,6 +90,7 @@ class DataConverter:
             raise ValueError('bool value error: "%s"' % value)
         return state
 
+    # Override
     def get_int(self, value: Any, default: Optional[int]) -> Optional[int]:
         if value is None:
             return default
@@ -80,6 +105,7 @@ class DataConverter:
             text = value if isinstance(value, str) else str(value)
             return int(text)
 
+    # Override
     def get_float(self, value: Any, default: Optional[float]) -> Optional[float]:
         if value is None:
             return default
@@ -94,6 +120,7 @@ class DataConverter:
             text = value if isinstance(value, str) else str(value)
             return float(text)
 
+    # Override
     def get_datetime(self, value: Any, default: Optional[DateTime]) -> Optional[DateTime]:
         if value is None:
             return default
@@ -117,9 +144,10 @@ BOOLEAN_STATES = {
 MAX_BOOLEAN_LEN = len('undefined')
 
 
-class Converter(ABC):
+class Converter:
+    """ Data Convert Interface """
 
-    converter = DataConverter()
+    converter: DataConverter = BaseConverter()
 
     @classmethod
     def get_str(cls, value: Any, default: Optional[str]) -> Optional[str]:
