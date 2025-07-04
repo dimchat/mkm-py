@@ -53,27 +53,29 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
 
     @classmethod
     def generate(cls, algorithm: str):  # -> Optional[SymmetricKey]:
-        helper = CryptoExtensions.symmetric_helper
-        assert isinstance(helper, SymmetricKeyHelper), 'symmetric helper error: %s' % helper
+        helper = symmetric_helper()
         return helper.generate_symmetric_key(algorithm=algorithm)
 
     @classmethod
     def parse(cls, key: Any):  # -> Optional[SymmetricKey]:
-        helper = CryptoExtensions.symmetric_helper
-        assert isinstance(helper, SymmetricKeyHelper), 'symmetric helper error: %s' % helper
+        helper = symmetric_helper()
         return helper.parse_symmetric_key(key)
 
     @classmethod
     def get_factory(cls, algorithm: str):  # -> Optional[SymmetricKeyFactory]:
-        helper = CryptoExtensions.symmetric_helper
-        assert isinstance(helper, SymmetricKeyHelper), 'symmetric helper error: %s' % helper
+        helper = symmetric_helper()
         return helper.get_symmetric_key_factory(algorithm=algorithm)
 
     @classmethod
     def set_factory(cls, algorithm: str, factory):
-        helper = CryptoExtensions.symmetric_helper
-        assert isinstance(helper, SymmetricKeyHelper), 'symmetric helper error: %s' % helper
+        helper = symmetric_helper()
         helper.set_symmetric_key_factory(algorithm=algorithm, factory=factory)
+
+
+def symmetric_helper():
+    helper = CryptoExtensions.symmetric_helper
+    assert isinstance(helper, SymmetricKeyHelper), 'symmetric helper error: %s' % helper
+    return helper
 
 
 class SymmetricKeyFactory(ABC):

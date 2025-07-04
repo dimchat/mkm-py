@@ -128,27 +128,29 @@ class Document(TAI, Mapper, ABC):
     @classmethod
     def create(cls, doc_type: str, identifier: ID,
                data: Optional[str] = None, signature: Optional[TransportableData] = None):  # -> Optional[Document]:
-        helper = AccountExtensions.doc_helper
-        assert isinstance(helper, DocumentHelper), 'document helper error: %s' % helper
+        helper = doc_helper()
         return helper.create_document(doc_type, identifier=identifier, data=data, signature=signature)
 
     @classmethod
     def parse(cls, document: Any):  # -> Optional[Document]:
-        helper = AccountExtensions.doc_helper
-        assert isinstance(helper, DocumentHelper), 'document helper error: %s' % helper
+        helper = doc_helper()
         return helper.parse_document(document=document)
 
     @classmethod
     def get_factory(cls, doc_type: str):  # -> Optional[DocumentFactory]:
-        helper = AccountExtensions.doc_helper
-        assert isinstance(helper, DocumentHelper), 'document helper error: %s' % helper
+        helper = doc_helper()
         return helper.get_document_factory(doc_type)
 
     @classmethod
     def set_factory(cls, doc_type: str, factory):
-        helper = AccountExtensions.doc_helper
-        assert isinstance(helper, DocumentHelper), 'document helper error: %s' % helper
+        helper = doc_helper()
         helper.set_document_factory(doc_type, factory=factory)
+
+
+def doc_helper():
+    helper = AccountExtensions.doc_helper
+    assert isinstance(helper, DocumentHelper), 'document helper error: %s' % helper
+    return helper
 
 
 class DocumentFactory(ABC):

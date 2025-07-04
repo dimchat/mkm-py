@@ -136,34 +136,35 @@ class Meta(Mapper, ABC):
 
     @classmethod
     def generate(cls, version: str, private_key: SignKey, seed: str = None):  # -> Optional[Meta]:
-        helper = AccountExtensions.meta_helper
-        assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
+        helper = meta_helper()
         return helper.generate_meta(version, private_key, seed=seed)
 
     @classmethod
     def create(cls, version: str, public_key: VerifyKey,
                seed: str = None, fingerprint: TransportableData = None):  # -> Optional[Meta]:
-        helper = AccountExtensions.meta_helper
-        assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
+        helper = meta_helper()
         return helper.create_meta(version, public_key, seed=seed, fingerprint=fingerprint)
 
     @classmethod
     def parse(cls, meta: Any):  # -> Optional[Meta]:
-        helper = AccountExtensions.meta_helper
-        assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
+        helper = meta_helper()
         return helper.parse_meta(meta=meta)
 
     @classmethod
     def get_factory(cls, version: str):  # -> Optional[MetaFactory]:
-        helper = AccountExtensions.meta_helper
-        assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
+        helper = meta_helper()
         return helper.get_meta_factory(version)
 
     @classmethod
     def set_factory(cls, version: str, factory):
-        helper = AccountExtensions.meta_helper
-        assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
+        helper = meta_helper()
         helper.set_meta_factory(version, factory=factory)
+
+
+def meta_helper():
+    helper = AccountExtensions.meta_helper
+    assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
+    return helper
 
 
 class MetaFactory(ABC):

@@ -60,27 +60,29 @@ class PrivateKey(SignKey, ABC):
 
     @classmethod
     def generate(cls, algorithm: str):  # -> Optional[PrivateKey]:
-        helper = CryptoExtensions.private_helper
-        assert isinstance(helper, PrivateKeyHelper), 'private helper error: %s' % helper
+        helper = private_helper()
         return helper.generate_private_key(algorithm=algorithm)
 
     @classmethod
     def parse(cls, key: Any):  # -> Optional[PrivateKey]:
-        helper = CryptoExtensions.private_helper
-        assert isinstance(helper, PrivateKeyHelper), 'private helper error: %s' % helper
+        helper = private_helper()
         return helper.parse_private_key(key)
 
     @classmethod
     def get_factory(cls, algorithm: str):  # -> Optional[PrivateKeyFactory]:
-        helper = CryptoExtensions.private_helper
-        assert isinstance(helper, PrivateKeyHelper), 'private helper error: %s' % helper
+        helper = private_helper()
         return helper.get_private_key_factory(algorithm=algorithm)
 
     @classmethod
     def set_factory(cls, algorithm: str, factory):
-        helper = CryptoExtensions.private_helper
-        assert isinstance(helper, PrivateKeyHelper), 'private helper error: %s' % helper
+        helper = private_helper()
         helper.set_private_key_factory(algorithm=algorithm, factory=factory)
+
+
+def private_helper():
+    helper = CryptoExtensions.private_helper
+    assert isinstance(helper, PrivateKeyHelper), 'private helper error: %s' % helper
+    return helper
 
 
 class PrivateKeyFactory(ABC):

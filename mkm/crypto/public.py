@@ -50,21 +50,24 @@ class PublicKey(VerifyKey, ABC):
 
     @classmethod
     def parse(cls, key: Any):  # -> Optional[PublicKey]:
-        helper = CryptoExtensions.symmetric_helper
-        assert isinstance(helper, PublicKeyHelper), 'public helper error: %s' % helper
+        helper = public_helper()
         return helper.parse_public_key(key)
 
     @classmethod
     def get_factory(cls, algorithm: str):  # -> Optional[PublicKeyFactory]:
-        helper = CryptoExtensions.symmetric_helper
-        assert isinstance(helper, PublicKeyHelper), 'public helper error: %s' % helper
+        helper = public_helper()
         return helper.get_public_key_factory(algorithm=algorithm)
 
     @classmethod
     def set_factory(cls, algorithm: str, factory):
-        helper = CryptoExtensions.symmetric_helper
-        assert isinstance(helper, PublicKeyHelper), 'public helper error: %s' % helper
+        helper = public_helper()
         helper.set_public_key_factory(algorithm=algorithm, factory=factory)
+
+
+def public_helper():
+    helper = CryptoExtensions.public_helper
+    assert isinstance(helper, PublicKeyHelper), 'public helper error: %s' % helper
+    return helper
 
 
 class PublicKeyFactory(ABC):

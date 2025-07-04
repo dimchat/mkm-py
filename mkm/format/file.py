@@ -147,27 +147,29 @@ class PortableNetworkFile(Mapper, ABC):
     @classmethod
     def create(cls, data: Optional[TransportableData] = None, filename: Optional[str] = None,
                url: Optional[URI] = None, password: Optional[DecryptKey] = None):  # -> PortableNetworkFile:
-        helper = FormatExtensions.pnf_helper
-        assert isinstance(helper, PortableNetworkFileHelper), 'PNF helper error: %s' % helper
+        helper = pnf_helper()
         return helper.create_portable_network_file(data=data, filename=filename, url=url, password=password)
 
     @classmethod
     def parse(cls, pnf: Any):  # -> Optional[PortableNetworkFile]:
-        helper = FormatExtensions.pnf_helper
-        assert isinstance(helper, PortableNetworkFileHelper), 'PNF helper error: %s' % helper
+        helper = pnf_helper()
         return helper.parse_portable_network_file(pnf)
 
     @classmethod
     def get_factory(cls):  # -> Optional[PortableNetworkFileFactory]:
-        helper = FormatExtensions.pnf_helper
-        assert isinstance(helper, PortableNetworkFileHelper), 'PNF helper error: %s' % helper
+        helper = pnf_helper()
         return helper.get_portable_network_file_factory()
 
     @classmethod
     def set_factory(cls, factory):
-        helper = FormatExtensions.pnf_helper
-        assert isinstance(helper, PortableNetworkFileHelper), 'PNF helper error: %s' % helper
+        helper = pnf_helper()
         helper.set_portable_network_file_factory(factory=factory)
+
+
+def pnf_helper():
+    helper = FormatExtensions.pnf_helper
+    assert isinstance(helper, PortableNetworkFileHelper), 'PNF helper error: %s' % helper
+    return helper
 
 
 class PortableNetworkFileFactory(ABC):

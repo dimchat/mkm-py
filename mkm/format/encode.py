@@ -99,8 +99,8 @@ class TransportableData(Mapper, ABC):
     #
 
     @classmethod
-    def encode(cls, data: bytes, algorithm: str) -> Any:
-        ted = cls.create(data=data, algorithm=algorithm)
+    def encode(cls, data: bytes) -> Any:
+        ted = cls.create(data=data)
         # assert isinstance(ted, TransportableData), 'should not happen'
         return ted.object
 
@@ -115,28 +115,30 @@ class TransportableData(Mapper, ABC):
     #
 
     @classmethod
-    def create(cls, data: bytes, algorithm: str):  # -> TransportableData;
-        helper = FormatExtensions.ted_helper
-        assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+    def create(cls, data: bytes, algorithm: str = None):  # -> TransportableData;
+        helper = ted_helper()
         return helper.create_transportable_data(data=data, algorithm=algorithm)
 
     @classmethod
     def parse(cls, ted: Any):  # -> Optional[TransportableData]:
-        helper = FormatExtensions.ted_helper
-        assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+        helper = ted_helper()
         return helper.parse_transportable_data(ted)
 
     @classmethod
     def get_factory(cls, algorithm: str):  # -> Optional[TransportableDataFactory]:
-        helper = FormatExtensions.ted_helper
-        assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+        helper = ted_helper()
         return helper.get_transportable_data_factory(algorithm=algorithm)
 
     @classmethod
     def set_factory(cls, algorithm: str, factory):
-        helper = FormatExtensions.ted_helper
-        assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+        helper = ted_helper()
         helper.set_transportable_data_factory(algorithm=algorithm, factory=factory)
+
+
+def ted_helper():
+    helper = FormatExtensions.ted_helper
+    assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+    return helper
 
 
 class TransportableDataFactory(ABC):

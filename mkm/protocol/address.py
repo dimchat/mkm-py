@@ -62,27 +62,29 @@ class Address(Stringer, ABC):
 
     @classmethod
     def generate(cls, meta, network: int = None):  # -> Address:
-        helper = AccountExtensions.address_helper
-        assert isinstance(helper, AddressHelper), 'address helper error: %s' % helper
+        helper = address_helper()
         return helper.generate_address(meta=meta, network=network)
 
     @classmethod
     def parse(cls, address: Any):  # -> Optional[Address]:
-        helper = AccountExtensions.address_helper
-        assert isinstance(helper, AddressHelper), 'address helper error: %s' % helper
+        helper = address_helper()
         return helper.parse_address(address=address)
 
     @classmethod
     def get_factory(cls):  # -> Optional[AddressFactory]:
-        helper = AccountExtensions.address_helper
-        assert isinstance(helper, AddressHelper), 'address helper error: %s' % helper
+        helper = address_helper()
         return helper.get_address_factory()
 
     @classmethod
     def set_factory(cls, factory):
-        helper = AccountExtensions.address_helper
-        assert isinstance(helper, AddressHelper), 'address helper error: %s' % helper
+        helper = address_helper()
         helper.set_address_factory(factory=factory)
+
+
+def address_helper():
+    helper = AccountExtensions.address_helper
+    assert isinstance(helper, AddressHelper), 'address helper error: %s' % helper
+    return helper
 
 
 class AddressFactory(ABC):

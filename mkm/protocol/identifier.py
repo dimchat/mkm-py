@@ -130,33 +130,34 @@ class ID(Stringer, ABC):
 
     @classmethod
     def generate(cls, meta, network: int = None, terminal: Optional[str] = None):  # -> ID:
-        helper = AccountExtensions.id_helper
-        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+        helper = id_helper()
         return helper.generate_identifier(meta=meta, network=network, terminal=terminal)
 
     @classmethod
     def create(cls, name: Optional[str], address: Address, terminal: Optional[str] = None):  # -> ID:
-        helper = AccountExtensions.id_helper
-        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+        helper = id_helper()
         return helper.create_identifier(name=name, address=address, terminal=terminal)
 
     @classmethod
     def parse(cls, identifier: Any):  # -> Optional[ID]:
-        helper = AccountExtensions.id_helper
-        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+        helper = id_helper()
         return helper.parse_identifier(identifier=identifier)
 
     @classmethod
     def get_factory(cls):  # -> Optional[IDFactory]:
-        helper = AccountExtensions.id_helper
-        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+        helper = id_helper()
         return helper.get_identifier_factory()
 
     @classmethod
     def set_factory(cls, factory):
-        helper = AccountExtensions.id_helper
-        assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+        helper = id_helper()
         helper.set_identifier_factory(factory=factory)
+
+
+def id_helper():
+    helper = AccountExtensions.id_helper
+    assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+    return helper
 
 
 class IDFactory(ABC):

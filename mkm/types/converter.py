@@ -73,8 +73,10 @@ class BaseConverter(DataConverter):
             # exactly
             return value
         elif isinstance(value, int):
+            assert value == 1 or value == 0, 'bool value error: %s' % value
             return value != 0
         elif isinstance(value, float):
+            assert value == 1.0 or value == 0.0, 'bool value error: %s' % value
             return value != 0.0
         else:
             text = value if isinstance(value, str) else str(value)
@@ -138,13 +140,13 @@ BOOLEAN_STATES = {
     '1': True, 'yes': True, 'true': True, 'on': True,
 
     '0': False, 'no': False, 'false': False, 'off': False,
-    '+0': False, '-0': False, '+0.0': False, '-0.0': False,
-    'none': False, 'null': False, 'undefined': False,
+    # '+0': False, '-0': False, '0.0': False, '+0.0': False, '-0.0': False,
+    'null': False, 'none': False, 'undefined': False,
 }
 MAX_BOOLEAN_LEN = len('undefined')
 
 
-class Converter:
+class Converter(ABC):
     """ Data Convert Interface """
 
     converter: DataConverter = BaseConverter()
