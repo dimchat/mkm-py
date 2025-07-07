@@ -84,10 +84,10 @@ class BaseConverter(DataConverter):
         size = len(text)
         if size == 0:
             return False
-        elif size > MAX_BOOLEAN_LEN:
+        elif size > Converter.MAX_BOOLEAN_LEN:
             raise ValueError('bool value error: "%s"' % value)
         text = text.lower()
-        state = BOOLEAN_STATES.get(text)
+        state = Converter.BOOLEAN_STATES.get(text)
         if state is None:
             raise ValueError('bool value error: "%s"' % value)
         return state
@@ -136,19 +136,19 @@ class BaseConverter(DataConverter):
             return DateTime(timestamp=seconds)
 
 
-BOOLEAN_STATES = {
-    '1': True, 'yes': True, 'true': True, 'on': True,
-
-    '0': False, 'no': False, 'false': False, 'off': False,
-    # '+0': False, '-0': False, '0.0': False, '+0.0': False, '-0.0': False,
-    'null': False, 'none': False, 'undefined': False,
-}
-MAX_BOOLEAN_LEN = len('undefined')
-
-
 class Converter(ABC):
     """ Data Convert Interface """
 
+    BOOLEAN_STATES = {
+        '1': True, 'yes': True, 'true': True, 'on': True,
+
+        '0': False, 'no': False, 'false': False, 'off': False,
+        # '+0': False, '-0': False, '0.0': False, '+0.0': False, '-0.0': False,
+        'null': False, 'none': False, 'undefined': False,
+    }
+    MAX_BOOLEAN_LEN = len('undefined')
+
+    # Singleton
     converter: DataConverter = BaseConverter()
 
     @classmethod

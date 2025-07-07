@@ -177,7 +177,7 @@ class TransportableDataHelper(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def create_transportable_data(self, algorithm: str, data: bytes) -> TransportableData:
+    def create_transportable_data(self, data: bytes, algorithm: Optional[str]) -> TransportableData:
         raise NotImplemented
 
     @abstractmethod

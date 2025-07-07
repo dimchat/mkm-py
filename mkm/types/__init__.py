@@ -24,7 +24,6 @@
 # ==============================================================================
 
 from .converter import Converter, DataConverter, BaseConverter
-# from .converter import BOOLEAN_STATES, MAX_BOOLEAN_LEN
 
 from .copier import Copier
 from .wrapper import Wrapper, Stringer, Mapper
@@ -60,7 +59,6 @@ __all__ = [
     'URI', 'DateTime',
 
     'Converter', 'DataConverter', 'BaseConverter',
-    # 'BOOLEAN_STATES', 'MAX_BOOLEAN_LEN',
 
     'Copier',
     'Wrapper', 'Stringer', 'Mapper',

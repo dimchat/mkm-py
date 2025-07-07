@@ -91,7 +91,7 @@ class AddressFactory(ABC):
     """ Address Factory """
 
     @abstractmethod
-    def generate_address(self, meta, network: int = None) -> Address:
+    def generate_address(self, meta, network: Optional[int]) -> Address:
         """
         Generate address with meta & type
 
@@ -124,7 +124,7 @@ class AddressHelper(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def generate_address(self, meta, network: int = None) -> Address:
+    def generate_address(self, meta, network: Optional[int]) -> Address:
         raise NotImplemented
 
     @abstractmethod
