@@ -77,27 +77,27 @@ class Dictionary(Mapper):
         return Dictionary(dictionary=dictionary)
 
     # Override
-    def get_str(self, key: str, default: Optional[str]) -> Optional[str]:
+    def get_str(self, key: str, default: Optional[str] = None) -> Optional[str]:
         value = self.__dictionary.get(key)
         return Converter.get_str(value=value, default=default)
 
     # Override
-    def get_bool(self, key: str, default: Optional[bool]) -> Optional[bool]:
+    def get_bool(self, key: str, default: Optional[bool] = None) -> Optional[bool]:
         value = self.__dictionary.get(key)
         return Converter.get_bool(value=value, default=default)
 
     # Override
-    def get_int(self, key: str, default: Optional[int]) -> Optional[int]:
+    def get_int(self, key: str, default: Optional[int] = None) -> Optional[int]:
         value = self.__dictionary.get(key)
         return Converter.get_int(value=value, default=default)
 
     # Override
-    def get_float(self, key: str, default: Optional[float]) -> Optional[float]:
+    def get_float(self, key: str, default: Optional[float] = None) -> Optional[float]:
         value = self.__dictionary.get(key)
         return Converter.get_float(value=value, default=default)
 
     # Override
-    def get_datetime(self, key: str, default: Optional[DateTime]) -> Optional[DateTime]:
+    def get_datetime(self, key: str, default: Optional[DateTime] = None) -> Optional[DateTime]:
         value = self.__dictionary.get(key)
         return Converter.get_datetime(value=value, default=default)
 

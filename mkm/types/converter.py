@@ -152,25 +152,25 @@ class Converter(ABC):
     converter: DataConverter = BaseConverter()
 
     @classmethod
-    def get_str(cls, value: Any, default: Optional[str]) -> Optional[str]:
+    def get_str(cls, value: Any, default: Optional[str] = None) -> Optional[str]:
         return cls.converter.get_str(value=value, default=default)
 
     @classmethod
-    def get_bool(cls, value: Any, default: Optional[bool]) -> Optional[bool]:
+    def get_bool(cls, value: Any, default: Optional[bool] = None) -> Optional[bool]:
         """ assume value can be a config string:
             'true', 'false', 'yes', 'no', 'on', 'off', '1', '0', ...
         """
         return cls.converter.get_bool(value=value, default=default)
 
     @classmethod
-    def get_int(cls, value: Any, default: Optional[int]) -> Optional[int]:
+    def get_int(cls, value: Any, default: Optional[int] = None) -> Optional[int]:
         return cls.converter.get_int(value=value, default=default)
 
     @classmethod
-    def get_float(cls, value: Any, default: Optional[float]) -> Optional[float]:
+    def get_float(cls, value: Any, default: Optional[float] = None) -> Optional[float]:
         return cls.converter.get_float(value=value, default=default)
 
     @classmethod
-    def get_datetime(cls, value: Any, default: Optional[DateTime]) -> Optional[DateTime]:
+    def get_datetime(cls, value: Any, default: Optional[DateTime] = None) -> Optional[DateTime]:
         """ assume value be a timestamp (seconds from 1970-01-01 00:00:00) """
         return cls.converter.get_datetime(value=value, default=default)

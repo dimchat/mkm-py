@@ -40,11 +40,11 @@ class GeneralAccountHelper(ABC):
     """ Account GeneralFactory """
 
     @abstractmethod
-    def get_meta_type(self, meta: Dict, default: Optional[str]) -> Optional[str]:
+    def get_meta_type(self, meta: Dict, default: Optional[str] = None) -> Optional[str]:
         raise NotImplemented
 
     @abstractmethod
-    def get_document_type(self, document: Dict, default: Optional[str]) -> Optional[str]:
+    def get_document_type(self, document: Dict, default: Optional[str] = None) -> Optional[str]:
         raise NotImplemented
 
 

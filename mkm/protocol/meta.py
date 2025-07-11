@@ -46,10 +46,10 @@ class Meta(Mapper, ABC):
         ~~~~~~~~~~~~~~~~~~~~
 
         data format: {
-            type: 1,             // meta version
-            seed: "moKy",        // user/group name
-            key: "{public key}", // PK = secp256k1(SK);
-            fingerprint: "..."   // CT = sign(seed, SK);
+            type        : 1,              // algorithm version
+            key         : "{public key}", // PK = secp256k1(SK);
+            seed        : "moKy",         // user/group name
+            fingerprint : "..."           // CT = sign(seed, SK);
         }
 
         algorithm:
@@ -135,13 +135,13 @@ class Meta(Mapper, ABC):
     #
 
     @classmethod
-    def generate(cls, version: str, private_key: SignKey, seed: str = None):  # -> Optional[Meta]:
+    def generate(cls, version: str, private_key: SignKey, seed: str = None):  # -> Meta:
         helper = meta_helper()
         return helper.generate_meta(version, private_key, seed=seed)
 
     @classmethod
     def create(cls, version: str, public_key: VerifyKey,
-               seed: str = None, fingerprint: TransportableData = None):  # -> Optional[Meta]:
+               seed: str = None, fingerprint: TransportableData = None):  # -> Meta:
         helper = meta_helper()
         return helper.create_meta(version, public_key, seed=seed, fingerprint=fingerprint)
 

@@ -64,23 +64,23 @@ class Mapper(MutableMapping[str, Any], ABC):
     """
 
     @abstractmethod
-    def get_str(self, key: str, default: Optional[str]) -> Optional[str]:
+    def get_str(self, key: str, default: Optional[str] = None) -> Optional[str]:
         raise NotImplemented
 
     @abstractmethod
-    def get_bool(self, key: str, default: Optional[bool]) -> Optional[bool]:
+    def get_bool(self, key: str, default: Optional[bool] = None) -> Optional[bool]:
         raise NotImplemented
 
     @abstractmethod
-    def get_int(self, key: str, default: Optional[int]) -> Optional[int]:
+    def get_int(self, key: str, default: Optional[int] = None) -> Optional[int]:
         raise NotImplemented
 
     @abstractmethod
-    def get_float(self, key: str, default: Optional[float]) -> Optional[float]:
+    def get_float(self, key: str, default: Optional[float] = None) -> Optional[float]:
         raise NotImplemented
 
     @abstractmethod
-    def get_datetime(self, key: str, default: Optional[DateTime]) -> Optional[DateTime]:
+    def get_datetime(self, key: str, default: Optional[DateTime] = None) -> Optional[DateTime]:
         raise NotImplemented
 
     @abstractmethod

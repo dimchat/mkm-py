@@ -47,7 +47,8 @@ class Document(TAI, Mapper, ABC):
         This class is used to generate entity profile
 
             data format: {
-                did       : "EntityID",        // entity ID
+                did       : "{EntityID}",      // entity ID
+                type      : "visa",            // "bulletin", ...
                 data      : "{JSON}",          // data = json_encode(info)
                 signature : "{BASE64_ENCODE}"  // signature = sign(data, SK);
             }
@@ -127,7 +128,7 @@ class Document(TAI, Mapper, ABC):
 
     @classmethod
     def create(cls, doc_type: str, identifier: ID,
-               data: Optional[str] = None, signature: Optional[TransportableData] = None):  # -> Optional[Document]:
+               data: str = None, signature: TransportableData = None):  # -> Document:
         helper = doc_helper()
         return helper.create_document(doc_type, identifier=identifier, data=data, signature=signature)
 

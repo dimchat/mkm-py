@@ -63,7 +63,7 @@ class GeneralCryptoHelper(ABC):
     #
 
     @abstractmethod
-    def get_key_algorithm(self, key: Dict, default: Optional[str]) -> Optional[str]:
+    def get_key_algorithm(self, key: Dict, default: Optional[str] = None) -> Optional[str]:
         raise NotImplemented
 
 

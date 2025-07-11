@@ -42,7 +42,7 @@ class GeneralFormatHelper(ABC):
     #
 
     @abstractmethod
-    def get_format_algorithm(self, ted: Dict, default: Optional[str]) -> Optional[str]:
+    def get_format_algorithm(self, ted: Dict, default: Optional[str] = None) -> Optional[str]:
         raise NotImplemented
 
 
