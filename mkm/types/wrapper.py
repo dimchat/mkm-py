@@ -97,12 +97,12 @@ class Mapper(MutableMapping[str, Any], ABC):
 
     @property
     @abstractmethod
-    def dictionary(self) -> Dict[str, Any]:
+    def dictionary(self) -> Dict:
         """ get inner map """
         raise NotImplemented
 
     @abstractmethod
-    def copy_dictionary(self, deep_copy: bool = False) -> Dict[str, Any]:
+    def copy_dictionary(self, deep_copy: bool = False) -> Dict:
         """ copy inner map """
         raise NotImplemented
 
@@ -126,7 +126,7 @@ class Wrapper:
             return str(s)
 
     @classmethod
-    def get_dict(cls, d) -> Optional[Dict[str, Any]]:
+    def get_dict(cls, d) -> Optional[Dict]:
         """
             Get inner map
             ~~~~~~~~~~~~~
@@ -161,7 +161,7 @@ class Wrapper:
             return o
 
     @classmethod
-    def unwrap_dict(cls, d) -> Dict[str, Any]:
+    def unwrap_dict(cls, d) -> Dict:
         """ Unwrap values for keys in map """
         if isinstance(d, Mapper):
             d = d.dictionary

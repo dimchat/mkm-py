@@ -190,7 +190,7 @@ class PortableNetworkFileFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def parse_portable_network_file(self, pnf: Dict[str, Any]) -> Optional[PortableNetworkFile]:
+    def parse_portable_network_file(self, pnf: Dict) -> Optional[PortableNetworkFile]:
         """
         Parse map object to PNF
 
@@ -198,6 +198,13 @@ class PortableNetworkFileFactory(ABC):
         :return: PNF object
         """
         raise NotImplemented
+
+
+########################
+#                      #
+#   Plugins: Helpers   #
+#                      #
+########################
 
 
 class PortableNetworkFileHelper(ABC):

@@ -73,7 +73,7 @@ def public_helper():
 class PublicKeyFactory(ABC):
 
     @abstractmethod
-    def parse_public_key(self, key: Dict[str, Any]) -> Optional[PublicKey]:
+    def parse_public_key(self, key: Dict) -> Optional[PublicKey]:
         """
         Parse map object to key
 
@@ -81,6 +81,13 @@ class PublicKeyFactory(ABC):
         :return: PublicKey
         """
         raise NotImplemented
+
+
+########################
+#                      #
+#   Plugins: Helpers   #
+#                      #
+########################
 
 
 class PublicKeyHelper(ABC):

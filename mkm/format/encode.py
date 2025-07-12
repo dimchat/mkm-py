@@ -155,7 +155,7 @@ class TransportableDataFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def parse_transportable_data(self, ted: Dict[str, Any]) -> Optional[TransportableData]:
+    def parse_transportable_data(self, ted: Dict) -> Optional[TransportableData]:
         """
         Parse map object to TED
 
@@ -163,6 +163,13 @@ class TransportableDataFactory(ABC):
         :return: TED object
         """
         raise NotImplemented
+
+
+########################
+#                      #
+#   Plugins: Helpers   #
+#                      #
+########################
 
 
 class TransportableDataHelper(ABC):

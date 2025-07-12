@@ -91,7 +91,7 @@ class SymmetricKeyFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def parse_symmetric_key(self, key: Dict[str, Any]) -> Optional[SymmetricKey]:
+    def parse_symmetric_key(self, key: Dict) -> Optional[SymmetricKey]:
         """
         Parse map object to key
 
@@ -99,6 +99,13 @@ class SymmetricKeyFactory(ABC):
         :return: SymmetricKey
         """
         raise NotImplemented
+
+
+########################
+#                      #
+#   Plugins: Helpers   #
+#                      #
+########################
 
 
 class SymmetricKeyHelper(ABC):

@@ -85,7 +85,7 @@ class TAI(ABC):
 
     @property
     @abstractmethod
-    def properties(self) -> Optional[Dict[str, Any]]:
+    def properties(self) -> Optional[Dict]:
         """
         Get all properties when valid
 

@@ -194,7 +194,7 @@ class MetaFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def parse_meta(self, meta: Dict[str, Any]) -> Optional[Meta]:
+    def parse_meta(self, meta: Dict) -> Optional[Meta]:
         """
         Parse map object to meta
 
@@ -202,6 +202,13 @@ class MetaFactory(ABC):
         :return: Meta
         """
         raise NotImplemented
+
+
+########################
+#                      #
+#   Plugins: Helpers   #
+#                      #
+########################
 
 
 class MetaHelper(ABC):

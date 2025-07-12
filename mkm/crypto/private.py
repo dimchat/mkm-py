@@ -98,7 +98,7 @@ class PrivateKeyFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def parse_private_key(self, key: Dict[str, Any]) -> Optional[PrivateKey]:
+    def parse_private_key(self, key: Dict) -> Optional[PrivateKey]:
         """
         Parse map object to key
 
@@ -106,6 +106,13 @@ class PrivateKeyFactory(ABC):
         :return: PrivateKey
         """
         raise NotImplemented
+
+
+########################
+#                      #
+#   Plugins: Helpers   #
+#                      #
+########################
 
 
 class PrivateKeyHelper(ABC):

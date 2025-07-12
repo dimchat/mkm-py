@@ -172,7 +172,7 @@ class DocumentFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def parse_document(self, document: Dict[str, Any]) -> Optional[Document]:
+    def parse_document(self, document: Dict) -> Optional[Document]:
         """
         Parse map object to entity document
 
@@ -180,6 +180,13 @@ class DocumentFactory(ABC):
         :return:
         """
         raise NotImplemented
+
+
+########################
+#                      #
+#   Plugins: Helpers   #
+#                      #
+########################
 
 
 class DocumentHelper(ABC):
