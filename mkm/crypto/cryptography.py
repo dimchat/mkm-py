@@ -66,7 +66,7 @@ class CryptographyKey(Mapper, ABC):
 class EncryptKey(CryptographyKey, ABC):
 
     @abstractmethod
-    def encrypt(self, data: bytes, extra: Optional[Dict]) -> bytes:
+    def encrypt(self, data: bytes, extra: Optional[Dict] = None) -> bytes:
         """
         1. Symmetric Key:
             ciphertext = encrypt(plaintext, PW)
@@ -83,7 +83,7 @@ class EncryptKey(CryptographyKey, ABC):
 class DecryptKey(CryptographyKey, ABC):
 
     @abstractmethod
-    def decrypt(self, data: bytes, params: Optional[Dict]) -> Optional[bytes]:
+    def decrypt(self, data: bytes, params: Optional[Dict] = None) -> Optional[bytes]:
         """
         1. Symmetric Key:
             plaintext = decrypt(ciphertext, PW)

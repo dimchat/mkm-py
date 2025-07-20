@@ -23,7 +23,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from typing import Any, Optional, Iterator, Tuple, Dict
+from typing import Optional, Iterator, Any, Tuple, Dict
 from typing import Mapping, ItemsView, KeysView, ValuesView
 
 from .x import DateTime
@@ -40,7 +40,7 @@ class Dictionary(Mapper):
         A container sharing the same inner dictionary
     """
 
-    def __init__(self, dictionary: Dict = None):
+    def __init__(self, dictionary: Optional[Dict] = None):
         super().__init__()
         if dictionary is None:
             dictionary = {}

@@ -28,8 +28,7 @@ It consists of 4 fields:
 | seed        | Entity Name (Optional)                   |
 | fingerprint | Signature to generate address (Optional) |
 
-1. if ```seed``` exists, ```fingerprint = private_key.sign(seed)```;
-2. if ```seed``` not exists, ```fingerprint = public_key.data```.
+If ```seed``` exists, ```fingerprint = private_key.sign(seed)```
 
 ### Meta Type
 
@@ -94,6 +93,7 @@ It's equivalent to ```meta.seed```
 
 The **Address** field was created with the Meta and a **Network ID**:
 
+#### BTC Address
 ```python
 from typing import Optional
 
@@ -122,12 +122,15 @@ class BTCAddress(ConstantString, Address):
 
     def __init__(self, address: str, network: int):
         super().__init__(string=address)
-        self.__network = network
+        self.__type = network
 
     @property  # Override
     def network(self) -> int:
-        return self.__network
+        return self.__type
 
+    #
+    #   Factory methods
+    #
     @classmethod
     def from_data(cls, fingerprint: bytes, network: int) -> Address:
         """
@@ -137,10 +140,14 @@ class BTCAddress(ConstantString, Address):
         :param network:     address type
         :return: Address object
         """
-        head = chr(network).encode('latin1')
-        body = ripemd160(sha256(fingerprint))
-        tail = check_code(head + body)
-        address = base58_encode(head + body + tail)
+        # 1. digest = ripemd160(sha256(fingerprint))
+        digest = ripemd160(sha256(fingerprint))
+        # 2. head = network + digest
+        head = chr(network).encode('latin1') + digest
+        # 3. cc = sha256(sha256(head)).prefix(4)
+        code = check_code(head)
+        # 4. data = base58_encode(head + cc)
+        address = base58_encode(head + code)
         return cls(address=address, network=network)
 
     @classmethod
@@ -170,6 +177,116 @@ def check_code(data: bytes) -> bytes:
     return sha256(sha256(data))[:4]
 ```
 
+#### ETH Address
+```python
+from typing import Optional
+
+from mkm.types import ConstantString
+from mkm.digest import keccak256
+from mkm.format import hex_encode
+from mkm import Address, EntityType
+
+class ETHAddress(ConstantString, Address):
+    """
+        Address like Ethereum
+        ~~~~~~~~~~~~~~~~~~~~~
+
+        data format: "0x{address}"
+
+        algorithm:
+            fingerprint = PK.data
+            digest      = keccak256(fingerprint)
+            address     = hex_encode(digest.suffix(20))
+    """
+
+    def __init__(self, address: str):
+        super().__init__(string=address)
+
+    @property  # Override
+    def network(self) -> int:
+        return EntityType.USER.value
+
+    @classmethod
+    def validate_address(cls, address: str) -> Optional[str]:
+        if is_eth(address=address):
+            lower = address[2:].lower()
+            return '0x%s' % eip55(address=lower)
+        # not an ETH address
+
+    @classmethod
+    def is_validate(cls, address: str) -> bool:
+        validate = cls.validate_address(address=address)
+        return validate is not None and validate == address
+
+    #
+    #   Factory methods
+    #
+    @classmethod
+    def from_data(cls, fingerprint: bytes) -> Address:
+        """
+        Generate ETH address with key.data
+
+        :param fingerprint: key.data
+        :return: Address object
+        """
+        if len(fingerprint) == 65:
+            # skip first char
+            fingerprint = fingerprint[1:]
+        assert len(fingerprint) == 64, 'key data length error: %d' % len(fingerprint)
+        # 1. digest = keccak256(fingerprint)
+        digest = keccak256(data=fingerprint)
+        # 2. address = hex_encode(digest.suffix(20))
+        tail = digest[-20:]
+        address = '0x' + eip55(address=hex_encode(data=tail))
+        return cls(address=address)
+
+    @classmethod
+    def from_str(cls, address: str) -> Optional[Address]:
+        """
+        Parse a string for ETH address
+
+        :param address: address string
+        :return: Address object
+        """
+        if is_eth(address=address):
+            return cls(address=address)
+
+
+# https://eips.ethereum.org/EIPS/eip-55
+def eip55(address: str) -> str:
+    res = ''
+    table = keccak256(address.encode('utf-8'))
+    for i in range(40):
+        ch = address[i]
+        x = ord(ch)
+        if x > 0x39:
+            # check for each 4 bits in the hash table
+            # if the first bit is '1',
+            #     change the character to uppercase
+            x -= (table[i >> 1] << (i << 2 & 4) & 0x80) >> 2
+            ch = chr(x)
+        res += ch
+    return res
+
+
+def is_eth(address: str) -> bool:
+    if len(address) != 42:
+        return False
+    if address[0] != '0' or address[1] != 'x':
+        return False
+    for i in range(2, 42):
+        ch = address[i]
+        if '0' <= ch <= '9':
+            continue
+        if 'A' <= ch <= 'Z':
+            continue
+        if 'a' <= ch <= 'z':
+            continue
+        # unexpected character
+        return False
+    return True
+```
+
 When you get a meta for the entity ID from the network,
 you must verify it with the consensus algorithm before accepting its **public key**.
 
@@ -177,5 +294,5 @@ you must verify it with the consensus algorithm before accepting its **public ke
 
 ----
 
-Copyright &copy; 2018 Albert Moky
+Copyright &copy; 2018-2025 Albert Moky
 [![Followers](https://img.shields.io/github/followers/moky)](https://github.com/moky?tab=followers)

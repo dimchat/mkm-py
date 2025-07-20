@@ -115,7 +115,7 @@ class TransportableData(Mapper, ABC):
     #
 
     @classmethod
-    def create(cls, data: bytes, algorithm: str = None):  # -> TransportableData;
+    def create(cls, data: bytes, algorithm: Optional[str] = None):  # -> TransportableData;
         helper = ted_helper()
         return helper.create_transportable_data(data=data, algorithm=algorithm)
 
