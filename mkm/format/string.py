@@ -61,15 +61,15 @@ class StringCoder(ABC):
 class UTF8:
     coder: StringCoder = None
 
-    @staticmethod
-    def encode(string: str) -> bytes:
+    @classmethod
+    def encode(cls, string: str) -> bytes:
         # assert UTF8.coder is not None, 'UTF8 parser not set yet'
-        return UTF8.coder.encode(string=string)
+        return cls.coder.encode(string=string)
 
-    @staticmethod
-    def decode(data: bytes) -> Optional[str]:
+    @classmethod
+    def decode(cls, data: bytes) -> Optional[str]:
         # assert UTF8.coder is not None, 'UTF8 parser not set yet'
-        return UTF8.coder.decode(data=data)
+        return cls.coder.decode(data=data)
 
 
 #

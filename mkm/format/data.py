@@ -61,43 +61,43 @@ class DataCoder(ABC):
 class Hex:
     coder: DataCoder = None
 
-    @staticmethod
-    def encode(data: bytes) -> str:
+    @classmethod
+    def encode(cls, data: bytes) -> str:
         # assert Hex.coder is not None, 'Hex coder not set yet'
-        return Hex.coder.encode(data=data)
+        return cls.coder.encode(data=data)
 
-    @staticmethod
-    def decode(string: str) -> Optional[bytes]:
+    @classmethod
+    def decode(cls, string: str) -> Optional[bytes]:
         # assert Hex.coder is not None, 'Hex coder not set yet'
-        return Hex.coder.decode(string=string)
+        return cls.coder.decode(string=string)
 
 
 class Base58:
     coder: DataCoder = None
 
-    @staticmethod
-    def encode(data: bytes) -> str:
+    @classmethod
+    def encode(cls, data: bytes) -> str:
         # assert Base58.coder is not None, 'Base58 coder not set yet'
-        return Base58.coder.encode(data=data)
+        return cls.coder.encode(data=data)
 
-    @staticmethod
-    def decode(string: str) -> Optional[bytes]:
+    @classmethod
+    def decode(cls, string: str) -> Optional[bytes]:
         # assert Base58.coder is not None, 'Base58 coder not set yet'
-        return Base58.coder.decode(string=string)
+        return cls.coder.decode(string=string)
 
 
 class Base64:
     coder: DataCoder = None
 
-    @staticmethod
-    def encode(data: bytes) -> str:
+    @classmethod
+    def encode(cls, data: bytes) -> str:
         # assert Base64.coder is not None, 'Base64 coder not set yet'
-        return Base64.coder.encode(data=data)
+        return cls.coder.encode(data=data)
 
-    @staticmethod
-    def decode(string: str) -> Optional[bytes]:
+    @classmethod
+    def decode(cls, string: str) -> Optional[bytes]:
         # assert Base64.coder is not None, 'Base64 coder not set yet'
-        return Base64.coder.decode(string=string)
+        return cls.coder.decode(string=string)
 
 
 #

@@ -50,13 +50,12 @@ __author__ = 'Albert Moky'
 __all__ = [
 
     #
-    #   Data Digest
+    #   Message Digest
     #
 
-    'DataDigester',
-    'MD5', 'SHA1', 'SHA256', 'KECCAK256', 'RIPEMD160',
-
-    'md5', 'sha1', 'sha256', 'keccak256', 'ripemd160',
+    'MessageDigester',
+    'SHA256', 'KECCAK256', 'RIPEMD160',
+    'sha256', 'keccak256', 'ripemd160',
 
     #
     #   Crypto

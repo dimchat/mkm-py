@@ -148,7 +148,7 @@ class Meta(Mapper, ABC):
     @classmethod
     def parse(cls, meta: Any):  # -> Optional[Meta]:
         helper = meta_helper()
-        return helper.parse_meta(meta=meta)
+        return helper.parse_meta(meta)
 
     @classmethod
     def get_factory(cls, version: str):  # -> Optional[MetaFactory]:

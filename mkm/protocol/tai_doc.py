@@ -135,7 +135,7 @@ class Document(TAI, Mapper, ABC):
     @classmethod
     def parse(cls, document: Any):  # -> Optional[Document]:
         helper = doc_helper()
-        return helper.parse_document(document=document)
+        return helper.parse_document(document)
 
     @classmethod
     def get_factory(cls, doc_type: str):  # -> Optional[DocumentFactory]:

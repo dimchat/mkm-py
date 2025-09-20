@@ -24,7 +24,7 @@
 # ==============================================================================
 
 """
-    Data Digest
+    Message Digest
     ~~~~~~~~~~~
 
     MD5, SHA1, SHA-256, Keccak256, RipeMD-160, ...
@@ -33,24 +33,43 @@
 from abc import ABC, abstractmethod
 
 
-class DataDigester(ABC):
+class MessageDigester(ABC):
 
     @abstractmethod
     def digest(self, data: bytes) -> bytes:
         raise NotImplemented
 
 
+class SHA256:
+    digester: MessageDigester = None
+
+    @classmethod
+    def digest(cls, data: bytes) -> bytes:
+        # assert SHA256.digester is not None, 'SHA256 coder not set yet'
+        return cls.digester.digest(data=data)
+
+
+class KECCAK256:
+    digester: MessageDigester = None
+
+    @classmethod
+    def digest(cls, data: bytes) -> bytes:
+        # assert KECCAK256.digester is not None, 'KECCAK256 coder not set yet'
+        return cls.digester.digest(data=data)
+
+
+class RIPEMD160:
+    digester: MessageDigester = None
+
+    @classmethod
+    def digest(cls, data: bytes) -> bytes:
+        # assert RIPEMD160.digester is not None, 'RIPEMD160 coder not set yet'
+        return cls.digester.digest(data=data)
+
+
 #
 #   Interfaces
 #
-
-
-def md5(data: bytes) -> bytes:
-    return MD5.digest(data=data)
-
-
-def sha1(data: bytes) -> bytes:
-    return SHA1.digest(data=data)
 
 
 def sha256(data: bytes) -> bytes:
@@ -63,53 +82,3 @@ def keccak256(data: bytes) -> bytes:
 
 def ripemd160(data: bytes) -> bytes:
     return RIPEMD160.digest(data=data)
-
-
-#
-#   Singleton
-#
-
-
-class MD5:
-    digester: DataDigester = None
-
-    @staticmethod
-    def digest(data: bytes) -> bytes:
-        # assert MD5.digester is not None, 'MD5 coder not set yet'
-        return MD5.digester.digest(data=data)
-
-
-class SHA1:
-    digester: DataDigester = None
-
-    @staticmethod
-    def digest(data: bytes) -> bytes:
-        # assert SHA1.digester is not None, 'SHA1 coder not set yet'
-        return SHA1.digester.digest(data=data)
-
-
-class SHA256:
-    digester: DataDigester = None
-
-    @staticmethod
-    def digest(data: bytes) -> bytes:
-        # assert SHA256.digester is not None, 'SHA256 coder not set yet'
-        return SHA256.digester.digest(data=data)
-
-
-class KECCAK256:
-    digester: DataDigester = None
-
-    @staticmethod
-    def digest(data: bytes) -> bytes:
-        # assert KECCAK256.digester is not None, 'KECCAK256 coder not set yet'
-        return KECCAK256.digester.digest(data=data)
-
-
-class RIPEMD160:
-    digester: DataDigester = None
-
-    @staticmethod
-    def digest(data: bytes) -> bytes:
-        # assert RIPEMD160.digester is not None, 'RIPEMD160 coder not set yet'
-        return RIPEMD160.digester.digest(data=data)

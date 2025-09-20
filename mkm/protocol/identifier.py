@@ -141,7 +141,7 @@ class ID(Stringer, ABC):
     @classmethod
     def parse(cls, identifier: Any):  # -> Optional[ID]:
         helper = id_helper()
-        return helper.parse_identifier(identifier=identifier)
+        return helper.parse_identifier(identifier)
 
     @classmethod
     def get_factory(cls):  # -> Optional[IDFactory]:

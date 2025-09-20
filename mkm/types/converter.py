@@ -79,7 +79,7 @@ class BaseConverter(DataConverter):
             assert value == 1.0 or value == 0.0, 'bool value error: %s' % value
             return value != 0.0
         else:
-            text = value if isinstance(value, str) else str(value)
+            text = to_str(value=value)
         text = text.strip()
         size = len(text)
         if size == 0:
@@ -104,7 +104,7 @@ class BaseConverter(DataConverter):
         elif isinstance(value, bool):
             return 1 if value else 0
         else:
-            text = value if isinstance(value, str) else str(value)
+            text = to_str(value=value)
             return int(text)
 
     # Override
@@ -119,7 +119,7 @@ class BaseConverter(DataConverter):
         elif isinstance(value, bool):
             return 1.0 if value else 0.0
         else:
-            text = value if isinstance(value, str) else str(value)
+            text = to_str(value=value)
             return float(text)
 
     # Override
@@ -134,6 +134,13 @@ class BaseConverter(DataConverter):
             raise ValueError('Timestamp error: "%s"' % value)
         else:
             return DateTime(timestamp=seconds)
+
+
+def to_str(value: Any) -> str:
+    if isinstance(value, str):
+        return value
+    else:
+        return str(value)
 
 
 class Converter(ABC):

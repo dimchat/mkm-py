@@ -68,7 +68,7 @@ class Address(Stringer, ABC):
     @classmethod
     def parse(cls, address: Any):  # -> Optional[Address]:
         helper = address_helper()
-        return helper.parse_address(address=address)
+        return helper.parse_address(address)
 
     @classmethod
     def get_factory(cls):  # -> Optional[AddressFactory]:

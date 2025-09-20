@@ -61,15 +61,15 @@ class ObjectCoder(ABC):
 class JSON:
     coder: ObjectCoder = None
 
-    @staticmethod
-    def encode(obj: Any) -> str:
+    @classmethod
+    def encode(cls, obj: Any) -> str:
         # assert JSON.coder is not None, 'JSON parser not set yet'
-        return JSON.coder.encode(obj=obj)
+        return cls.coder.encode(obj=obj)
 
-    @staticmethod
-    def decode(string: str) -> Optional[Any]:
+    @classmethod
+    def decode(cls, string: str) -> Optional[Any]:
         # assert JSON.coder is not None, 'JSON parser not set yet'
-        return JSON.coder.decode(string=string)
+        return cls.coder.decode(string=string)
 
 
 class MapCoder(ObjectCoder, ABC):
@@ -77,51 +77,25 @@ class MapCoder(ObjectCoder, ABC):
 
     # Override
     def encode(self, obj: Dict) -> str:
-        return JSON.encode(obj=obj)
+        return JSON.coder.encode(obj=obj)
 
     # Override
     def decode(self, string: str) -> Optional[Dict]:
-        return JSON.decode(string=string)
-
-
-class ListCoder(ObjectCoder, ABC):
-    """ coder for json <=> list """
-
-    # Override
-    def encode(self, obj: List) -> str:
-        return JSON.encode(obj=obj)
-
-    # Override
-    def decode(self, string: str) -> Optional[List]:
-        return JSON.decode(string=string)
+        return JSON.coder.decode(string=string)
 
 
 class JSONMap:
     coder = MapCoder()
 
-    @staticmethod
-    def encode(obj: Any) -> str:
+    @classmethod
+    def encode(cls, obj: Any) -> str:
         # assert JSONMap.coder is not None, 'JSONMap parser not set yet'
-        return JSONMap.coder.encode(obj=obj)
+        return cls.coder.encode(obj=obj)
 
-    @staticmethod
-    def decode(string: str) -> Optional[Any]:
+    @classmethod
+    def decode(cls, string: str) -> Optional[Any]:
         # assert JSONMap.coder is not None, 'JSONMap parser not set yet'
-        return JSONMap.coder.decode(string=string)
-
-
-class JSONList:
-    coder = ListCoder()
-
-    @staticmethod
-    def encode(obj: Any) -> str:
-        # assert JSONList.coder is not None, 'JSONList parser not set yet'
-        return JSONList.coder.encode(obj=obj)
-
-    @staticmethod
-    def decode(string: str) -> Optional[Any]:
-        # assert JSONList.coder is not None, 'JSONList parser not set yet'
-        return JSONList.coder.decode(string=string)
+        return cls.coder.decode(string=string)
 
 
 #
