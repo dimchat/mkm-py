@@ -131,7 +131,7 @@ class ID(Stringer, ABC):
     @classmethod
     def generate(cls, meta, network: int = None, terminal: Optional[str] = None):  # -> ID:
         helper = id_helper()
-        return helper.generate_identifier(meta=meta, network=network, terminal=terminal)
+        return helper.generate_identifier(meta, network, terminal=terminal)
 
     @classmethod
     def create(cls, name: Optional[str], address: Address, terminal: Optional[str] = None):  # -> ID:

@@ -63,7 +63,7 @@ class Address(Stringer, ABC):
     @classmethod
     def generate(cls, meta, network: Optional[int] = None):  # -> Address:
         helper = address_helper()
-        return helper.generate_address(meta=meta, network=network)
+        return helper.generate_address(meta, network)
 
     @classmethod
     def parse(cls, address: Any):  # -> Optional[Address]:
