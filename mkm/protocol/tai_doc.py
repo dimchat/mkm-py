@@ -78,26 +78,26 @@ class Document(TAI, Mapper, ABC):
         """
         raise NotImplemented
 
-    @property
-    @abstractmethod
-    def name(self) -> Optional[str]:
-        """
-        Get entity name
-
-        :return: name string
-        """
-        raise NotImplemented
-
-    @name.setter
-    @abstractmethod
-    def name(self, string: str):
-        """
-        Set entity name
-
-        :param string: name string
-        :return:
-        """
-        raise NotImplemented
+    # @property
+    # @abstractmethod
+    # def name(self) -> Optional[str]:
+    #     """
+    #     Get entity name
+    #
+    #     :return: name string
+    #     """
+    #     raise NotImplemented
+    #
+    # @name.setter
+    # @abstractmethod
+    # def name(self, string: str):
+    #     """
+    #     Set entity name
+    #
+    #     :param string: name string
+    #     :return:
+    #     """
+    #     raise NotImplemented
 
     #
     #   Conveniences
@@ -130,7 +130,7 @@ class Document(TAI, Mapper, ABC):
     def create(cls, doc_type: str, identifier: ID,
                data: str = None, signature: TransportableData = None):  # -> Document:
         helper = doc_helper()
-        return helper.create_document(doc_type, identifier=identifier, data=data, signature=signature)
+        return helper.create_document(doc_type, identifier, data=data, signature=signature)
 
     @classmethod
     def parse(cls, document: Any):  # -> Optional[Document]:

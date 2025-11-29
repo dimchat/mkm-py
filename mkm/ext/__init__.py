@@ -33,7 +33,7 @@ from ..format.file import PortableNetworkFileHelper
 # from ..format.helpers import FormatExtensions
 
 from ..protocol.address import AddressHelper
-from ..protocol.identifier import IdentifierHelper
+from ..protocol.identifier import IDHelper
 from ..protocol.meta import MetaHelper
 from ..protocol.tai_doc import DocumentHelper
 # from ..protocol.helpers import AccountExtensions
@@ -51,7 +51,7 @@ __all__ = [
     'TransportableDataHelper', 'PortableNetworkFileHelper',
     # 'FormatExtensions',
 
-    'AddressHelper', 'IdentifierHelper',
+    'AddressHelper', 'IDHelper',
     'MetaHelper', 'DocumentHelper',
     # 'AccountExtensions',
 

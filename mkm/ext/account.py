@@ -29,13 +29,13 @@ from typing import Optional, Dict
 from ..types import Singleton
 
 from ..protocol.address import AddressHelper
-from ..protocol.identifier import IdentifierHelper
+from ..protocol.identifier import IDHelper
 from ..protocol.meta import MetaHelper
 from ..protocol.tai_doc import DocumentHelper
 from ..protocol.helpers import AccountExtensions
 
 
-# class GeneralAccountHelper(AddressHelper, IdentifierHelper, MetaHelper, DocumentHelper, ABC):
+# class GeneralAccountHelper(AddressHelper, IDHelper, MetaHelper, DocumentHelper, ABC):
 class GeneralAccountHelper(ABC):
     """ Account GeneralFactory """
 
@@ -81,11 +81,11 @@ class SharedAccountExtensions:
     #
 
     @property
-    def id_helper(self) -> Optional[IdentifierHelper]:
+    def id_helper(self) -> Optional[IDHelper]:
         return AccountExtensions.id_helper
 
     @id_helper.setter
-    def id_helper(self, helper: IdentifierHelper):
+    def id_helper(self, helper: IDHelper):
         AccountExtensions.id_helper = helper
 
     #

@@ -36,7 +36,7 @@ from .tai import TAI
 from .tai_doc import Document, DocumentFactory
 
 # from .address import AddressHelper
-# from .identifier import IdentifierHelper
+# from .identifier import IDHelper
 # from .meta import MetaHelper
 # from .tai_doc import DocumentHelper
 # from .helpers import AccountExtensions
@@ -54,7 +54,7 @@ __all__ = [
     #   Plugins
     #
 
-    # 'AddressHelper', 'IdentifierHelper',
+    # 'AddressHelper', 'IDHelper',
     # 'MetaHelper', 'DocumentHelper',
     # 'AccountExtensions',
 

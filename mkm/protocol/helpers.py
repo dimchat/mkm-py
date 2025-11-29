@@ -34,7 +34,7 @@
 class AccountExtensions:
 
     address_helper = None  # AddressHelper
-    id_helper = None       # IdentifierHelper
+    id_helper = None       # IDHelper
 
     meta_helper = None     # MetaHelper
     doc_helper = None      # DocumentHelper

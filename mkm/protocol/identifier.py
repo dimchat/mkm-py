@@ -65,10 +65,14 @@ class ID(Stringer, ABC):
     def terminal(self) -> Optional[str]:
         raise NotImplemented
 
+    #
+    #   ID types
+    #
+
     @property
     @abstractmethod
     def type(self) -> int:
-        # return self.address.type
+        # return self.address.network
         raise NotImplemented
 
     @property
@@ -131,32 +135,32 @@ class ID(Stringer, ABC):
     @classmethod
     def generate(cls, meta, network: int = None, terminal: Optional[str] = None):  # -> ID:
         helper = id_helper()
-        return helper.generate_identifier(meta, network, terminal=terminal)
+        return helper.generate_id(meta, network, terminal=terminal)
 
     @classmethod
     def create(cls, name: Optional[str], address: Address, terminal: Optional[str] = None):  # -> ID:
         helper = id_helper()
-        return helper.create_identifier(name=name, address=address, terminal=terminal)
+        return helper.create_id(name=name, address=address, terminal=terminal)
 
     @classmethod
     def parse(cls, identifier: Any):  # -> Optional[ID]:
         helper = id_helper()
-        return helper.parse_identifier(identifier)
+        return helper.parse_id(identifier)
 
     @classmethod
     def get_factory(cls):  # -> Optional[IDFactory]:
         helper = id_helper()
-        return helper.get_identifier_factory()
+        return helper.get_id_factory()
 
     @classmethod
     def set_factory(cls, factory):
         helper = id_helper()
-        helper.set_identifier_factory(factory=factory)
+        helper.set_id_factory(factory=factory)
 
 
 def id_helper():
     helper = AccountExtensions.id_helper
-    assert isinstance(helper, IdentifierHelper), 'ID helper error: %s' % helper
+    assert isinstance(helper, IDHelper), 'ID helper error: %s' % helper
     return helper
 
 
@@ -164,7 +168,7 @@ class IDFactory(ABC):
     """ ID Factory """
 
     @abstractmethod
-    def generate_identifier(self, meta, network: Optional[int], terminal: Optional[str]) -> ID:
+    def generate_id(self, meta, network: Optional[int], terminal: Optional[str]) -> ID:
         """
         Generate ID
 
@@ -176,7 +180,7 @@ class IDFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def create_identifier(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
+    def create_id(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
         """
         Create ID
 
@@ -188,7 +192,7 @@ class IDFactory(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def parse_identifier(self, identifier: str) -> Optional[ID]:
+    def parse_id(self, identifier: str) -> Optional[ID]:
         """
         Parse string object to ID
 
@@ -205,25 +209,25 @@ class IDFactory(ABC):
 ########################
 
 
-class IdentifierHelper(ABC):
+class IDHelper(ABC):
     """ General Helper """
 
     @abstractmethod
-    def set_identifier_factory(self, factory: IDFactory):
+    def set_id_factory(self, factory: IDFactory):
         raise NotImplemented
 
     @abstractmethod
-    def get_identifier_factory(self) -> Optional[IDFactory]:
+    def get_id_factory(self) -> Optional[IDFactory]:
         raise NotImplemented
 
     @abstractmethod
-    def generate_identifier(self, meta, network: Optional[int], terminal: Optional[str]) -> ID:
+    def generate_id(self, meta, network: Optional[int], terminal: Optional[str]) -> ID:
         raise NotImplemented
 
     @abstractmethod
-    def create_identifier(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
+    def create_id(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
         raise NotImplemented
 
     @abstractmethod
-    def parse_identifier(self, identifier: Any) -> Optional[ID]:
+    def parse_id(self, identifier: Any) -> Optional[ID]:
         raise NotImplemented
