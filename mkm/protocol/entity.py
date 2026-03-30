@@ -30,6 +30,8 @@
 
 from enum import IntEnum
 
+from ..types import Singleton
+
 
 class EntityType(IntEnum):
     """
@@ -115,3 +117,17 @@ class EntityType(IntEnum):
     @classmethod
     def is_broadcast(cls, network: int) -> bool:
         return (network & cls.ANY) == cls.ANY
+
+
+# -----------------------------------------------------------------------------
+#  AccountExtensions Extensions
+# -----------------------------------------------------------------------------
+
+
+@Singleton
+class AccountExtensions:
+    pass
+
+
+# global
+shared_account_extensions = AccountExtensions()

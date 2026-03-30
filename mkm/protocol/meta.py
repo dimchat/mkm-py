@@ -36,7 +36,7 @@ from ..crypto import VerifyKey, SignKey
 from ..format import TransportableData
 
 from .address import Address
-from .helpers import AccountExtensions
+from .entity import AccountExtensions, shared_account_extensions
 
 
 class Meta(Mapper, ABC):
@@ -94,7 +94,7 @@ class Meta(Mapper, ABC):
 
     @property
     @abstractmethod
-    def fingerprint(self) -> Optional[bytes]:
+    def fingerprint(self) -> Optional[TransportableData]:
         """
         Fingerprint to verify ID and public key
 
@@ -162,7 +162,7 @@ class Meta(Mapper, ABC):
 
 
 def meta_helper():
-    helper = AccountExtensions.meta_helper
+    helper = shared_account_extensions.meta_helper
     assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
     return helper
 
@@ -204,11 +204,9 @@ class MetaFactory(ABC):
         raise NotImplemented
 
 
-########################
-#                      #
-#   Plugins: Helpers   #
-#                      #
-########################
+# -----------------------------------------------------------------------------
+#  Account Extensions
+# -----------------------------------------------------------------------------
 
 
 class MetaHelper(ABC):
@@ -234,3 +232,18 @@ class MetaHelper(ABC):
     @abstractmethod
     def parse_meta(self, meta: Any) -> Optional[Meta]:
         raise NotImplemented
+
+
+class _MetaExt:
+    _meta_helper: Optional[MetaHelper] = None
+
+    @property
+    def meta_helper(self) -> Optional[MetaHelper]:
+        return _MetaExt._meta_helper
+
+    @meta_helper.setter
+    def meta_helper(self, helper: MetaHelper):
+        _MetaExt._meta_helper = helper
+
+
+AccountExtensions.meta_helper = _MetaExt.meta_helper

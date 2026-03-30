@@ -27,7 +27,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Any, Dict
 
 from .cryptography import EncryptKey, DecryptKey
-from .helpers import CryptoExtensions
+from .cryptography import CryptoExtensions, shared_crypto_extensions
 
 
 # noinspection PyAbstractClass
@@ -73,7 +73,7 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
 
 
 def symmetric_helper():
-    helper = CryptoExtensions.symmetric_helper
+    helper = shared_crypto_extensions.symmetric_helper
     assert isinstance(helper, SymmetricKeyHelper), 'symmetric helper error: %s' % helper
     return helper
 
@@ -101,11 +101,9 @@ class SymmetricKeyFactory(ABC):
         raise NotImplemented
 
 
-########################
-#                      #
-#   Plugins: Helpers   #
-#                      #
-########################
+# -----------------------------------------------------------------------------
+#  Crypto Extensions
+# -----------------------------------------------------------------------------
 
 
 class SymmetricKeyHelper(ABC):
@@ -126,3 +124,18 @@ class SymmetricKeyHelper(ABC):
     @abstractmethod
     def parse_symmetric_key(self, key: Any) -> Optional[SymmetricKey]:
         raise NotImplemented
+
+
+class _SymmetricExt:
+    _symmetric_helper: Optional[SymmetricKeyHelper] = None
+
+    @property
+    def symmetric_helper(self) -> Optional[SymmetricKeyHelper]:
+        return _SymmetricExt._symmetric_helper
+
+    @symmetric_helper.setter
+    def symmetric_helper(self, helper: SymmetricKeyHelper):
+        _SymmetricExt._symmetric_helper = helper
+
+
+CryptoExtensions.symmetric_helper = _SymmetricExt.symmetric_helper

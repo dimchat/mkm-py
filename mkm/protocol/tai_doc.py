@@ -37,7 +37,7 @@ from ..format import TransportableData
 
 from .identifier import ID
 from .tai import TAI
-from .helpers import AccountExtensions
+from .entity import AccountExtensions, shared_account_extensions
 
 
 class Document(TAI, Mapper, ABC):
@@ -149,7 +149,7 @@ class Document(TAI, Mapper, ABC):
 
 
 def doc_helper():
-    helper = AccountExtensions.doc_helper
+    helper = shared_account_extensions.doc_helper
     assert isinstance(helper, DocumentHelper), 'document helper error: %s' % helper
     return helper
 
@@ -182,11 +182,9 @@ class DocumentFactory(ABC):
         raise NotImplemented
 
 
-########################
-#                      #
-#   Plugins: Helpers   #
-#                      #
-########################
+# -----------------------------------------------------------------------------
+#  Account Extensions
+# -----------------------------------------------------------------------------
 
 
 class DocumentHelper(ABC):
@@ -208,3 +206,18 @@ class DocumentHelper(ABC):
     @abstractmethod
     def parse_document(self, document: Any) -> Optional[Document]:
         raise NotImplemented
+
+
+class _DocExt:
+    _doc_helper: Optional[DocumentHelper] = None
+
+    @property
+    def doc_helper(self) -> Optional[DocumentHelper]:
+        return _DocExt._doc_helper
+
+    @doc_helper.setter
+    def doc_helper(self, helper: DocumentHelper):
+        _DocExt._doc_helper = helper
+
+
+AccountExtensions.doc_helper = _DocExt.doc_helper

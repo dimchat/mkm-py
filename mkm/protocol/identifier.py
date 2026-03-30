@@ -34,7 +34,7 @@ from typing import Optional, Iterable, List, Any
 from ..types import Stringer
 
 from .address import Address
-from .helpers import AccountExtensions
+from .entity import AccountExtensions, shared_account_extensions
 
 
 class ID(Stringer, ABC):
@@ -159,7 +159,7 @@ class ID(Stringer, ABC):
 
 
 def id_helper():
-    helper = AccountExtensions.id_helper
+    helper = shared_account_extensions.id_helper
     assert isinstance(helper, IDHelper), 'ID helper error: %s' % helper
     return helper
 
@@ -202,11 +202,9 @@ class IDFactory(ABC):
         raise NotImplemented
 
 
-########################
-#                      #
-#   Plugins: Helpers   #
-#                      #
-########################
+# -----------------------------------------------------------------------------
+#  Account Extensions
+# -----------------------------------------------------------------------------
 
 
 class IDHelper(ABC):
@@ -231,3 +229,18 @@ class IDHelper(ABC):
     @abstractmethod
     def parse_id(self, identifier: Any) -> Optional[ID]:
         raise NotImplemented
+
+
+class _IdExt:
+    _id_helper: Optional[IDHelper] = None
+
+    @property
+    def id_helper(self) -> Optional[IDHelper]:
+        return _IdExt._id_helper
+
+    @id_helper.setter
+    def id_helper(self, helper: IDHelper):
+        _IdExt._id_helper = helper
+
+
+AccountExtensions.id_helper = _IdExt.id_helper

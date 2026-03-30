@@ -26,6 +26,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Dict
 
+from ..types import Singleton
 from ..types import Mapper
 from ..format import TransportableData
 
@@ -107,3 +108,17 @@ class DecryptKey(CryptographyKey, ABC):
         :return: False on error
         """
         raise NotImplemented
+
+
+# -----------------------------------------------------------------------------
+#  Crypto Extensions
+# -----------------------------------------------------------------------------
+
+
+@Singleton
+class CryptoExtensions:
+    pass
+
+
+# global
+shared_crypto_extensions = CryptoExtensions()

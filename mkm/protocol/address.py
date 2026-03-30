@@ -33,7 +33,7 @@ from typing import Any, Optional
 
 from ..types import Stringer
 
-from .helpers import AccountExtensions
+from .entity import AccountExtensions, shared_account_extensions
 
 
 class Address(Stringer, ABC):
@@ -82,7 +82,7 @@ class Address(Stringer, ABC):
 
 
 def address_helper():
-    helper = AccountExtensions.address_helper
+    helper = shared_account_extensions.address_helper
     assert isinstance(helper, AddressHelper), 'address helper error: %s' % helper
     return helper
 
@@ -112,11 +112,9 @@ class AddressFactory(ABC):
         raise NotImplemented
 
 
-########################
-#                      #
-#   Plugins: Helpers   #
-#                      #
-########################
+# -----------------------------------------------------------------------------
+#  Account Extensions
+# -----------------------------------------------------------------------------
 
 
 class AddressHelper(ABC):
@@ -137,3 +135,18 @@ class AddressHelper(ABC):
     @abstractmethod
     def parse_address(self, address: Any) -> Optional[Address]:
         raise NotImplemented
+
+
+class _AddressExt:
+    _address_helper: Optional[AddressHelper] = None
+
+    @property
+    def address_helper(self) -> Optional[AddressHelper]:
+        return _AddressExt._address_helper
+
+    @address_helper.setter
+    def address_helper(self, helper: AddressHelper):
+        _AddressExt._address_helper = helper
+
+
+AccountExtensions.address_helper = _AddressExt.address_helper

@@ -28,7 +28,7 @@ from typing import Optional, Any, Dict
 
 from .asymmetric import SignKey
 from .public import PublicKey
-from .helpers import CryptoExtensions
+from .cryptography import CryptoExtensions, shared_crypto_extensions
 
 
 class PrivateKey(SignKey, ABC):
@@ -80,7 +80,7 @@ class PrivateKey(SignKey, ABC):
 
 
 def private_helper():
-    helper = CryptoExtensions.private_helper
+    helper = shared_crypto_extensions.private_helper
     assert isinstance(helper, PrivateKeyHelper), 'private helper error: %s' % helper
     return helper
 
@@ -108,11 +108,9 @@ class PrivateKeyFactory(ABC):
         raise NotImplemented
 
 
-########################
-#                      #
-#   Plugins: Helpers   #
-#                      #
-########################
+# -----------------------------------------------------------------------------
+#  Crypto Extensions
+# -----------------------------------------------------------------------------
 
 
 class PrivateKeyHelper(ABC):
@@ -133,3 +131,18 @@ class PrivateKeyHelper(ABC):
     @abstractmethod
     def parse_private_key(self, key: Any) -> Optional[PrivateKey]:
         raise NotImplemented
+
+
+class _PrivateExt:
+    _private_helper: Optional[PrivateKeyHelper] = None
+
+    @property
+    def private_helper(self) -> Optional[PrivateKeyHelper]:
+        return _PrivateExt._private_helper
+
+    @private_helper.setter
+    def private_helper(self, helper: PrivateKeyHelper):
+        _PrivateExt._private_helper = helper
+
+
+CryptoExtensions.private_helper = _PrivateExt.private_helper
