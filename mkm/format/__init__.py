@@ -43,7 +43,7 @@ from .string import StringCoder, UTF8
 from .string import utf8_encode, utf8_decode
 
 
-from .encode import TransportableData, TransportableDataFactory
+from .ted import TransportableData, TransportableDataFactory
 
 # from .encode import TransportableDataHelper
 # from .helpers import FormatExtensions

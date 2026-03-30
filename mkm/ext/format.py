@@ -28,8 +28,8 @@ from typing import Optional, Dict
 
 from ..types import Singleton
 
-from ..format.encode import TransportableDataHelper
-from ..format.helpers import FormatExtensions
+from ..format.ted import TransportableDataHelper
+from ..format.ext import FormatExtensions
 
 
 # class GeneralFormatHelper(TransportableDataHelper, ABC):

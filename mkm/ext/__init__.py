@@ -28,7 +28,7 @@ from ..crypto.public import PublicKeyHelper
 from ..crypto.private import PrivateKeyHelper
 # from ..crypto.helpers import CryptoExtensions
 
-from ..format.encode import TransportableDataHelper
+from ..format.ted import TransportableDataHelper
 # from ..format.helpers import FormatExtensions
 
 from ..protocol.address import AddressHelper

@@ -27,6 +27,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Dict
 
 from ..types import Mapper
+from ..format import TransportableData
 
 
 class CryptographyKey(Mapper, ABC):
@@ -54,7 +55,7 @@ class CryptographyKey(Mapper, ABC):
 
     @property
     @abstractmethod
-    def data(self) -> bytes:
+    def data(self) -> TransportableData:
         """
         Get key data
 
@@ -66,15 +67,15 @@ class CryptographyKey(Mapper, ABC):
 class EncryptKey(CryptographyKey, ABC):
 
     @abstractmethod
-    def encrypt(self, data: bytes, extra: Optional[Dict] = None) -> bytes:
+    def encrypt(self, plaintext: bytes, extra: Optional[Dict] = None) -> bytes:
         """
         1. Symmetric Key:
             ciphertext = encrypt(plaintext, PW)
         2. Asymmetric Public Key:
             ciphertext = encrypt(plaintext, PK)
 
-        :param data:  plaintext
-        :param extra: store extra variables ('IV' for 'AES')
+        :param plaintext: original data
+        :param extra:     store extra variables ('IV' for 'AES')
         :return: ciphertext
         """
         raise NotImplemented
@@ -83,15 +84,15 @@ class EncryptKey(CryptographyKey, ABC):
 class DecryptKey(CryptographyKey, ABC):
 
     @abstractmethod
-    def decrypt(self, data: bytes, params: Optional[Dict] = None) -> Optional[bytes]:
+    def decrypt(self, ciphertext: bytes, params: Optional[Dict] = None) -> Optional[bytes]:
         """
         1. Symmetric Key:
             plaintext = decrypt(ciphertext, PW)
         2. Asymmetric Private Key:
             plaintext = decrypt(ciphertext, SK)
 
-        :param data:   ciphertext
-        :param params: extra params ('IV' for 'AES')
+        :param ciphertext: encrypted data
+        :param params:     extra params ('IV' for 'AES')
         :return: plaintext
         """
         raise NotImplemented
