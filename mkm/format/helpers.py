@@ -34,5 +34,3 @@
 class FormatExtensions:
 
     ted_helper = None  # TransportableDataHelper
-
-    pnf_helper = None  # PortableNetworkFileHelper

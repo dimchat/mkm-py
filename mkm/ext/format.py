@@ -29,11 +29,10 @@ from typing import Optional, Dict
 from ..types import Singleton
 
 from ..format.encode import TransportableDataHelper
-from ..format.file import PortableNetworkFileHelper
 from ..format.helpers import FormatExtensions
 
 
-# class GeneralFormatHelper(TransportableDataHelper, PortableNetworkFileHelper, ABC):
+# class GeneralFormatHelper(TransportableDataHelper, ABC):
 class GeneralFormatHelper(ABC):
     """ Format GeneralFactory """
 
@@ -73,15 +72,3 @@ class SharedFormatExtensions:
     @ted_helper.setter
     def ted_helper(self, helper: TransportableDataHelper):
         FormatExtensions.ted_helper = helper
-
-    #
-    #   PNF
-    #
-
-    @property
-    def pnf_helper(self) -> Optional[PortableNetworkFileHelper]:
-        return FormatExtensions.pnf_helper
-
-    @pnf_helper.setter
-    def pnf_helper(self, helper: PortableNetworkFileHelper):
-        FormatExtensions.pnf_helper = helper

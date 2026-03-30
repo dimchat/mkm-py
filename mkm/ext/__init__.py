@@ -29,7 +29,6 @@ from ..crypto.private import PrivateKeyHelper
 # from ..crypto.helpers import CryptoExtensions
 
 from ..format.encode import TransportableDataHelper
-from ..format.file import PortableNetworkFileHelper
 # from ..format.helpers import FormatExtensions
 
 from ..protocol.address import AddressHelper
@@ -48,7 +47,7 @@ __all__ = [
     'SymmetricKeyHelper', 'PublicKeyHelper', 'PrivateKeyHelper',
     # 'CryptoExtensions',
 
-    'TransportableDataHelper', 'PortableNetworkFileHelper',
+    'TransportableDataHelper',
     # 'FormatExtensions',
 
     'AddressHelper', 'IDHelper',

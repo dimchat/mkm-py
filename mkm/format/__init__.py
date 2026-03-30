@@ -44,10 +44,8 @@ from .string import utf8_encode, utf8_decode
 
 
 from .encode import TransportableData, TransportableDataFactory
-from .file import PortableNetworkFile, PortableNetworkFileFactory
 
 # from .encode import TransportableDataHelper
-# from .file import PortableNetworkFileHelper
 # from .helpers import FormatExtensions
 
 
@@ -73,20 +71,18 @@ __all__ = [
     'utf8_encode', 'utf8_decode',
 
     'TransportableData',
-    'PortableNetworkFile',
 
     #
     #   Factories
     #
 
     'TransportableDataFactory',
-    'PortableNetworkFileFactory',
 
     #
     #   Plugins
     #
 
-    # 'TransportableDataHelper', 'PortableNetworkFileHelper',
+    # 'TransportableDataHelper',
     # 'FormatExtensions',
 
 ]
