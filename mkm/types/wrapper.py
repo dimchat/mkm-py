@@ -107,14 +107,40 @@ class Mapper(MutableMapping[str, Any], ABC):
         raise NotImplemented
 
 
-class Wrapper:
+######################
+#                    #
+#   Data Wrapper     #
+#                    #
+######################
 
-    @classmethod
-    def get_str(cls, s) -> Optional[str]:
-        """
-            Get inner string
-            ~~~~~~~~~~~~~~~~
-        """
+
+class DataWrapper(ABC):
+
+    @abstractmethod
+    def get_str(self, s) -> Optional[str]:
+        raise NotImplemented
+
+    @abstractmethod
+    def get_dict(self, d) -> Optional[Dict]:
+        raise NotImplemented
+
+    @abstractmethod
+    def unwrap(self, o) -> Any:
+        raise NotImplemented
+
+    @abstractmethod
+    def unwrap_dict(self, d) -> Dict:
+        raise NotImplemented
+
+    @abstractmethod
+    def unwrap_list(self, a) -> List[Any]:
+        raise NotImplemented
+
+
+class BaseWrapper(DataWrapper):
+
+    # Override
+    def get_str(self, s) -> Optional[str]:
         if s is None:
             return None
         elif isinstance(s, Stringer):
@@ -125,13 +151,8 @@ class Wrapper:
             # assert False, 'string error: %s' % s
             return str(s)
 
-    @classmethod
-    def get_dict(cls, d) -> Optional[Dict]:
-        """
-            Get inner map
-            ~~~~~~~~~~~~~
-            Remove first wrapper
-        """
+    # Override
+    def get_dict(self, d) -> Optional[Dict]:
         if d is None:
             return None
         elif isinstance(d, Mapper):
@@ -141,42 +162,77 @@ class Wrapper:
         else:
             assert False, 'map error: %s' % d
 
+    # Override
+    def unwrap(self, o) -> Any:
+        if o is None:
+            return None
+        elif isinstance(o, Mapper):
+            return self.unwrap_dict(o.dictionary)
+        elif isinstance(o, Dict):
+            return self.unwrap_dict(o)
+        elif isinstance(o, List):
+            return self.unwrap_list(o)
+        elif isinstance(o, Stringer):
+            return o.string
+        else:
+            return o
+
+    # Override
+    def unwrap_dict(self, d) -> Dict:
+        if isinstance(d, Mapper):
+            d = d.dictionary
+        dictionary = {}
+        for key in d:
+            value = d[key]
+            naked = self.unwrap(value)
+            dictionary[key] = naked
+        return dictionary
+
+    # Override
+    def unwrap_list(self, a) -> List[Any]:
+        array = []
+        for item in a:
+            naked = self.unwrap(item)
+            array.append(naked)
+        return array
+
+
+class Wrapper:
+
+    # Singleton
+    wrapper: DataWrapper = BaseWrapper()
+
+    @classmethod
+    def get_str(cls, s) -> Optional[str]:
+        """
+            Get inner string
+            ~~~~~~~~~~~~~~~~
+        """
+        return cls.wrapper.get_str(s)
+
+    @classmethod
+    def get_dict(cls, d) -> Optional[Dict]:
+        """
+            Get inner map
+            ~~~~~~~~~~~~~
+            Remove first wrapper
+        """
+        return cls.wrapper.get_dict(d)
+
     @classmethod
     def unwrap(cls, o) -> Any:
         """
             Unwrap object container
             ~~~~~~~~~~~~~~~~~~~~~~~
         """
-        if o is None:
-            return None
-        elif isinstance(o, Mapper):
-            return cls.unwrap_dict(o.dictionary)
-        elif isinstance(o, Dict):
-            return cls.unwrap_dict(o)
-        elif isinstance(o, List):
-            return cls.unwrap_list(o)
-        elif isinstance(o, Stringer):
-            return o.string
-        else:
-            return o
+        return cls.wrapper.unwrap(o)
 
     @classmethod
     def unwrap_dict(cls, d) -> Dict:
         """ Unwrap values for keys in map """
-        if isinstance(d, Mapper):
-            d = d.dictionary
-        dictionary = {}
-        for key in d:
-            value = d[key]
-            naked = cls.unwrap(value)
-            dictionary[key] = naked
-        return dictionary
+        return cls.wrapper.unwrap_dict(d)
 
     @classmethod
     def unwrap_list(cls, a) -> List[Any]:
         """ Unwrap values in the array """
-        array = []
-        for item in a:
-            naked = cls.unwrap(item)
-            array.append(naked)
-        return array
+        return cls.wrapper.unwrap_list(a)

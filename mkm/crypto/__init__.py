@@ -24,13 +24,11 @@
 # ==============================================================================
 
 """
-    Crypto
-    ~~~~~~
+    Crypto Keys
+    ~~~~~~~~~~~
 
-    Crypto Keys: SymmetricKey, PrivateKey, PublicKey
+    SymmetricKey, PrivateKey, PublicKey
 """
-
-from .digest import *
 
 from .cryptography import CryptographyKey, EncryptKey, DecryptKey
 from .asymmetric import AsymmetricKey, SignKey, VerifyKey
@@ -41,21 +39,14 @@ from .private import PrivateKey, PrivateKeyFactory
 # from .symmetric import SymmetricKeyHelper
 # from .public import PublicKeyHelper
 # from .private import PrivateKeyHelper
-# from .helpers import CryptoExtensions
+# from .cryptography import CryptoExtensions, shared_crypto_extensions
+
 
 name = "Crypto"
 
 __author__ = 'Albert Moky'
 
 __all__ = [
-
-    #
-    #   Message Digest
-    #
-
-    'MessageDigester',
-    'SHA256', 'KECCAK256', 'RIPEMD160',
-    'sha256', 'keccak256', 'ripemd160',
 
     #
     #   Crypto
@@ -73,10 +64,10 @@ __all__ = [
     'SymmetricKeyFactory', 'PrivateKeyFactory', 'PublicKeyFactory',
 
     #
-    #   Plugins
+    #   Extensions
     #
 
     # 'SymmetricKeyHelper', 'PublicKeyHelper', 'PrivateKeyHelper',
-    # 'CryptoExtensions',
+    # 'CryptoExtensions', 'shared_crypto_extensions',
 
 ]

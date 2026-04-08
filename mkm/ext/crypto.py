@@ -26,15 +26,14 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Dict
 
-from ..types import Singleton
-
 from ..crypto import SignKey, VerifyKey
 from ..crypto import EncryptKey, DecryptKey
+from ..crypto.cryptography import CryptoExtensions
 
-from ..crypto.symmetric import SymmetricKeyHelper
-from ..crypto.private import PrivateKeyHelper
-from ..crypto.public import PublicKeyHelper
-from ..crypto.helpers import CryptoExtensions
+
+# -----------------------------------------------------------------------------
+#  Crypto Extensions
+# -----------------------------------------------------------------------------
 
 
 # class GeneralCryptoHelper(SymmetricKeyHelper, PrivateKeyHelper, PublicKeyHelper, ABC):
@@ -54,8 +53,8 @@ class GeneralCryptoHelper(ABC):
     def match_symmetric_keys(cls, encrypt_key: EncryptKey, decrypt_key: DecryptKey) -> bool:
         """ check by encryption """
         extra = {}
-        ciphertext = encrypt_key.encrypt(data=cls.PROMISE, extra=extra)
-        plaintext = decrypt_key.decrypt(data=ciphertext, params=extra)
+        ciphertext = encrypt_key.encrypt(cls.PROMISE, extra=extra)
+        plaintext = decrypt_key.decrypt(ciphertext, params=extra)
         return plaintext == cls.PROMISE
 
     #
@@ -67,54 +66,16 @@ class GeneralCryptoHelper(ABC):
         raise NotImplemented
 
 
-@Singleton
-class SharedCryptoExtensions:
-    """ CryptographyKey FactoryManager """
-
-    def __init__(self):
-        super().__init__()
-        self.__helper: Optional[GeneralCryptoHelper] = None
+class _CryptoExt:
+    _crypto_helper: Optional[GeneralCryptoHelper] = None
 
     @property
-    def helper(self) -> Optional[GeneralCryptoHelper]:
-        return self.__helper
+    def crypto_helper(self) -> Optional[GeneralCryptoHelper]:
+        return _CryptoExt._crypto_helper
 
-    @helper.setter
-    def helper(self, helper: GeneralCryptoHelper):
-        self.__helper = helper
+    @crypto_helper.setter
+    def crypto_helper(self, helper: GeneralCryptoHelper):
+        _CryptoExt._crypto_helper = helper
 
-    #
-    #   Symmetric Key
-    #
 
-    @property
-    def symmetric_helper(self) -> Optional[SymmetricKeyHelper]:
-        return CryptoExtensions.symmetric_helper
-
-    @symmetric_helper.setter
-    def symmetric_helper(self, helper: SymmetricKeyHelper):
-        CryptoExtensions.symmetric_helper = helper
-
-    #
-    #   Private Key
-    #
-
-    @property
-    def private_helper(self) -> Optional[PrivateKeyHelper]:
-        return CryptoExtensions.private_helper
-
-    @private_helper.setter
-    def private_helper(self, helper: PrivateKeyHelper):
-        CryptoExtensions.private_helper = helper
-
-    #
-    #   Public Key
-    #
-
-    @property
-    def public_helper(self) -> Optional[PublicKeyHelper]:
-        return CryptoExtensions.public_helper
-
-    @public_helper.setter
-    def public_helper(self, helper: PublicKeyHelper):
-        CryptoExtensions.public_helper = helper
+CryptoExtensions.helper = _CryptoExt.crypto_helper

@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
-#
-#   Ming-Ke-Ming : Decentralized User Identity Authentication
-#
-#                                Written in 2019 by Moky <albert.moky@gmail.com>
-#
 # ==============================================================================
 # MIT License
 #
-# Copyright (c) 2019 Albert Moky
+# Copyright (c) 2020 Albert Moky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,31 +23,26 @@
 # SOFTWARE.
 # ==============================================================================
 
-from typing import Union
-
-from .types import ConstantString
-from .protocol import EntityType
-from .protocol import Address
-
-
 """
-    Address for Broadcast
-    ~~~~~~~~~~~~~~~~~~~~~
+    Message Digest
+    ~~~~~~~~~~~~~~
+
+    MD5, SHA1, SHA-256, Keccak256, RipeMD-160, ...
 """
 
-
-class BroadcastAddress(ConstantString, Address):
-
-    def __init__(self, address: str, network: Union[int, EntityType]):
-        super().__init__(string=address)
-        if isinstance(network, EntityType):
-            network = network.value
-        self.__type = network
-
-    @property  # Override
-    def network(self) -> int:
-        return self.__type
+from .md import MessageDigester
+from .md import SHA256, KECCAK256, RIPEMD160
+from .md import sha256, keccak256, ripemd160
 
 
-ANYWHERE = BroadcastAddress(address='anywhere', network=EntityType.ANY)
-EVERYWHERE = BroadcastAddress(address='everywhere', network=EntityType.EVERY)
+__all__ = [
+
+    #
+    #   Message Digest
+    #
+
+    'MessageDigester',
+    'SHA256', 'KECCAK256', 'RIPEMD160',
+    'sha256', 'keccak256', 'ripemd160',
+
+]

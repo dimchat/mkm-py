@@ -43,15 +43,12 @@ from .string import StringCoder, UTF8
 from .string import utf8_encode, utf8_decode
 
 
+from .ted import TransportableResource
 from .ted import TransportableData, TransportableDataFactory
 
-# from .encode import TransportableDataHelper
-# from .helpers import FormatExtensions
+# from .ted import TransportableDataHelper
+# from .ted import FormatExtensions, shared_format_extensions
 
-
-name = "Crypto"
-
-__author__ = 'Albert Moky'
 
 __all__ = [
 
@@ -70,6 +67,7 @@ __all__ = [
     'json_encode', 'json_decode',
     'utf8_encode', 'utf8_decode',
 
+    'TransportableResource',
     'TransportableData',
 
     #
@@ -79,10 +77,10 @@ __all__ = [
     'TransportableDataFactory',
 
     #
-    #   Plugins
+    #   Extensions
     #
 
     # 'TransportableDataHelper',
-    # 'FormatExtensions',
+    # 'FormatExtensions', 'shared_format_extensions',
 
 ]

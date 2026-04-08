@@ -24,10 +24,14 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
+from typing import TypeVar, Generic
 from typing import Optional, Union, Any, Dict, List
 
 
-class ObjectCoder(ABC):
+T = TypeVar['T']
+
+
+class ObjectCoder(Generic[T], ABC):
     """
         Object Coder
         ~~~~~~~~~~~~
@@ -38,17 +42,17 @@ class ObjectCoder(ABC):
     """
 
     @abstractmethod
-    def encode(self, obj: Any) -> str:
+    def encode(self, container: T) -> str:
         """
         Encode Map/List object to str
 
-        :param obj: Map or List
+        :param container: Map or List
         :return: serialized string
         """
         raise NotImplemented
 
     @abstractmethod
-    def decode(self, string: str) -> Optional[Any]:
+    def decode(self, string: str) -> Optional[T]:
         """
         Decode str to Map/List object
 
@@ -59,12 +63,12 @@ class ObjectCoder(ABC):
 
 
 class JSON:
-    coder: ObjectCoder = None
+    coder: ObjectCoder[Any] = None
 
     @classmethod
-    def encode(cls, obj: Any) -> str:
+    def encode(cls, container: Any) -> str:
         # assert JSON.coder is not None, 'JSON parser not set yet'
-        return cls.coder.encode(obj=obj)
+        return cls.coder.encode(container=container)
 
     @classmethod
     def decode(cls, string: str) -> Optional[Any]:
@@ -72,12 +76,12 @@ class JSON:
         return cls.coder.decode(string=string)
 
 
-class MapCoder(ObjectCoder, ABC):
+class MapCoder(ObjectCoder[Dict], ABC):
     """ coder for json <=> map """
 
     # Override
-    def encode(self, obj: Dict) -> str:
-        return JSON.coder.encode(obj=obj)
+    def encode(self, container: Dict) -> str:
+        return JSON.coder.encode(container=container)
 
     # Override
     def decode(self, string: str) -> Optional[Dict]:
@@ -88,12 +92,12 @@ class JSONMap:
     coder = MapCoder()
 
     @classmethod
-    def encode(cls, obj: Any) -> str:
+    def encode(cls, container: Dict) -> str:
         # assert JSONMap.coder is not None, 'JSONMap parser not set yet'
-        return cls.coder.encode(obj=obj)
+        return cls.coder.encode(container=container)
 
     @classmethod
-    def decode(cls, string: str) -> Optional[Any]:
+    def decode(cls, string: str) -> Optional[Dict]:
         # assert JSONMap.coder is not None, 'JSONMap parser not set yet'
         return cls.coder.decode(string=string)
 
@@ -103,8 +107,8 @@ class JSONMap:
 #
 
 
-def json_encode(obj: Union[Dict, List]) -> str:
-    return JSON.encode(obj=obj)
+def json_encode(container: Union[Dict, List]) -> str:
+    return JSON.encode(container=container)
 
 
 def json_decode(string: str) -> Union[Dict, List, None]:

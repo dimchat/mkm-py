@@ -149,21 +149,24 @@ class TransportableData(Stringer, TransportableResource, ABC):
 
     @classmethod
     def parse(cls, ted: Any):  # -> Optional[TransportableData]:
-        helper = shared_format_extensions.ted_helper
-        # assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+        helper = ted_helper()
         return helper.parse_transportable_data(ted)
 
     @classmethod
     def get_factory(cls):  # -> Optional[TransportableDataFactory]:
-        helper = shared_format_extensions.ted_helper
-        # assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+        helper = ted_helper()
         return helper.get_transportable_data_factory()
 
     @classmethod
     def set_factory(cls, factory):
-        helper = shared_format_extensions.ted_helper
-        # assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+        helper = ted_helper()
         helper.set_transportable_data_factory(factory=factory)
+
+
+def ted_helper():
+    helper = shared_format_extensions.ted_helper
+    assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+    return helper
 
 
 class TransportableDataFactory(ABC):

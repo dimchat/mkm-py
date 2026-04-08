@@ -26,13 +26,13 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Dict
 
-from ..types import Singleton
+from ..protocol import ID
+from ..protocol.entity import AccountExtensions
 
-from ..protocol.address import AddressHelper
-from ..protocol.identifier import IDHelper
-from ..protocol.meta import MetaHelper
-from ..protocol.tai_doc import DocumentHelper
-from ..protocol.helpers import AccountExtensions
+
+# -----------------------------------------------------------------------------
+#  Account Extensions
+# -----------------------------------------------------------------------------
 
 
 # class GeneralAccountHelper(AddressHelper, IDHelper, MetaHelper, DocumentHelper, ABC):
@@ -47,67 +47,21 @@ class GeneralAccountHelper(ABC):
     def get_document_type(self, document: Dict, default: Optional[str] = None) -> Optional[str]:
         raise NotImplemented
 
+    @abstractmethod
+    def get_document_id(self, document: Dict) -> Optional[ID]:
+        raise NotImplemented
 
-@Singleton
-class SharedAccountExtensions:
-    """ Account FactoryManager """
 
-    def __init__(self):
-        super().__init__()
-        self.__helper: Optional[GeneralAccountHelper] = None
-
-    @property
-    def helper(self) -> Optional[GeneralAccountHelper]:
-        return self.__helper
-
-    @helper.setter
-    def helper(self, helper: GeneralAccountHelper):
-        self.__helper = helper
-
-    #
-    #   Address
-    #
+class _AccountExt:
+    _account_helper: Optional[GeneralAccountHelper] = None
 
     @property
-    def address_helper(self) -> Optional[AddressHelper]:
-        return AccountExtensions.address_helper
+    def account_helper(self) -> Optional[GeneralAccountHelper]:
+        return _AccountExt._account_helper
 
-    @address_helper.setter
-    def address_helper(self, helper: AddressHelper):
-        AccountExtensions.address_helper = helper
+    @account_helper.setter
+    def account_helper(self, helper: GeneralAccountHelper):
+        _AccountExt._account_helper = helper
 
-    #
-    #   ID
-    #
 
-    @property
-    def id_helper(self) -> Optional[IDHelper]:
-        return AccountExtensions.id_helper
-
-    @id_helper.setter
-    def id_helper(self, helper: IDHelper):
-        AccountExtensions.id_helper = helper
-
-    #
-    #   Meta
-    #
-
-    @property
-    def meta_helper(self) -> Optional[MetaHelper]:
-        return AccountExtensions.meta_helper
-
-    @meta_helper.setter
-    def meta_helper(self, helper: MetaHelper):
-        AccountExtensions.meta_helper = helper
-
-    #
-    #   Document
-    #
-
-    @property
-    def doc_helper(self) -> Optional[DocumentHelper]:
-        return AccountExtensions.doc_helper
-
-    @doc_helper.setter
-    def doc_helper(self, helper: DocumentHelper):
-        AccountExtensions.doc_helper = helper
+AccountExtensions.helper = _AccountExt.account_helper

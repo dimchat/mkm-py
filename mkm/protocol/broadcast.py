@@ -28,12 +28,12 @@
 # SOFTWARE.
 # ==============================================================================
 
-from typing import Optional
+from typing import Optional, Union
 
-from .types import ConstantString
-from .protocol import ID, Address, EntityType
-
-from .address import ANYWHERE, EVERYWHERE
+from ..types import ConstantString
+from .entity import EntityType
+from .address import Address
+from .identifier import ID
 
 
 class Identifier(ConstantString, ID):
@@ -92,6 +92,29 @@ class Identifier(ConstantString, ID):
         if terminal is not None and len(terminal) > 0:
             string = string + '/' + terminal
         return string
+
+
+"""
+    Address for Broadcast
+    ~~~~~~~~~~~~~~~~~~~~~
+"""
+
+
+class BroadcastAddress(ConstantString, Address):
+
+    def __init__(self, address: str, network: Union[int, EntityType]):
+        super().__init__(string=address)
+        if isinstance(network, EntityType):
+            network = network.value
+        self.__type = network
+
+    @property  # Override
+    def network(self) -> int:
+        return self.__type
+
+
+ANYWHERE = BroadcastAddress(address='anywhere', network=EntityType.ANY)
+EVERYWHERE = BroadcastAddress(address='everywhere', network=EntityType.EVERY)
 
 
 """
