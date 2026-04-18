@@ -46,10 +46,10 @@ class Meta(Mapper, ABC):
         ~~~~~~~~~~~~~~~~~~~~
 
         data format: {
-            type        : 1,              // algorithm version
-            key         : "{public key}", // PK = secp256k1(SK);
-            seed        : "moKy",         // user/group name
-            fingerprint : "..."           // CT = sign(seed, SK);
+            "type"        : "1",             // algorithm version
+            "key"         : "{public key}",  // PK = secp256k1(SK);
+            "seed"        : "moKy",          // user/group name
+            "fingerprint" : "..."            // CT = sign(seed, SK);
         }
 
         algorithm:
@@ -111,7 +111,7 @@ class Meta(Mapper, ABC):
 
     @property
     @abstractmethod
-    def valid(self) -> bool:
+    def is_valid(self) -> bool:
         """
         Check meta valid
         (must call this when received a new meta from network)

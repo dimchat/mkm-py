@@ -45,15 +45,15 @@ class Dictionary(Mapper):
         if dictionary is None:
             dictionary = {}
         elif isinstance(dictionary, Mapper):
-            dictionary = dictionary.dictionary
+            dictionary = dictionary.to_dict()
         self.__dictionary = dictionary
 
-    @property  # Override
-    def dictionary(self) -> Dict:
+    # Override
+    def to_dict(self) -> Dict:
         return self.__dictionary
 
     # Override
-    def copy_dictionary(self, deep_copy: bool = False) -> Dict:
+    def copy_dict(self, deep_copy: bool = False) -> Dict:
         if deep_copy:
             return Copier.deep_copy(self.__dictionary)
         else:
@@ -113,14 +113,14 @@ class Dictionary(Mapper):
         if value is None:
             self.__dictionary.pop(key, None)
         else:
-            self.__dictionary[key] = value.string
+            self.__dictionary[key] = value.to_str()
 
     # Override
     def set_map(self, key: str, value: Optional[Mapper]):
         if value is None:
             self.__dictionary.pop(key, None)
         else:
-            self.__dictionary[key] = value.dictionary
+            self.__dictionary[key] = value.to_dict()
 
     # Override
     def get(self, key: str, default: Optional[Any] = None) -> Optional[Any]:
@@ -185,14 +185,14 @@ class Dictionary(Mapper):
             if self is o:
                 # same object
                 return True
-            o = o.dictionary
+            o = o.to_dict()
         # check inner map
         return self.__dictionary.__eq__(o)
 
     # def __getattribute__(self, name: str) -> Any:
     #     """ Return getattr(self, name). """
     #     if isinstance(name, Stringer):
-    #         name = name.string
+    #         name = name.to_str()
     #     return self.__dictionary.__getattribute__(name=name)
 
     def __getitem__(self, k: str) -> Any:
@@ -229,7 +229,7 @@ class Dictionary(Mapper):
             if self is o:
                 # same object
                 return False
-            o = o.dictionary
+            o = o.to_dict()
         # check inner map
         return self.__dictionary.__ne__(o)
 

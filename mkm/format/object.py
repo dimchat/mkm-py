@@ -28,7 +28,7 @@ from typing import TypeVar, Generic
 from typing import Optional, Union, Any, Dict, List
 
 
-T = TypeVar['T']
+T = TypeVar('T')
 
 
 class ObjectCoder(Generic[T], ABC):

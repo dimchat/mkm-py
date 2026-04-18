@@ -92,9 +92,8 @@ class TransportableData(Stringer, TransportableResource, ABC):
         """
         raise NotImplemented
 
-    @property
     @abstractmethod
-    def binary(self) -> Optional[bytes]:
+    def to_bytes(self) -> Optional[bytes]:
         """
         Get original data
 
@@ -114,7 +113,7 @@ class TransportableData(Stringer, TransportableResource, ABC):
 
     @property
     @abstractmethod
-    def empty(self) -> bool:
+    def is_empty(self) -> bool:
         """
         Check whether this data is empty.
 

@@ -35,7 +35,6 @@ from ..types import DateTime
 from ..types import Mapper
 from ..format import TransportableData
 
-from .identifier import ID
 from .tai import TAI
 from .entity import AccountExtensions, shared_account_extensions
 
@@ -47,22 +46,22 @@ class Document(TAI, Mapper, ABC):
         This class is used to generate entity profile
 
             data format: {
-                did       : "{EntityID}",      // entity ID
-                type      : "visa",            // "bulletin", ...
-                data      : "{JSON}",          // data = json_encode(info)
-                signature : "{BASE64_ENCODE}"  // signature = sign(data, SK);
+                "did"       : "{EntityID}",      // entity ID
+                "type"      : "visa",            // "bulletin", ...
+                "data"      : "{JSON}",          // data = json_encode(info)
+                "signature" : "{BASE64_ENCODE}"  // signature = sign(data, SK);
             }
     """
 
-    @property
-    @abstractmethod
-    def identifier(self) -> ID:
-        """
-        Get entity ID
-
-        :return: Entity ID
-        """
-        raise NotImplemented
+    # @property
+    # @abstractmethod
+    # def identifier(self) -> ID:
+    #     """
+    #     Get entity ID
+    #
+    #     :return: Entity ID
+    #     """
+    #     raise NotImplemented
 
     #
     #  properties getter/setter
@@ -119,7 +118,7 @@ class Document(TAI, Mapper, ABC):
         array = []
         for doc in documents:
             assert isinstance(doc, Document), 'document error: %s' % doc
-            array.append(doc.dictionary)
+            array.append(doc.to_dict())
         return array
 
     #
@@ -127,10 +126,9 @@ class Document(TAI, Mapper, ABC):
     #
 
     @classmethod
-    def create(cls, doc_type: str, identifier: ID,
-               data: str = None, signature: TransportableData = None):  # -> Document:
+    def create(cls, doc_type: str, data: str = None, signature: TransportableData = None):  # -> Document:
         helper = doc_helper()
-        return helper.create_document(doc_type, identifier, data=data, signature=signature)
+        return helper.create_document(doc_type, data=data, signature=signature)
 
     @classmethod
     def parse(cls, document: Any):  # -> Optional[Document]:
@@ -158,13 +156,12 @@ class DocumentFactory(ABC):
     """ Document Factory """
 
     @abstractmethod
-    def create_document(self, identifier: ID, data: Optional[str], signature: Optional[TransportableData]) -> Document:
+    def create_document(self, data: Optional[str], signature: Optional[TransportableData]) -> Document:
         """
         1. Create a new empty document with entity ID
 
         2. Create document with data & signature loaded from local storage
 
-        :param identifier: entity ID
         :param data:       document data
         :param signature:  document signature
         :return: Document
@@ -199,8 +196,7 @@ class DocumentHelper(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def create_document(self, doc_type: str, identifier: ID,
-                        data: Optional[str], signature: Optional[TransportableData]) -> Document:
+    def create_document(self, doc_type: str, data: Optional[str], signature: Optional[TransportableData]) -> Document:
         raise NotImplemented
 
     @abstractmethod

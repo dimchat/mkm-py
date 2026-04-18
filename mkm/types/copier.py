@@ -71,7 +71,7 @@ class BaseCopier(DataCopier):
         if o is None:
             return None
         elif isinstance(o, Mapper):
-            return self.copy_map(o.dictionary)
+            return self.copy_map(o.to_dict())
         elif isinstance(o, Dict):
             return self.copy_map(o)
         elif isinstance(o, List):
@@ -92,7 +92,7 @@ class BaseCopier(DataCopier):
         if o is None:
             return None
         elif isinstance(o, Mapper):
-            return self.deep_copy_map(o.dictionary)
+            return self.deep_copy_map(o.to_dict())
         elif isinstance(o, Dict):
             return self.deep_copy_map(o)
         elif isinstance(o, List):

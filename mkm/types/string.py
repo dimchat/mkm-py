@@ -40,7 +40,7 @@ class ConstantString(Stringer):
         if string is None:
             string = ''
         elif isinstance(string, Stringer):
-            string = string.string
+            string = string.to_str()
         self.__string = string
 
     # Override
@@ -60,7 +60,7 @@ class ConstantString(Stringer):
             if self is x:
                 # same object
                 return True
-            x = x.string
+            x = x.to_str()
         # check inner string
         return self.__string.__eq__(x)
 
@@ -71,7 +71,7 @@ class ConstantString(Stringer):
             if self is x:
                 # same object
                 return False
-            x = x.string
+            x = x.to_str()
         # check inner string
         return self.__string.__ne__(x)
 
@@ -86,8 +86,8 @@ class ConstantString(Stringer):
         clazz = self.__class__.__name__
         return '<%s>%s</%s>' % (clazz, self.__string, clazz)
 
-    @property  # Override
-    def string(self) -> str:
+    # Override
+    def to_str(self) -> str:
         return self.__string
 
 
@@ -101,12 +101,12 @@ class String(Stringer):
         if string is None:
             string = ''
         elif isinstance(string, Stringer):
-            string = string.string
+            string = string.to_str()
         assert isinstance(string, str), 'string error: %s' % string
         self.__string = string
 
-    @property  # Override
-    def string(self) -> str:
+    # Override
+    def to_str(self) -> str:
         return self.__string
 
     def capitalize(self):
@@ -131,7 +131,7 @@ class String(Stringer):
         Padding is done using the specified fill character (default is a space).
         """
         if isinstance(fillchar, Stringer):
-            fillchar = fillchar.string
+            fillchar = fillchar.to_str()
         string = self.__string.center(width, fillchar)
         return String(string=string)
 
@@ -144,7 +144,7 @@ class String(Stringer):
         interpreted as in slice notation.
         """
         if isinstance(x, Stringer):
-            x = x.string
+            x = x.to_str()
         return self.__string.count(x, __start, __end)
 
     def encode(self, encoding: str = 'utf-8', errors: str = 'strict') -> bytes:
@@ -172,7 +172,7 @@ class String(Stringer):
         suffix can also be a tuple of strings to try.
         """
         if isinstance(suffix, Stringer):
-            suffix = suffix.string
+            suffix = suffix.to_str()
         return self.__string.endswith(suffix, start, end)
 
     def expandtabs(self, tabsize: int = 8):
@@ -195,7 +195,7 @@ class String(Stringer):
         Return -1 on failure.
         """
         if isinstance(sub, Stringer):
-            sub = sub.string
+            sub = sub.to_str()
         return self.__string.find(sub, __start, __end)
 
     def format(self, *args, **kwargs):
@@ -230,7 +230,7 @@ class String(Stringer):
         Raises ValueError when the substring is not found.
         """
         if isinstance(sub, Stringer):
-            sub = sub.string
+            sub = sub.to_str()
         return self.__string.index(sub, __start, __end)
 
     def isalnum(self) -> bool:
@@ -360,7 +360,7 @@ class String(Stringer):
         Padding is done using the specified fill character (default is a space).
         """
         if isinstance(fillchar, Stringer):
-            fillchar = fillchar.string
+            fillchar = fillchar.to_str()
         string = self.__string.ljust(width, fillchar)
         return String(string=string)
 
@@ -376,7 +376,7 @@ class String(Stringer):
         If chars is given and not None, remove characters in chars instead.
         """
         if isinstance(chars, Stringer):
-            chars = chars.string
+            chars = chars.to_str()
         string = self.__string.lstrip(chars)
         return String(string=string)
 
@@ -406,7 +406,7 @@ class String(Stringer):
         and two empty strings.
         """
         if isinstance(sep, Stringer):
-            sep = sep.string
+            sep = sep.to_str()
         return self.__string.partition(sep)
 
     def replace(self, old: str, new: str, count: int = -1):
@@ -421,9 +421,9 @@ class String(Stringer):
         replaced.
         """
         if isinstance(old, Stringer):
-            old = old.string
+            old = old.to_str()
         if isinstance(new, Stringer):
-            new = new.string
+            new = new.to_str()
         string = self.__string.replace(old, new, count)
         return String(string=string)
 
@@ -438,7 +438,7 @@ class String(Stringer):
         Return -1 on failure.
         """
         if isinstance(sub, Stringer):
-            sub = sub.string
+            sub = sub.to_str()
         return self.__string.rfind(sub, __start, __end)
 
     def rindex(self, sub: str, __start: Optional[int] = None, __end: Optional[int] = None) -> int:
@@ -452,7 +452,7 @@ class String(Stringer):
         Raises ValueError when the substring is not found.
         """
         if isinstance(sub, Stringer):
-            sub = sub.string
+            sub = sub.to_str()
         return self.__string.rindex(sub, __start, __end)
 
     def rjust(self, width: int, fillchar: str = ' '):
@@ -462,7 +462,7 @@ class String(Stringer):
         Padding is done using the specified fill character (default is a space).
         """
         if isinstance(fillchar, Stringer):
-            fillchar = fillchar.string
+            fillchar = fillchar.to_str()
         string = self.__string.rjust(width, fillchar)
         return String(string=string)
 
@@ -478,7 +478,7 @@ class String(Stringer):
         and the original string.
         """
         if isinstance(sep, Stringer):
-            sep = sep.string
+            sep = sep.to_str()
         return self.__string.rpartition(sep)
 
     def rsplit(self, sep: Optional[str] = None, maxsplit: int = -1) -> List[str]:
@@ -496,7 +496,7 @@ class String(Stringer):
         Splits are done starting at the end of the string and working to the front.
         """
         if isinstance(sep, Stringer):
-            sep = sep.string
+            sep = sep.to_str()
         return self.__string.rsplit(sep, maxsplit)
 
     def rstrip(self, chars: Optional[str] = None):
@@ -506,7 +506,7 @@ class String(Stringer):
         If chars is given and not None, remove characters in chars instead.
         """
         if isinstance(chars, Stringer):
-            chars = chars.string
+            chars = chars.to_str()
         string = self.__string.rstrip(chars)
         return String(string=string)
 
@@ -523,7 +523,7 @@ class String(Stringer):
             -1 (the default value) means no limit.
         """
         if isinstance(sep, Stringer):
-            sep = sep.string
+            sep = sep.to_str()
         return self.__string.split(sep, maxsplit)
 
     def splitlines(self, keepends: bool = False) -> List[str]:
@@ -545,7 +545,7 @@ class String(Stringer):
         prefix can also be a tuple of strings to try.
         """
         if isinstance(prefix, Stringer):
-            prefix = prefix.string
+            prefix = prefix.to_str()
         return self.__string.startswith(prefix, start, end)
 
     def strip(self, chars: Optional[str] = None):
@@ -555,7 +555,7 @@ class String(Stringer):
         If chars is given and not None, remove characters in chars instead.
         """
         if isinstance(chars, Stringer):
-            chars = chars.string
+            chars = chars.to_str()
         string = self.__string.strip(chars)
         return String(string=string)
 
@@ -605,14 +605,14 @@ class String(Stringer):
     def __add__(self, s: str):
         """ Return self+value. """
         if isinstance(s, Stringer):
-            s = s.string
+            s = s.to_str()
         string = self.__string.__add__(s)
         return String(string=string)
 
     def __contains__(self, s: str) -> bool:
         """ Return key in self. """
         if isinstance(s, Stringer):
-            s = s.string
+            s = s.to_str()
         return self.__string.__contains__(s)
 
     def __eq__(self, x: str) -> bool:
@@ -620,20 +620,20 @@ class String(Stringer):
         if self is x:
             return True
         if isinstance(x, Stringer):
-            x = x.string
+            x = x.to_str()
         return self.__string.__eq__(x)
 
     def __format__(self, format_spec: str):
         """ Return a formatted version of the string as described by format_spec. """
         if isinstance(format_spec, Stringer):
-            format_spec = format_spec.string
+            format_spec = format_spec.to_str()
         string = self.__string.__format__(format_spec)
         return String(string=string)
 
     # def __getattribute__(self, name: str) -> Any:
     #     """ Return getattr(self, name). """
     #     if isinstance(name, Stringer):
-    #         name = name.string
+    #         name = name.to_str()
     #     return self.__string.__getattribute__(name=name)
 
     def __getitem__(self, i: Union[int, slice]) -> str:
@@ -648,7 +648,7 @@ class String(Stringer):
         if self is x:
             return True
         if isinstance(x, Stringer):
-            x = x.string
+            x = x.to_str()
         return self.__string.__ge__(x)
 
     def __gt__(self, x: str) -> bool:
@@ -656,7 +656,7 @@ class String(Stringer):
         if self is x:
             return False
         if isinstance(x, Stringer):
-            x = x.string
+            x = x.to_str()
         return self.__string.__gt__(x)
 
     def __hash__(self) -> int:
@@ -676,7 +676,7 @@ class String(Stringer):
         if self is x:
             return True
         if isinstance(x, Stringer):
-            x = x.string
+            x = x.to_str()
         return self.__string.__le__(x)
 
     def __lt__(self, x: str) -> bool:
@@ -684,7 +684,7 @@ class String(Stringer):
         if self is x:
             return False
         if isinstance(x, Stringer):
-            x = x.string
+            x = x.to_str()
         return self.__string.__lt__(x)
 
     def __mod__(self, value: Any):
@@ -702,7 +702,7 @@ class String(Stringer):
         if self is x:
             return False
         if isinstance(x, Stringer):
-            x = x.string
+            x = x.to_str()
         return self.__string.__ne__(x)
 
     def __repr__(self) -> str:

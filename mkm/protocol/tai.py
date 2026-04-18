@@ -47,7 +47,7 @@ class TAI(ABC):
 
     @property
     @abstractmethod
-    def valid(self) -> bool:
+    def is_valid(self) -> bool:
         """
         Check if signature matched
 

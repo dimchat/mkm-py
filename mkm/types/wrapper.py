@@ -50,9 +50,8 @@ class Stringer(ABC):
     def __str__(self) -> str:
         return NotImplemented
 
-    @property
     @abstractmethod
-    def string(self) -> str:
+    def to_str(self) -> str:
         """ get inner string """
         return NotImplemented
 
@@ -95,14 +94,13 @@ class Mapper(MutableMapping[str, Any], ABC):
     def set_map(self, key: str, value):  # value: Optional[Mapper]
         raise NotImplemented
 
-    @property
     @abstractmethod
-    def dictionary(self) -> Dict:
+    def to_dict(self) -> Dict:
         """ get inner map """
         raise NotImplemented
 
     @abstractmethod
-    def copy_dictionary(self, deep_copy: bool = False) -> Dict:
+    def copy_dict(self, deep_copy: bool = False) -> Dict:
         """ copy inner map """
         raise NotImplemented
 
@@ -144,7 +142,7 @@ class BaseWrapper(DataWrapper):
         if s is None:
             return None
         elif isinstance(s, Stringer):
-            return s.string
+            return s.to_str()
         elif isinstance(s, str):
             return s
         else:
@@ -156,7 +154,7 @@ class BaseWrapper(DataWrapper):
         if d is None:
             return None
         elif isinstance(d, Mapper):
-            return d.dictionary
+            return d.to_dict()
         elif isinstance(d, Dict):
             return d
         else:
@@ -167,20 +165,20 @@ class BaseWrapper(DataWrapper):
         if o is None:
             return None
         elif isinstance(o, Mapper):
-            return self.unwrap_dict(o.dictionary)
+            return self.unwrap_dict(o.to_dict())
         elif isinstance(o, Dict):
             return self.unwrap_dict(o)
         elif isinstance(o, List):
             return self.unwrap_list(o)
         elif isinstance(o, Stringer):
-            return o.string
+            return o.to_str()
         else:
             return o
 
     # Override
     def unwrap_dict(self, d) -> Dict:
         if isinstance(d, Mapper):
-            d = d.dictionary
+            d = d.to_dict()
         dictionary = {}
         for key in d:
             value = d[key]
