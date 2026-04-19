@@ -28,7 +28,7 @@ from typing import Optional, Dict
 
 from ..crypto import SignKey, VerifyKey
 from ..crypto import EncryptKey, DecryptKey
-from ..crypto.cryptography import CryptoExtensions
+from ..crypto.cryptography import shared_crypto_extensions
 
 
 # -----------------------------------------------------------------------------
@@ -66,16 +66,19 @@ class GeneralCryptoHelper(ABC):
         raise NotImplemented
 
 
-class _CryptoExt:
-    _crypto_helper: Optional[GeneralCryptoHelper] = None
+class GeneralCryptoExtension:
 
     @property
-    def crypto_helper(self) -> Optional[GeneralCryptoHelper]:
-        return _CryptoExt._crypto_helper
+    def helper(self) -> Optional[GeneralCryptoHelper]:
+        raise NotImplemented
 
-    @crypto_helper.setter
-    def crypto_helper(self, helper: GeneralCryptoHelper):
-        _CryptoExt._crypto_helper = helper
+    @helper.setter
+    def helper(self, delegate: GeneralCryptoHelper):
+        raise NotImplemented
 
 
-CryptoExtensions.helper = _CryptoExt.crypto_helper
+shared_crypto_extensions.helper: Optional[GeneralCryptoHelper] = None
+
+
+# def crypto_extensions() -> Union[GeneralCryptoExtension, CryptoExtensions]:
+#     return shared_crypto_extensions

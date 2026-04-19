@@ -29,16 +29,24 @@ from ..format.ted import FormatExtensions, shared_format_extensions
 from ..crypto.symmetric import SymmetricKeyHelper
 from ..crypto.public import PublicKeyHelper
 from ..crypto.private import PrivateKeyHelper
+
+from ..crypto.symmetric import SymmetricKeyExtension
+from ..crypto.public import PublicKeyExtension
+from ..crypto.private import PrivateKeyExtension
 from ..crypto.cryptography import CryptoExtensions, shared_crypto_extensions
 
 from ..protocol.address import AddressHelper
 from ..protocol.identifier import IDHelper
 from ..protocol.meta import MetaHelper
 from ..protocol.tai_doc import DocumentHelper
+from ..protocol.address import AddressExtension
+from ..protocol.identifier import IDExtension
+from ..protocol.meta import MetaExtension
+from ..protocol.tai_doc import DocumentExtension
 from ..protocol.entity import AccountExtensions, shared_account_extensions
 
-from .crypto import GeneralCryptoHelper
-from .account import GeneralAccountHelper
+from .crypto import GeneralCryptoHelper, GeneralCryptoExtension
+from .account import GeneralAccountHelper, GeneralAccountExtension
 
 
 __all__ = [
@@ -55,6 +63,7 @@ __all__ = [
     #
 
     'SymmetricKeyHelper', 'PublicKeyHelper', 'PrivateKeyHelper',
+    'SymmetricKeyExtension', 'PublicKeyExtension', 'PrivateKeyExtension',
     'CryptoExtensions', 'shared_crypto_extensions',
 
     #
@@ -63,13 +72,15 @@ __all__ = [
 
     'AddressHelper', 'IDHelper',
     'MetaHelper', 'DocumentHelper',
+    'AddressExtension', 'IDExtension',
+    'MetaExtension', 'DocumentExtension',
     'AccountExtensions', 'shared_account_extensions',
 
     #
     #   General Extensions
     #
 
-    'GeneralCryptoHelper',
-    'GeneralAccountHelper',
+    'GeneralCryptoHelper', 'GeneralCryptoExtension',
+    'GeneralAccountHelper', 'GeneralAccountExtension',
 
 ]

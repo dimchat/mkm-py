@@ -27,7 +27,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Dict
 
 from ..protocol import ID
-from ..protocol.entity import AccountExtensions
+from ..protocol.entity import shared_account_extensions
 
 
 # -----------------------------------------------------------------------------
@@ -52,16 +52,19 @@ class GeneralAccountHelper(ABC):
         raise NotImplemented
 
 
-class _AccountExt:
-    _account_helper: Optional[GeneralAccountHelper] = None
+class GeneralAccountExtension:
 
     @property
-    def account_helper(self) -> Optional[GeneralAccountHelper]:
-        return _AccountExt._account_helper
+    def helper(self) -> Optional[GeneralAccountHelper]:
+        raise NotImplemented
 
-    @account_helper.setter
-    def account_helper(self, helper: GeneralAccountHelper):
-        _AccountExt._account_helper = helper
+    @helper.setter
+    def helper(self, delegate: GeneralAccountHelper):
+        raise NotImplemented
 
 
-AccountExtensions.helper = _AccountExt.account_helper
+shared_account_extensions.helper: Optional[GeneralAccountHelper] = None
+
+
+# def account_extensions() -> Union[GeneralAccountExtension, AccountExtensions]:
+#     return shared_account_extensions

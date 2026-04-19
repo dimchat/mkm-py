@@ -27,7 +27,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Any, Dict
 
 from .asymmetric import VerifyKey
-from .cryptography import CryptoExtensions, shared_crypto_extensions
+from .cryptography import shared_crypto_extensions
 
 
 # noinspection PyAbstractClass
@@ -64,12 +64,6 @@ class PublicKey(VerifyKey, ABC):
         helper.set_public_key_factory(algorithm=algorithm, factory=factory)
 
 
-def public_helper():
-    helper = shared_crypto_extensions.public_helper
-    assert isinstance(helper, PublicKeyHelper), 'public helper error: %s' % helper
-    return helper
-
-
 class PublicKeyFactory(ABC):
 
     @abstractmethod
@@ -103,16 +97,24 @@ class PublicKeyHelper(ABC):
         raise NotImplemented
 
 
-class _PublicExt:
-    _public_helper: Optional[PublicKeyHelper] = None
+class PublicKeyExtension:
 
     @property
     def public_helper(self) -> Optional[PublicKeyHelper]:
-        return _PublicExt._public_helper
+        raise NotImplemented
 
     @public_helper.setter
     def public_helper(self, helper: PublicKeyHelper):
-        _PublicExt._public_helper = helper
+        raise NotImplemented
 
 
-CryptoExtensions.public_helper = _PublicExt.public_helper
+shared_crypto_extensions.public_helper: Optional[PublicKeyHelper] = None
+
+
+def crypto_extensions() -> PublicKeyExtension:
+    return shared_crypto_extensions
+
+
+def public_helper() -> PublicKeyHelper:
+    ext = crypto_extensions()
+    return ext.public_helper

@@ -28,7 +28,7 @@ from typing import Optional, Any, Dict
 
 from .asymmetric import SignKey
 from .public import PublicKey
-from .cryptography import CryptoExtensions, shared_crypto_extensions
+from .cryptography import shared_crypto_extensions
 
 
 class PrivateKey(SignKey, ABC):
@@ -79,12 +79,6 @@ class PrivateKey(SignKey, ABC):
         helper.set_private_key_factory(algorithm=algorithm, factory=factory)
 
 
-def private_helper():
-    helper = shared_crypto_extensions.private_helper
-    assert isinstance(helper, PrivateKeyHelper), 'private helper error: %s' % helper
-    return helper
-
-
 class PrivateKeyFactory(ABC):
     """ Key Factory """
 
@@ -133,16 +127,24 @@ class PrivateKeyHelper(ABC):
         raise NotImplemented
 
 
-class _PrivateExt:
-    _private_helper: Optional[PrivateKeyHelper] = None
+class PrivateKeyExtension:
 
     @property
     def private_helper(self) -> Optional[PrivateKeyHelper]:
-        return _PrivateExt._private_helper
+        raise NotImplemented
 
     @private_helper.setter
     def private_helper(self, helper: PrivateKeyHelper):
-        _PrivateExt._private_helper = helper
+        raise NotImplemented
 
 
-CryptoExtensions.private_helper = _PrivateExt.private_helper
+shared_crypto_extensions.private_helper: Optional[PrivateKeyHelper] = None
+
+
+def crypto_extensions() -> PrivateKeyExtension:
+    return shared_crypto_extensions
+
+
+def private_helper() -> PrivateKeyHelper:
+    ext = crypto_extensions()
+    return ext.private_helper

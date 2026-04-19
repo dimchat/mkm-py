@@ -36,7 +36,7 @@ from ..types import Mapper
 from ..format import TransportableData
 
 from .tai import TAI
-from .entity import AccountExtensions, shared_account_extensions
+from .entity import shared_account_extensions
 
 
 class Document(TAI, Mapper, ABC):
@@ -146,12 +146,6 @@ class Document(TAI, Mapper, ABC):
         helper.set_document_factory(doc_type, factory=factory)
 
 
-def doc_helper():
-    helper = shared_account_extensions.doc_helper
-    assert isinstance(helper, DocumentHelper), 'document helper error: %s' % helper
-    return helper
-
-
 class DocumentFactory(ABC):
     """ Document Factory """
 
@@ -204,16 +198,24 @@ class DocumentHelper(ABC):
         raise NotImplemented
 
 
-class _DocExt:
-    _doc_helper: Optional[DocumentHelper] = None
+class DocumentExtension:
 
     @property
     def doc_helper(self) -> Optional[DocumentHelper]:
-        return _DocExt._doc_helper
+        raise NotImplemented
 
     @doc_helper.setter
     def doc_helper(self, helper: DocumentHelper):
-        _DocExt._doc_helper = helper
+        raise NotImplemented
 
 
-AccountExtensions.doc_helper = _DocExt.doc_helper
+shared_account_extensions.doc_helper: Optional[DocumentHelper] = None
+
+
+def account_extensions() -> DocumentExtension:
+    return shared_account_extensions
+
+
+def doc_helper() -> DocumentHelper:
+    ext = account_extensions()
+    return ext.doc_helper

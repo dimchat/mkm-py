@@ -29,11 +29,11 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Optional, Any
 
 from ..types import Stringer
 
-from .entity import AccountExtensions, shared_account_extensions
+from .entity import shared_account_extensions
 
 
 class Address(Stringer, ABC):
@@ -79,12 +79,6 @@ class Address(Stringer, ABC):
     def set_factory(cls, factory):
         helper = address_helper()
         helper.set_address_factory(factory=factory)
-
-
-def address_helper():
-    helper = shared_account_extensions.address_helper
-    assert isinstance(helper, AddressHelper), 'address helper error: %s' % helper
-    return helper
 
 
 class AddressFactory(ABC):
@@ -137,16 +131,24 @@ class AddressHelper(ABC):
         raise NotImplemented
 
 
-class _AddressExt:
-    _address_helper: Optional[AddressHelper] = None
+class AddressExtension:
 
     @property
     def address_helper(self) -> Optional[AddressHelper]:
-        return _AddressExt._address_helper
+        raise NotImplemented
 
     @address_helper.setter
     def address_helper(self, helper: AddressHelper):
-        _AddressExt._address_helper = helper
+        raise NotImplemented
 
 
-AccountExtensions.address_helper = _AddressExt.address_helper
+shared_account_extensions.address_helper: Optional[AddressHelper] = None
+
+
+def account_extensions() -> AddressExtension:
+    return shared_account_extensions
+
+
+def address_helper() -> AddressHelper:
+    ext = account_extensions()
+    return ext.address_helper

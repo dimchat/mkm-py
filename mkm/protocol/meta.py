@@ -36,7 +36,7 @@ from ..crypto import VerifyKey, SignKey
 from ..format import TransportableData
 
 from .address import Address
-from .entity import AccountExtensions, shared_account_extensions
+from .entity import shared_account_extensions
 
 
 class Meta(Mapper, ABC):
@@ -161,12 +161,6 @@ class Meta(Mapper, ABC):
         helper.set_meta_factory(version, factory=factory)
 
 
-def meta_helper():
-    helper = shared_account_extensions.meta_helper
-    assert isinstance(helper, MetaHelper), 'meta helper error: %s' % helper
-    return helper
-
-
 class MetaFactory(ABC):
     """ Meta Factory """
 
@@ -234,16 +228,24 @@ class MetaHelper(ABC):
         raise NotImplemented
 
 
-class _MetaExt:
-    _meta_helper: Optional[MetaHelper] = None
+class MetaExtension:
 
     @property
     def meta_helper(self) -> Optional[MetaHelper]:
-        return _MetaExt._meta_helper
+        raise NotImplemented
 
     @meta_helper.setter
     def meta_helper(self, helper: MetaHelper):
-        _MetaExt._meta_helper = helper
+        raise NotImplemented
 
 
-AccountExtensions.meta_helper = _MetaExt.meta_helper
+shared_account_extensions.meta_helper: Optional[MetaHelper] = None
+
+
+def account_extensions() -> MetaExtension:
+    return shared_account_extensions
+
+
+def meta_helper() -> MetaHelper:
+    ext = account_extensions()
+    return ext.meta_helper

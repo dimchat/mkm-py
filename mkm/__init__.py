@@ -132,14 +132,17 @@ __all__ = [
     'FormatExtensions', 'shared_format_extensions',
 
     'SymmetricKeyHelper', 'PublicKeyHelper', 'PrivateKeyHelper',
+    'SymmetricKeyExtension', 'PublicKeyExtension', 'PrivateKeyExtension',
     'CryptoExtensions', 'shared_crypto_extensions',
 
     'AddressHelper', 'IDHelper',
     'MetaHelper', 'DocumentHelper',
+    'AddressExtension', 'IDExtension',
+    'MetaExtension', 'DocumentExtension',
     'AccountExtensions', 'shared_account_extensions',
 
-    'GeneralCryptoHelper',
-    'GeneralAccountHelper',
+    'GeneralCryptoHelper', 'GeneralCryptoExtension',
+    'GeneralAccountHelper', 'GeneralAccountExtension',
 
     #
     #   Core

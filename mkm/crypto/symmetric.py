@@ -27,7 +27,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Any, Dict
 
 from .cryptography import EncryptKey, DecryptKey
-from .cryptography import CryptoExtensions, shared_crypto_extensions
+from .cryptography import shared_crypto_extensions
 
 
 # noinspection PyAbstractClass
@@ -70,12 +70,6 @@ class SymmetricKey(EncryptKey, DecryptKey, ABC):
     def set_factory(cls, algorithm: str, factory):
         helper = symmetric_helper()
         helper.set_symmetric_key_factory(algorithm=algorithm, factory=factory)
-
-
-def symmetric_helper():
-    helper = shared_crypto_extensions.symmetric_helper
-    assert isinstance(helper, SymmetricKeyHelper), 'symmetric helper error: %s' % helper
-    return helper
 
 
 class SymmetricKeyFactory(ABC):
@@ -126,16 +120,24 @@ class SymmetricKeyHelper(ABC):
         raise NotImplemented
 
 
-class _SymmetricExt:
-    _symmetric_helper: Optional[SymmetricKeyHelper] = None
+class SymmetricKeyExtension:
 
     @property
     def symmetric_helper(self) -> Optional[SymmetricKeyHelper]:
-        return _SymmetricExt._symmetric_helper
+        raise NotImplemented
 
     @symmetric_helper.setter
     def symmetric_helper(self, helper: SymmetricKeyHelper):
-        _SymmetricExt._symmetric_helper = helper
+        raise NotImplemented
 
 
-CryptoExtensions.symmetric_helper = _SymmetricExt.symmetric_helper
+shared_crypto_extensions.symmetric_helper: Optional[SymmetricKeyHelper] = None
+
+
+def crypto_extensions() -> SymmetricKeyExtension:
+    return shared_crypto_extensions
+
+
+def symmetric_helper() -> SymmetricKeyHelper:
+    ext = crypto_extensions()
+    return ext.symmetric_helper
