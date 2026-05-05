@@ -39,6 +39,10 @@ from .private import PrivateKey, PrivateKeyFactory
 # from .symmetric import SymmetricKeyHelper
 # from .public import PublicKeyHelper
 # from .private import PrivateKeyHelper
+
+# from .symmetric import SymmetricKeyExtension
+# from .public import PublicKeyExtension
+# from .private import PrivateKeyExtension
 # from .cryptography import CryptoExtensions, shared_crypto_extensions
 
 
@@ -68,6 +72,8 @@ __all__ = [
     #
 
     # 'SymmetricKeyHelper', 'PublicKeyHelper', 'PrivateKeyHelper',
+
+    # 'SymmetricKeyExtension', 'PublicKeyExtension', 'PrivateKeyExtension',
     # 'CryptoExtensions', 'shared_crypto_extensions',
 
 ]

@@ -95,12 +95,12 @@ class Mapper(MutableMapping[str, Any], ABC):
         raise NotImplemented
 
     @abstractmethod
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Any]:
         """ get inner map """
         raise NotImplemented
 
     @abstractmethod
-    def copy_dict(self, deep_copy: bool = False) -> Dict:
+    def copy_dict(self, deep_copy: bool = False) -> Dict[str, Any]:
         """ copy inner map """
         raise NotImplemented
 

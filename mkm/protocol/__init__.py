@@ -43,6 +43,11 @@ from .broadcast import ANYONE, EVERYONE, FOUNDER
 # from .identifier import IDHelper
 # from .meta import MetaHelper
 # from .tai_doc import DocumentHelper
+
+# from .address import AddressExtension
+# from .identifier import IDExtension
+# from .meta import MetaExtension
+# from .tai_doc import DocumentExtension
 # from .entity import AccountExtensions, shared_account_extensions
 
 
@@ -73,6 +78,9 @@ __all__ = [
 
     # 'AddressHelper', 'IDHelper',
     # 'MetaHelper', 'DocumentHelper',
+
+    # 'AddressExtension', 'IDExtension',
+    # 'MetaExtension', 'DocumentExtension',
     # 'AccountExtensions', 'shared_account_extensions',
 
 ]

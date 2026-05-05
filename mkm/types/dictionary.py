@@ -49,11 +49,11 @@ class Dictionary(Mapper):
         self.__dictionary = dictionary
 
     # Override
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Any]:
         return self.__dictionary
 
     # Override
-    def copy_dict(self, deep_copy: bool = False) -> Dict:
+    def copy_dict(self, deep_copy: bool = False) -> Dict[str, Any]:
         if deep_copy:
             return Copier.deep_copy(self.__dictionary)
         else:

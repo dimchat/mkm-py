@@ -39,6 +39,7 @@ from ..protocol.address import AddressHelper
 from ..protocol.identifier import IDHelper
 from ..protocol.meta import MetaHelper
 from ..protocol.tai_doc import DocumentHelper
+
 from ..protocol.address import AddressExtension
 from ..protocol.identifier import IDExtension
 from ..protocol.meta import MetaExtension
@@ -63,6 +64,7 @@ __all__ = [
     #
 
     'SymmetricKeyHelper', 'PublicKeyHelper', 'PrivateKeyHelper',
+
     'SymmetricKeyExtension', 'PublicKeyExtension', 'PrivateKeyExtension',
     'CryptoExtensions', 'shared_crypto_extensions',
 
@@ -72,6 +74,7 @@ __all__ = [
 
     'AddressHelper', 'IDHelper',
     'MetaHelper', 'DocumentHelper',
+
     'AddressExtension', 'IDExtension',
     'MetaExtension', 'DocumentExtension',
     'AccountExtensions', 'shared_account_extensions',
