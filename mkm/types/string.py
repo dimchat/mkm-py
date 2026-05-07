@@ -84,7 +84,8 @@ class ConstantString(Stringer):
     def __repr__(self) -> str:
         """ Return repr(self). """
         clazz = self.__class__.__name__
-        return '<%s>%s</%s>' % (clazz, self.__string, clazz)
+        text = self.__string
+        return f'<{clazz}>{text}</{clazz}>'
 
     # Override
     def to_str(self) -> str:
@@ -102,7 +103,7 @@ class String(Stringer):
             string = ''
         elif isinstance(string, Stringer):
             string = string.to_str()
-        assert isinstance(string, str), 'string error: %s' % string
+        assert isinstance(string, str), f'string error: {string}'
         self.__string = string
 
     # Override

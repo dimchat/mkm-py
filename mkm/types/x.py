@@ -45,14 +45,14 @@ class DateTime:
         """ Return self<value. """
         if isinstance(other, DateTime):
             other = other.timestamp
-        # assert isinstance(other, float), 'other time error: %s' % other
+        # assert isinstance(other, float), f'other time error: {other}'
         return self.__timestamp < other
 
     def after(self, other) -> bool:
         """ Return self>value. """
         if isinstance(other, DateTime):
             other = other.timestamp
-        # assert isinstance(other, float), 'other time error: %s' % other
+        # assert isinstance(other, float), f'other time error: {other}'
         return self.__timestamp > other
 
     # Override
@@ -215,7 +215,7 @@ class DateTime:
             # assuming it is a timestamp value in seconds
             return DateTime(timestamp=float(value))
         else:
-            raise TypeError('invalid time value: %s' % value)
+            raise TypeError(f'invalid time value: {value}')
 
     @classmethod
     def now(cls):

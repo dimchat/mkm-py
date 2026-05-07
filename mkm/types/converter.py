@@ -84,7 +84,7 @@ class BaseConverter(DataConverter):
             # exactly
             return value
         else:
-            # assert False, 'not a string value: %s' % value
+            # assert False, f'not a string value: {value}'
             return str(value)
 
     # Override
@@ -95,10 +95,10 @@ class BaseConverter(DataConverter):
             # exactly
             return value
         elif isinstance(value, int):
-            assert value == 1 or value == 0, 'bool value error: %s' % value
+            assert value == 1 or value == 0, f'bool value error: {value}'
             return value != 0
         elif isinstance(value, float):
-            assert value == 1.0 or value == 0.0, 'bool value error: %s' % value
+            assert value == 1.0 or value == 0.0, f'bool value error: {value}'
             return value != 0.0
         else:
             text = to_str(value=value)
@@ -107,11 +107,11 @@ class BaseConverter(DataConverter):
         if size == 0:
             return False
         elif size > Converter.MAX_BOOLEAN_LEN:
-            raise ValueError('bool value error: "%s"' % value)
+            raise ValueError(f'bool value error: "{value}"')
         text = text.lower()
         state = Converter.BOOLEAN_STATES.get(text)
         if state is None:
-            raise ValueError('bool value error: "%s"' % value)
+            raise ValueError(f'bool value error: "{value}"')
         return state
 
     # Override
@@ -153,7 +153,7 @@ class BaseConverter(DataConverter):
             return value
         seconds = self.get_float(value=value, default=None)
         if seconds is None or seconds < 0:
-            raise ValueError('Timestamp error: "%s"' % value)
+            raise ValueError(f'Timestamp error: "{value}"')
         else:
             return DateTime(timestamp=seconds)
 

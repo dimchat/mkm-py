@@ -178,7 +178,7 @@ class TransportableData(Stringer, TransportableResource, ABC):
 
 def ted_helper():
     helper = shared_format_extensions.ted_helper
-    assert isinstance(helper, TransportableDataHelper), 'TED helper error: %s' % helper
+    assert isinstance(helper, TransportableDataHelper), f'TED helper error: {helper}'
     return helper
 
 

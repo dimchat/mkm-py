@@ -126,7 +126,7 @@ class Document(TAI, Mapper, ABC):
     def revert(cls, documents: Iterable) -> List[Dict]:
         array = []
         for doc in documents:
-            assert isinstance(doc, Document), 'document error: %s' % doc
+            assert isinstance(doc, Document), f'document error: {doc}'
             array.append(doc.to_dict())
         return array
 

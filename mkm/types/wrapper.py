@@ -206,7 +206,7 @@ class BaseWrapper(DataWrapper):
         elif isinstance(s, str):
             return s
         else:
-            # assert False, 'string error: %s' % s
+            # assert False, f'string error: {s}'
             return str(s)
 
     # Override
@@ -218,7 +218,7 @@ class BaseWrapper(DataWrapper):
         elif isinstance(d, Dict):
             return d
         else:
-            assert False, 'map error: %s' % d
+            assert False, f'map error: {d}'
 
     # Override
     def unwrap(self, o) -> Any:

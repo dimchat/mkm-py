@@ -138,7 +138,7 @@ class ID(Stringer, ABC):
         """
         array = []
         for did in identifiers:
-            assert isinstance(did, ID), 'ID error: %s' % did
+            assert isinstance(did, ID), f'ID error: {did}'
             array.append(str(did))
         return array
 
