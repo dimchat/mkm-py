@@ -52,7 +52,9 @@ class PrivateKey(SignKey, ABC):
 
         :return: public key paired to this private key
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.public_key getter'
+        )
 
     #
     #  Factory methods
@@ -89,7 +91,9 @@ class PrivateKeyFactory(ABC):
 
         :return: PrivateKey
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_private_key()'
+        )
 
     @abstractmethod
     def parse_private_key(self, key: Dict) -> Optional[PrivateKey]:
@@ -99,7 +103,9 @@ class PrivateKeyFactory(ABC):
         :param key: key info
         :return: PrivateKey
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_private_key()'
+        )
 
 
 # -----------------------------------------------------------------------------
@@ -112,30 +118,48 @@ class PrivateKeyHelper(ABC):
 
     @abstractmethod
     def set_private_key_factory(self, algorithm: str, factory: PrivateKeyFactory):
-        raise NotImplemented
+        """ Set private key factory for algorithm """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.set_private_key_factory()'
+        )
 
     @abstractmethod
     def get_private_key_factory(self, algorithm: str) -> Optional[PrivateKeyFactory]:
-        raise NotImplemented
+        """ Get private key factory for algorithm """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_private_key_factory()'
+        )
 
     @abstractmethod
     def generate_private_key(self, algorithm: str) -> Optional[PrivateKey]:
-        raise NotImplemented
+        """ Generate private key with algorithm """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_private_key()'
+        )
 
     @abstractmethod
     def parse_private_key(self, key: Any) -> Optional[PrivateKey]:
-        raise NotImplemented
+        """ Parse any object to private key """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_private_key()'
+        )
 
 
 class PrivateKeyExtension:
 
     @property
     def private_helper(self) -> Optional[PrivateKeyHelper]:
-        raise NotImplemented
+        """ Get private key helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.private_helper getter'
+        )
 
     @private_helper.setter
     def private_helper(self, helper: PrivateKeyHelper):
-        raise NotImplemented
+        """ Set private key helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.private_helper setter'
+        )
 
 
 shared_crypto_extensions.private_helper: Optional[PrivateKeyHelper] = None

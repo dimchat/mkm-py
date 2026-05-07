@@ -64,7 +64,9 @@ class TransportableResource(ABC):
         :return: str for formats 0, 1, 2 (Base64 string, Data URI, or URL)
                  dict for format 3 (structured JSON object as map)
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.serialize()'
+        )
 
 
 class TransportableData(Stringer, TransportableResource, ABC):
@@ -90,7 +92,9 @@ class TransportableData(Stringer, TransportableResource, ABC):
 
         :return: 'base64'
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.encoding getter'
+        )
 
     @abstractmethod
     def to_bytes(self) -> Optional[bytes]:
@@ -99,7 +103,9 @@ class TransportableData(Stringer, TransportableResource, ABC):
 
         :return: plaintext
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.to_bytes()'
+        )
 
     # Override
     @abstractmethod
@@ -109,7 +115,9 @@ class TransportableData(Stringer, TransportableResource, ABC):
 
         :return: size in bytes
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.__len__()'
+        )
 
     @property
     @abstractmethod
@@ -119,7 +127,9 @@ class TransportableData(Stringer, TransportableResource, ABC):
 
         :return: True or False
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.is_empty getter'
+        )
 
     # Override
     @abstractmethod
@@ -130,7 +140,9 @@ class TransportableData(Stringer, TransportableResource, ABC):
         :return: '{BASE64_ENCODE}', or
                  'data:image/png;base64,{BASE64_ENCODE}'
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.__str__()'
+        )
 
     # Override
     @abstractmethod
@@ -140,7 +152,9 @@ class TransportableData(Stringer, TransportableResource, ABC):
 
         :return: Encoded string representation (format 0 or 1)
         """
-        return NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.serialize()'
+        )
 
     #
     #  Factory methods
@@ -179,7 +193,9 @@ class TransportableDataFactory(ABC):
         :param ted: Encoded string in TED format (0 or 1)
         :return: TED object
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_transportable_data()'
+        )
 
 
 # -----------------------------------------------------------------------------
@@ -192,15 +208,24 @@ class TransportableDataHelper(ABC):
 
     @abstractmethod
     def set_transportable_data_factory(self, factory: TransportableDataFactory):
-        raise NotImplemented
+        """ Set factory for TED """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.set_transportable_data_factory()'
+        )
 
     @abstractmethod
     def get_transportable_data_factory(self) -> Optional[TransportableDataFactory]:
-        raise NotImplemented
+        """ Get factory for TED """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_transportable_data_factory()'
+        )
 
     @abstractmethod
     def parse_transportable_data(self, ted: Any) -> Optional[TransportableData]:
-        raise NotImplemented
+        """ Parse any object to TED """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_transportable_data()'
+        )
 
 
 @Singleton
@@ -208,10 +233,12 @@ class FormatExtensions:
 
     @property
     def ted_helper(self) -> Optional[TransportableDataHelper]:
+        """ Get TED helper """
         return _TedExt.ted_helper
 
     @ted_helper.setter
     def ted_helper(self, helper: Optional[TransportableDataHelper]):
+        """ Set TED helper """
         _TedExt.ted_helper = helper
 
 

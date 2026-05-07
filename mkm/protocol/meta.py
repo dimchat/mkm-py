@@ -67,7 +67,9 @@ class Meta(Mapper, ABC):
             4 = ETH : eth_address
             ...
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.type getter'
+        )
 
     @property
     @abstractmethod
@@ -80,7 +82,9 @@ class Meta(Mapper, ABC):
 
         :return: public key
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.public_key getter'
+        )
 
     @property
     @abstractmethod
@@ -90,7 +94,9 @@ class Meta(Mapper, ABC):
 
         :return: ID.name
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.seed getter'
+        )
 
     @property
     @abstractmethod
@@ -103,7 +109,9 @@ class Meta(Mapper, ABC):
 
         :return: signature
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.fingerprint getter'
+        )
 
     #
     #   Validation
@@ -118,7 +126,9 @@ class Meta(Mapper, ABC):
 
         :return: True on valid
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.is_valid getter'
+        )
 
     @abstractmethod
     def generate_address(self, network: int = None) -> Address:
@@ -128,7 +138,9 @@ class Meta(Mapper, ABC):
         :param network:  Address.type
         :return: Address
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_address()'
+        )
 
     #
     #   Factory methods
@@ -173,7 +185,9 @@ class MetaFactory(ABC):
         :param seed:        ID.name
         :return: Meta
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_meta()'
+        )
 
     @abstractmethod
     def create_meta(self, public_key: VerifyKey, seed: Optional[str], fingerprint: Optional[TransportableData]) -> Meta:
@@ -185,7 +199,9 @@ class MetaFactory(ABC):
         :param fingerprint: private_key.sign(seed)
         :return: Meta
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.create_meta()'
+        )
 
     @abstractmethod
     def parse_meta(self, meta: Dict) -> Optional[Meta]:
@@ -195,7 +211,9 @@ class MetaFactory(ABC):
         :param meta: meta info
         :return: Meta
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_meta()'
+        )
 
 
 # -----------------------------------------------------------------------------
@@ -208,35 +226,56 @@ class MetaHelper(ABC):
 
     @abstractmethod
     def set_meta_factory(self, version: str, factory: MetaFactory):
-        raise NotImplemented
+        """ Set meta factory for type (version) """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.set_meta_factory()'
+        )
 
     @abstractmethod
     def get_meta_factory(self, version: str) -> Optional[MetaFactory]:
-        raise NotImplemented
+        """ Get meta factory for type (version) """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_meta_factory()'
+        )
 
     @abstractmethod
     def generate_meta(self, version: str, private_key: SignKey, seed: Optional[str]) -> Meta:
-        raise NotImplemented
+        """ Generate meta from private key and seed for type (version) """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_meta()'
+        )
 
     @abstractmethod
     def create_meta(self, version: str, public_key: VerifyKey,
                     seed: Optional[str], fingerprint: Optional[TransportableData]) -> Meta:
-        raise NotImplemented
+        """ Create meta with public key and seed, fingerprint for type (version) """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.create_meta()'
+        )
 
     @abstractmethod
     def parse_meta(self, meta: Any) -> Optional[Meta]:
-        raise NotImplemented
+        """ Parse any object to meta """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_meta()'
+        )
 
 
 class MetaExtension:
 
     @property
     def meta_helper(self) -> Optional[MetaHelper]:
-        raise NotImplemented
+        """ Get meta helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.meta_helper'
+        )
 
     @meta_helper.setter
     def meta_helper(self, helper: MetaHelper):
-        raise NotImplemented
+        """ Set meta helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.meta_helper setter'
+        )
 
 
 shared_account_extensions.meta_helper: Optional[MetaHelper] = None

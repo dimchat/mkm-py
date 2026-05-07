@@ -41,27 +41,45 @@ class DataCopier(ABC):
 
     @abstractmethod
     def copy(self, o: Any) -> Any:
-        raise NotImplemented
+        """ Shallow copy any object """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.copy()'
+        )
 
     @abstractmethod
     def copy_map(self, d: Dict) -> Dict:
-        raise NotImplemented
+        """ Shallow copy the map """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.copy_map()'
+        )
 
     @abstractmethod
     def copy_list(self, a: List) -> List:
-        raise NotImplemented
+        """ Shallow copy the list """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.copy_list()'
+        )
 
     @abstractmethod
     def deep_copy(self, o: Any) -> Any:
-        raise NotImplemented
+        """ Deep copy any object """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.deep_copy()'
+        )
 
     @abstractmethod
     def deep_copy_map(self, d: Dict) -> Dict:
-        raise NotImplemented
+        """ Deep copy the map """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.deep_copy_map()'
+        )
 
     @abstractmethod
     def deep_copy_list(self, a: List) -> List:
-        raise NotImplemented
+        """ Deep copy the list """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.deep_copy_list()'
+        )
 
 
 class BaseCopier(DataCopier):

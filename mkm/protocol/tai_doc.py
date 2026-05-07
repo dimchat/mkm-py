@@ -61,7 +61,9 @@ class Document(TAI, Mapper, ABC):
     #
     #     :return: Entity ID
     #     """
-    #     raise NotImplemented
+    #     raise NotImplementedError(
+    #         f'Not implemented: {type(self).__module__}.{type(self).__name__}.identifier getter'
+    #     )
 
     #
     #  properties getter/setter
@@ -75,7 +77,9 @@ class Document(TAI, Mapper, ABC):
 
         :return: timestamp
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.time getter'
+        )
 
     # @property
     # @abstractmethod
@@ -85,7 +89,10 @@ class Document(TAI, Mapper, ABC):
     #
     #     :return: name string
     #     """
-    #     raise NotImplemented
+    #     raise NotImplementedError(
+    #         f'Not implemented: {type(self).__module__}.{type(self).__name__}.name getter'
+    #     )
+    #
     #
     # @name.setter
     # @abstractmethod
@@ -96,7 +103,9 @@ class Document(TAI, Mapper, ABC):
     #     :param string: name string
     #     :return:
     #     """
-    #     raise NotImplemented
+    #     raise NotImplementedError(
+    #         f'Not implemented: {type(self).__module__}.{type(self).__name__}.name setter'
+    #     )
 
     #
     #   Conveniences
@@ -160,7 +169,9 @@ class DocumentFactory(ABC):
         :param signature:  document signature
         :return: Document
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.create_document()'
+        )
 
     @abstractmethod
     def parse_document(self, document: Dict) -> Optional[Document]:
@@ -170,7 +181,9 @@ class DocumentFactory(ABC):
         :param document:
         :return:
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_document()'
+        )
 
 
 # -----------------------------------------------------------------------------
@@ -183,30 +196,48 @@ class DocumentHelper(ABC):
 
     @abstractmethod
     def set_document_factory(self, doc_type: str, factory: DocumentFactory):
-        raise NotImplemented
+        """ Set document factory for type """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.set_document_factory()'
+        )
 
     @abstractmethod
     def get_document_factory(self, doc_type: str) -> Optional[DocumentFactory]:
-        raise NotImplemented
+        """ Get document factory for type """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_document_factory()'
+        )
 
     @abstractmethod
     def create_document(self, doc_type: str, data: Optional[str], signature: Optional[TransportableData]) -> Document:
-        raise NotImplemented
+        """ Create document with data and signature for type """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.create_document()'
+        )
 
     @abstractmethod
     def parse_document(self, document: Any) -> Optional[Document]:
-        raise NotImplemented
+        """ Parse any object to document """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_document()'
+        )
 
 
 class DocumentExtension:
 
     @property
     def doc_helper(self) -> Optional[DocumentHelper]:
-        raise NotImplemented
+        """ Get document helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.doc_helper getter'
+        )
 
     @doc_helper.setter
     def doc_helper(self, helper: DocumentHelper):
-        raise NotImplemented
+        """ Set document helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.doc_helper setter'
+        )
 
 
 shared_account_extensions.doc_helper: Optional[DocumentHelper] = None

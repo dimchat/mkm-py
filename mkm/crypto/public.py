@@ -74,7 +74,9 @@ class PublicKeyFactory(ABC):
         :param key: key info
         :return: PublicKey
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_public_key()'
+        )
 
 
 # -----------------------------------------------------------------------------
@@ -86,26 +88,41 @@ class PublicKeyHelper(ABC):
 
     @abstractmethod
     def set_public_key_factory(self, algorithm: str, factory: PublicKeyFactory):
-        raise NotImplemented
+        """ Set public key factory for algorithm """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.set_public_key_factory()'
+        )
 
     @abstractmethod
     def get_public_key_factory(self, algorithm: str) -> Optional[PublicKeyFactory]:
-        raise NotImplemented
+        """ Get public key factory for algorithm """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_public_key_factory()'
+        )
 
     @abstractmethod
     def parse_public_key(self, key: Any) -> Optional[PublicKey]:
-        raise NotImplemented
+        """ Parse any object to public key """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_public_key()'
+        )
 
 
 class PublicKeyExtension:
 
     @property
     def public_helper(self) -> Optional[PublicKeyHelper]:
-        raise NotImplemented
+        """ Get public key helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.public_helper getter'
+        )
 
     @public_helper.setter
     def public_helper(self, helper: PublicKeyHelper):
-        raise NotImplemented
+        """ Set public key helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.public_helper setter'
+        )
 
 
 shared_crypto_extensions.public_helper: Optional[PublicKeyHelper] = None

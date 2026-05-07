@@ -41,26 +41,41 @@ class GeneralAccountHelper(ABC):
 
     @abstractmethod
     def get_meta_type(self, meta: Dict, default: Optional[str] = None) -> Optional[str]:
-        raise NotImplemented
+        """ Get type from the meta info """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_meta_type()'
+        )
 
     @abstractmethod
     def get_document_type(self, document: Dict, default: Optional[str] = None) -> Optional[str]:
-        raise NotImplemented
+        """ Get type from the document info """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_document_type()'
+        )
 
     @abstractmethod
     def get_document_id(self, document: Dict) -> Optional[ID]:
-        raise NotImplemented
+        """ Get did from the document info """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_document_id()'
+        )
 
 
 class GeneralAccountExtension:
 
     @property
     def helper(self) -> Optional[GeneralAccountHelper]:
-        raise NotImplemented
+        """ Get general account helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.helper getter'
+        )
 
     @helper.setter
     def helper(self, delegate: GeneralAccountHelper):
-        raise NotImplemented
+        """ Set general account helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.helper setter'
+        )
 
 
 shared_account_extensions.helper: Optional[GeneralAccountHelper] = None

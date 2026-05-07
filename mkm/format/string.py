@@ -45,7 +45,9 @@ class StringCoder(ABC):
         :param string: local string
         :return: binary data
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.encode()'
+        )
 
     @abstractmethod
     def decode(self, data: bytes) -> Optional[str]:
@@ -55,7 +57,9 @@ class StringCoder(ABC):
         :param data: binary data
         :return: local string
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.decode()'
+        )
 
 
 class UTF8:

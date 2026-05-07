@@ -37,7 +37,10 @@ class MessageDigester(ABC):
 
     @abstractmethod
     def digest(self, data: bytes) -> bytes:
-        raise NotImplemented
+        """ Get message digest """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.digest()'
+        )
 
 
 class SHA256:

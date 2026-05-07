@@ -53,7 +53,9 @@ class TAI(ABC):
 
         :return: True on matched
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.is_valid getter'
+        )
 
     #
     #  signature
@@ -67,7 +69,9 @@ class TAI(ABC):
         :param public_key: public key in meta.key
         :return: True on signature matched
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.verify()'
+        )
 
     @abstractmethod
     def sign(self, private_key: SignKey) -> Optional[bytes]:
@@ -77,7 +81,9 @@ class TAI(ABC):
         :param private_key: private key match meta.key
         :return: signature, None on error
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.sign()'
+        )
 
     #
     #  properties
@@ -91,7 +97,9 @@ class TAI(ABC):
 
         :return: inner dictionary
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.properties getter'
+        )
 
     @abstractmethod
     def get_property(self, name: str) -> Optional[Any]:
@@ -101,7 +109,9 @@ class TAI(ABC):
         :param name: property key
         :return: property value
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_property()'
+        )
 
     @abstractmethod
     def set_property(self, name: str, value: Optional[Any]):
@@ -112,4 +122,6 @@ class TAI(ABC):
         :param name:  property key
         :param value: property value
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.set_property()'
+        )

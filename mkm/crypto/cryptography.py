@@ -52,7 +52,9 @@ class CryptographyKey(Mapper, ABC):
 
         :return: algorithm name
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.algorithm getter'
+        )
 
     @property
     @abstractmethod
@@ -62,7 +64,9 @@ class CryptographyKey(Mapper, ABC):
 
         :return: key data
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.data getter'
+        )
 
 
 class EncryptKey(CryptographyKey, ABC):
@@ -79,7 +83,9 @@ class EncryptKey(CryptographyKey, ABC):
         :param extra:     store extra variables ('IV' for 'AES')
         :return: ciphertext
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.encrypt()'
+        )
 
 
 class DecryptKey(CryptographyKey, ABC):
@@ -96,7 +102,9 @@ class DecryptKey(CryptographyKey, ABC):
         :param params:     extra params ('IV' for 'AES')
         :return: plaintext
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.decrypt()'
+        )
 
     @abstractmethod
     def match_encrypt_key(self, key: EncryptKey) -> bool:
@@ -107,7 +115,9 @@ class DecryptKey(CryptographyKey, ABC):
         :param key: encrypt (public) key
         :return: False on error
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.match_encrypt_key()'
+        )
 
 
 # -----------------------------------------------------------------------------

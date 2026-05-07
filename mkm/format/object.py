@@ -49,7 +49,9 @@ class ObjectCoder(Generic[T], ABC):
         :param container: Map or List
         :return: serialized string
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.encode()'
+        )
 
     @abstractmethod
     def decode(self, string: str) -> Optional[T]:
@@ -59,7 +61,9 @@ class ObjectCoder(Generic[T], ABC):
         :param string: serialized string
         :return: Map or List
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.decode()'
+        )
 
 
 class JSON:

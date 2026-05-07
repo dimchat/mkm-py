@@ -46,7 +46,9 @@ class SignKey(AsymmetricKey, ABC):
         :param data: message data
         :return: signature
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.sign()'
+        )
 
 
 class VerifyKey(AsymmetricKey, ABC):
@@ -60,7 +62,9 @@ class VerifyKey(AsymmetricKey, ABC):
         :param signature: signature of message data
         :return: True on signature matched
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.verify()'
+        )
 
     @abstractmethod
     def match_sign_key(self, key: SignKey) -> bool:
@@ -71,4 +75,6 @@ class VerifyKey(AsymmetricKey, ABC):
         :param key: private key
         :return: True on signature matched
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.match_sign_key()'
+        )

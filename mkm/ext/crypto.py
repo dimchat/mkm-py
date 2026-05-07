@@ -63,18 +63,27 @@ class GeneralCryptoHelper(ABC):
 
     @abstractmethod
     def get_key_algorithm(self, key: Dict, default: Optional[str] = None) -> Optional[str]:
-        raise NotImplemented
+        """ Get algorithm from tje key info """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_key_algorithm()'
+        )
 
 
 class GeneralCryptoExtension:
 
     @property
     def helper(self) -> Optional[GeneralCryptoHelper]:
-        raise NotImplemented
+        """ Get general crypto helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.helper getter'
+        )
 
     @helper.setter
     def helper(self, delegate: GeneralCryptoHelper):
-        raise NotImplemented
+        """ Set general crypto helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.helper setter'
+        )
 
 
 shared_crypto_extensions.helper: Optional[GeneralCryptoHelper] = None

@@ -82,7 +82,9 @@ class SymmetricKeyFactory(ABC):
 
         :return: SymmetricKey
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_symmetric_key()'
+        )
 
     @abstractmethod
     def parse_symmetric_key(self, key: Dict) -> Optional[SymmetricKey]:
@@ -92,7 +94,9 @@ class SymmetricKeyFactory(ABC):
         :param key: key info
         :return: SymmetricKey
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_symmetric_key()'
+        )
 
 
 # -----------------------------------------------------------------------------
@@ -105,30 +109,48 @@ class SymmetricKeyHelper(ABC):
 
     @abstractmethod
     def set_symmetric_key_factory(self, algorithm: str, factory: SymmetricKeyFactory):
-        raise NotImplemented
+        """ Set symmetric key factory for algorithm """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.set_symmetric_key_factory()'
+        )
 
     @abstractmethod
     def get_symmetric_key_factory(self, algorithm: str) -> Optional[SymmetricKeyFactory]:
-        raise NotImplemented
+        """ Get symmetric key factory for algorithm """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_symmetric_key_factory()'
+        )
 
     @abstractmethod
     def generate_symmetric_key(self, algorithm: str) -> Optional[SymmetricKey]:
-        raise NotImplemented
+        """ Generate symmetric key with algorithm """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_symmetric_key()'
+        )
 
     @abstractmethod
     def parse_symmetric_key(self, key: Any) -> Optional[SymmetricKey]:
-        raise NotImplemented
+        """ Parse any object to symmetric key """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_symmetric_key()'
+        )
 
 
 class SymmetricKeyExtension:
 
     @property
     def symmetric_helper(self) -> Optional[SymmetricKeyHelper]:
-        raise NotImplemented
+        """ Get symmetric key helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.symmetric_helper getter'
+        )
 
     @symmetric_helper.setter
     def symmetric_helper(self, helper: SymmetricKeyHelper):
-        raise NotImplemented
+        """ Set symmetric key helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.symmetric_helper setter'
+        )
 
 
 shared_crypto_extensions.symmetric_helper: Optional[SymmetricKeyHelper] = None

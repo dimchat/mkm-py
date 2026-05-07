@@ -54,7 +54,9 @@ class Address(Stringer, ABC):
 
         :return: 0 ~ 255
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.network getter'
+        )
 
     #
     #   Factory methods
@@ -93,7 +95,9 @@ class AddressFactory(ABC):
         :param network: address type
         :return: Address
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_address()'
+        )
 
     @abstractmethod
     def parse_address(self, address: str) -> Optional[Address]:
@@ -103,7 +107,9 @@ class AddressFactory(ABC):
         :param address: address string
         :return: Address
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_address()'
+        )
 
 
 # -----------------------------------------------------------------------------
@@ -116,30 +122,48 @@ class AddressHelper(ABC):
 
     @abstractmethod
     def set_address_factory(self, factory: AddressFactory):
-        raise NotImplemented
+        """ Set address factory """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.set_address_factory()'
+        )
 
     @abstractmethod
     def get_address_factory(self) -> Optional[AddressFactory]:
-        raise NotImplemented
+        """ Get address factory """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_address_factory()'
+        )
 
     @abstractmethod
     def generate_address(self, meta, network: Optional[int]) -> Address:
-        raise NotImplemented
+        """ Generate address from meta with network id """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_address()'
+        )
 
     @abstractmethod
     def parse_address(self, address: Any) -> Optional[Address]:
-        raise NotImplemented
+        """ Parse any object to address """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_address()'
+        )
 
 
 class AddressExtension:
 
     @property
     def address_helper(self) -> Optional[AddressHelper]:
-        raise NotImplemented
+        """ Get address helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.address_helper getter'
+        )
 
     @address_helper.setter
     def address_helper(self, helper: AddressHelper):
-        raise NotImplemented
+        """ Set address helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.address_helper setter'
+        )
 
 
 shared_account_extensions.address_helper: Optional[AddressHelper] = None

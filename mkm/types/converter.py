@@ -29,27 +29,49 @@ from typing import Any, Optional
 from .x import DateTime
 
 
+######################
+#                    #
+#   Data Converter   #
+#                    #
+######################
+
+
 class DataConverter(ABC):
 
     @abstractmethod
     def get_str(self, value: Any, default: Optional[str]) -> Optional[str]:
-        raise NotImplemented
+        """ Convert the value to a string, if value is None, return the default value """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_str()'
+        )
 
     @abstractmethod
     def get_bool(self, value: Any, default: Optional[bool]) -> Optional[bool]:
-        raise NotImplemented
+        """ Convert the value to a boolean value, if value is None, return the default value """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_bool()'
+        )
 
     @abstractmethod
     def get_int(self, value: Any, default: Optional[int]) -> Optional[int]:
-        raise NotImplemented
+        """ Convert the value to a integer, if value is None, return the default value """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_int()'
+        )
 
     @abstractmethod
     def get_float(self, value: Any, default: Optional[float]) -> Optional[float]:
-        raise NotImplemented
+        """ Convert the value to a float number, if value is None, return the default value """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_float()'
+        )
 
     @abstractmethod
     def get_datetime(self, value: Any, default: Optional[DateTime]) -> Optional[DateTime]:
-        raise NotImplemented
+        """ Convert the value to a DateTime object, if value is None, return the default value """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_datetime()'
+        )
 
 
 class BaseConverter(DataConverter):

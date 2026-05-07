@@ -45,7 +45,9 @@ class DataCoder(ABC):
         :param data: binary data
         :return:     text string (Base58/64, Hex, ...)
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.encode()'
+        )
 
     @abstractmethod
     def decode(self, string: str) -> Optional[bytes]:
@@ -55,7 +57,9 @@ class DataCoder(ABC):
         :param string: text string (Base58/64, Hex, ...)
         :return:       binary data
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.decode()'
+        )
 
 
 class Hex:

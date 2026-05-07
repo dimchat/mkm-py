@@ -53,17 +53,23 @@ class ID(Stringer, ABC):
     @property
     @abstractmethod
     def name(self) -> Optional[str]:
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.name getter'
+        )
 
     @property
     @abstractmethod
     def address(self) -> Address:
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.address getter'
+        )
 
     @property
     @abstractmethod
     def terminal(self) -> Optional[str]:
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.terminal getter'
+        )
 
     #
     #   ID types
@@ -73,25 +79,33 @@ class ID(Stringer, ABC):
     @abstractmethod
     def type(self) -> int:
         # return self.address.network
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.type getter'
+        )
 
     @property
     @abstractmethod
     def is_broadcast(self) -> bool:
         # return EntityType.is_broadcast(type)
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.is_broadcast getter'
+        )
 
     @property
     @abstractmethod
     def is_user(self) -> bool:
         # return EntityType.is_user(type)
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.is_user getter'
+        )
 
     @property
     @abstractmethod
     def is_group(self) -> bool:
         # return EntityType.is_group(type)
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.is_group getter'
+        )
 
     #
     #   Conveniences
@@ -171,7 +185,9 @@ class IDFactory(ABC):
         :param terminal: ID.terminal
         :return: ID
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_id()'
+        )
 
     @abstractmethod
     def create_id(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
@@ -183,7 +199,9 @@ class IDFactory(ABC):
         :param terminal: ID.terminal
         :return: ID
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.create_id()'
+        )
 
     @abstractmethod
     def parse_id(self, identifier: str) -> Optional[ID]:
@@ -193,7 +211,9 @@ class IDFactory(ABC):
         :param identifier: ID string
         :return: ID
         """
-        raise NotImplemented
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_id()'
+        )
 
 
 # -----------------------------------------------------------------------------
@@ -206,34 +226,55 @@ class IDHelper(ABC):
 
     @abstractmethod
     def set_id_factory(self, factory: IDFactory):
-        raise NotImplemented
+        """ Set ID factory """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.set_id_factory()'
+        )
 
     @abstractmethod
     def get_id_factory(self) -> Optional[IDFactory]:
-        raise NotImplemented
+        """ Get ID factory """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_id_factory()'
+        )
 
     @abstractmethod
     def generate_id(self, meta, network: Optional[int], terminal: Optional[str]) -> ID:
-        raise NotImplemented
+        """ Generate ID from meta with terminal """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_id()'
+        )
 
     @abstractmethod
     def create_id(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
-        raise NotImplemented
+        """ Create ID with name, address and terminal """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.create_id()'
+        )
 
     @abstractmethod
     def parse_id(self, identifier: Any) -> Optional[ID]:
-        raise NotImplemented
+        """ Parse any object to ID """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_id()'
+        )
 
 
 class IDExtension:
 
     @property
     def id_helper(self) -> Optional[IDHelper]:
-        raise NotImplemented
+        """ Get ID helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.id_helper getter'
+        )
 
     @id_helper.setter
     def id_helper(self, helper: IDHelper):
-        raise NotImplemented
+        """ Set ID helper """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.id_helper setter'
+        )
 
 
 shared_account_extensions.id_helper: Optional[IDHelper] = None
