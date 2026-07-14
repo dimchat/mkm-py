@@ -122,16 +122,17 @@ class BaseCopier(DataCopier):
     # Override
     def deep_copy_map(self, d: Dict) -> Dict:
         dictionary = {}
-        for k in d:
-            v = d[k]
-            dictionary[k] = self.deep_copy(v)
+        for key, value in d.items():
+            clone = self.deep_copy(value)
+            dictionary[key] = clone
         return dictionary
 
     # Override
     def deep_copy_list(self, a: List) -> List:
         array = []
         for item in a:
-            array.append(self.deep_copy(item))
+            clone = self.deep_copy(item)
+            array.append(clone)
         return array
 
 

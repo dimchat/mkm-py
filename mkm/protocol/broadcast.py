@@ -28,7 +28,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-from typing import Optional, Union
+from typing import Optional, Union, Any
 
 from ..types import ConstantString
 from .entity import EntityType
@@ -58,7 +58,7 @@ class Identifier(ConstantString, ID):
 
     @property  # Override
     def type(self) -> int:
-        return self.__address.network
+        return self.address.network
 
     @property  # Override
     def is_broadcast(self) -> bool:
@@ -74,6 +74,58 @@ class Identifier(ConstantString, ID):
     def is_group(self) -> bool:
         network = self.type
         return EntityType.is_group(network=network)
+
+    # Override
+    def is_same_as(self, other: Any) -> bool:
+        other = ID.parse(identifier=other)
+        if other is None:
+            # should not happen
+            return False
+        elif other is self:
+            # same object
+            return True
+        #
+        #  1. check address
+        #
+        if self.address != other.address:
+            # addresses not equal,
+            # sure not the same entity
+            return False
+        #
+        #  2. check name
+        #
+        this_name = self.name or ''
+        that_name = other.name or ''
+        return this_name == that_name
+
+    # Override
+    def without_terminal(self) -> ID:
+        # check self terminal (device)
+        device = self.terminal
+        if device is None:  # or len(device) == 0:
+            # nothing changed
+            return self
+        # create new ID without terminal
+        return ID.create(name=self.name, address=self.address)
+
+    # Override
+    def with_terminal(self, terminal: str) -> ID:
+        # check self terminal (device)
+        device = self.terminal
+        if terminal is None or len(terminal) == 0:
+            # should not happen
+            if device is None or len(device) == 0:
+                return self
+            else:
+                return ID.create(name=self.name, address=self.address)
+        # new terminal not empty (normally),
+        # try to add/replace terminal
+        if terminal == device:
+            # self terminal equals to the new terminal,
+            # nothing changed
+            return self
+        # create new ID with terminal
+        return ID.create(name=self.name, address=self.address, terminal=terminal)
 
     #
     #   Factory

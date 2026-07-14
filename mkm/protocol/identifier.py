@@ -38,7 +38,8 @@ from .entity import shared_account_extensions
 
 
 class ID(Stringer, ABC):
-    """
+    """This class is used to build ID for entity
+
         ID for entity (User/Group)
         ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -105,6 +106,36 @@ class ID(Stringer, ABC):
         # return EntityType.is_group(type)
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.is_group getter'
+        )
+
+    #
+    #   Comparison
+    #
+
+    @abstractmethod
+    def is_same_as(self, other: Any) -> bool:
+        """ Check Naked ID """
+        # return self.name == other.name and self.address == other.address
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.is_same_as()'
+        )
+
+    #
+    #   Rebuild
+    #
+
+    @abstractmethod
+    def without_terminal(self):  # -> ID:
+        """ Naked ID: name@address """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.without_terminal()'
+        )
+
+    @abstractmethod
+    def with_terminal(self, terminal: str):  # -> ID:
+        """ Dressed ID: name@address/terminal """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.with_terminal()'
         )
 
     #

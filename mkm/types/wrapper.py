@@ -240,8 +240,7 @@ class BaseWrapper(DataWrapper):
         if isinstance(d, Mapper):
             d = d.to_dict()
         dictionary = {}
-        for key in d:
-            value = d[key]
+        for key, value in d.items():
             naked = self.unwrap(value)
             dictionary[key] = naked
         return dictionary

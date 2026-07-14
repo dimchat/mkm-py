@@ -24,7 +24,7 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Union, Any
+from typing import Optional, Union, Any, Dict
 
 from ..types import Singleton
 from ..types import Stringer
@@ -57,7 +57,7 @@ class TransportableResource(ABC):
     """
 
     @abstractmethod
-    def serialize(self) -> Union[str, dict]:
+    def serialize(self) -> Union[str, Dict]:
         """
         Serializes the resource into a transportable format.
 

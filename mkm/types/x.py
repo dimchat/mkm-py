@@ -141,6 +141,16 @@ class DateTime:
         return other - self.__timestamp
 
     # Override
+    def __pos__(self) -> float:
+        """ +self """
+        return self.__timestamp.__pos__()
+
+    # Override
+    def __neg__(self) -> float:
+        """ -self """
+        return self.__timestamp.__neg__()
+
+    # Override
     def __str__(self):
         """ Return str(self). """
         return time.strftime('%Y-%m-%d %H:%M:%S', self.localtime)

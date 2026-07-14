@@ -53,59 +53,17 @@ class Document(TAI, Mapper, ABC):
             }
     """
 
-    # @property
-    # @abstractmethod
-    # def identifier(self) -> ID:
-    #     """
-    #     Get entity ID
-    #
-    #     :return: Entity ID
-    #     """
-    #     raise NotImplementedError(
-    #         f'Not implemented: {type(self).__module__}.{type(self).__name__}.identifier getter'
-    #     )
-
-    #
-    #  properties getter/setter
-    #
-
     @property
     @abstractmethod
     def time(self) -> Optional[DateTime]:
         """
-        Get sign time
+        Get signature time from properties (data)
 
         :return: timestamp
         """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.time getter'
         )
-
-    # @property
-    # @abstractmethod
-    # def name(self) -> Optional[str]:
-    #     """
-    #     Get entity name
-    #
-    #     :return: name string
-    #     """
-    #     raise NotImplementedError(
-    #         f'Not implemented: {type(self).__module__}.{type(self).__name__}.name getter'
-    #     )
-    #
-    #
-    # @name.setter
-    # @abstractmethod
-    # def name(self, string: str):
-    #     """
-    #     Set entity name
-    #
-    #     :param string: name string
-    #     :return:
-    #     """
-    #     raise NotImplementedError(
-    #         f'Not implemented: {type(self).__module__}.{type(self).__name__}.name setter'
-    #     )
 
     #
     #   Conveniences
