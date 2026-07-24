@@ -24,7 +24,8 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any, Dict
+from collections.abc import Mapping
+from typing import Optional, Any
 
 from .asymmetric import VerifyKey
 from .cryptography import shared_crypto_extensions
@@ -67,7 +68,7 @@ class PublicKey(VerifyKey, ABC):
 class PublicKeyFactory(ABC):
 
     @abstractmethod
-    def parse_public_key(self, key: Dict) -> Optional[PublicKey]:
+    def parse_public_key(self, key: Mapping) -> Optional[PublicKey]:
         """
         Parse map object to key
 

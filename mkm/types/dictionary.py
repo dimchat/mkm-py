@@ -23,8 +23,9 @@
 # SOFTWARE.
 # ==============================================================================
 
-from typing import Optional, Iterator, Any, Tuple, Dict
-from typing import Mapping, ItemsView, KeysView, ValuesView
+from collections.abc import Mapping
+from typing import Optional, Iterator, Any, Tuple
+from typing import ItemsView, KeysView, ValuesView
 
 from .x import DateTime
 from .string import Stringer
@@ -40,7 +41,7 @@ class Dictionary(Mapper):
         A container sharing the same inner dictionary
     """
 
-    def __init__(self, dictionary: Optional[Dict] = None):
+    def __init__(self, dictionary: Optional[Mapping] = None):
         super().__init__()
         if dictionary is None:
             dictionary = {}
@@ -49,11 +50,11 @@ class Dictionary(Mapper):
         self.__dictionary = dictionary
 
     # Override
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Mapping[str, Any]:
         return self.__dictionary
 
     # Override
-    def copy_dict(self, deep_copy: bool = False) -> Dict[str, Any]:
+    def copy_dict(self, deep_copy: bool = False) -> Mapping[str, Any]:
         if deep_copy:
             return Copier.deep_copy(self.__dictionary)
         else:
@@ -179,7 +180,7 @@ class Dictionary(Mapper):
         """ Delete self[key]. """
         self.__dictionary.__delitem__(v)
 
-    def __eq__(self, o: Dict) -> bool:
+    def __eq__(self, o: Mapping) -> bool:
         """ Return self==value. """
         if isinstance(o, Mapper):
             if self is o:
@@ -223,7 +224,7 @@ class Dictionary(Mapper):
         """ Return self<value. """
         pass
 
-    def __ne__(self, o: Dict) -> bool:
+    def __ne__(self, o: Mapping) -> bool:
         """ Return self!=value. """
         if isinstance(o, Mapper):
             if self is o:

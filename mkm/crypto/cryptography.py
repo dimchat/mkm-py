@@ -24,7 +24,8 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Dict
+from collections.abc import Mapping
+from typing import Optional
 
 from ..types import Singleton
 from ..types import Mapper
@@ -72,7 +73,7 @@ class CryptographyKey(Mapper, ABC):
 class EncryptKey(CryptographyKey, ABC):
 
     @abstractmethod
-    def encrypt(self, plaintext: bytes, extra: Optional[Dict] = None) -> bytes:
+    def encrypt(self, plaintext: bytes, extra: Optional[Mapping] = None) -> bytes:
         """
         1. Symmetric Key:
             ciphertext = encrypt(plaintext, PW)
@@ -91,7 +92,7 @@ class EncryptKey(CryptographyKey, ABC):
 class DecryptKey(CryptographyKey, ABC):
 
     @abstractmethod
-    def decrypt(self, ciphertext: bytes, params: Optional[Dict] = None) -> Optional[bytes]:
+    def decrypt(self, ciphertext: bytes, params: Optional[Mapping] = None) -> Optional[bytes]:
         """
         1. Symmetric Key:
             plaintext = decrypt(ciphertext, PW)

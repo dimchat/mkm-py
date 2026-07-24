@@ -24,7 +24,8 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any, Dict
+from collections.abc import Mapping
+from typing import Optional, Any
 
 from .asymmetric import SignKey
 from .public import PublicKey
@@ -96,7 +97,7 @@ class PrivateKeyFactory(ABC):
         )
 
     @abstractmethod
-    def parse_private_key(self, key: Dict) -> Optional[PrivateKey]:
+    def parse_private_key(self, key: Mapping) -> Optional[PrivateKey]:
         """
         Parse map object to key
 

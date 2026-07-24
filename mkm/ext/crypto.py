@@ -24,7 +24,8 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Dict
+from collections.abc import Mapping
+from typing import Optional
 
 from ..crypto import SignKey, VerifyKey
 from ..crypto import EncryptKey, DecryptKey
@@ -62,7 +63,7 @@ class GeneralCryptoHelper(ABC):
     #
 
     @abstractmethod
-    def get_key_algorithm(self, key: Dict, default: Optional[str] = None) -> Optional[str]:
+    def get_key_algorithm(self, key: Mapping, default: Optional[str] = None) -> Optional[str]:
         """ Get algorithm from tje key info """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_key_algorithm()'

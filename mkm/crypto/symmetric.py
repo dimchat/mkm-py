@@ -24,7 +24,8 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any, Dict
+from collections.abc import Mapping
+from typing import Optional, Any
 
 from .cryptography import EncryptKey, DecryptKey
 from .cryptography import shared_crypto_extensions
@@ -87,7 +88,7 @@ class SymmetricKeyFactory(ABC):
         )
 
     @abstractmethod
-    def parse_symmetric_key(self, key: Dict) -> Optional[SymmetricKey]:
+    def parse_symmetric_key(self, key: Mapping) -> Optional[SymmetricKey]:
         """
         Parse map object to key
 

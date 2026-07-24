@@ -24,7 +24,8 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any, MutableMapping, Dict, List
+from collections.abc import Mapping, MutableMapping
+from typing import Optional, Any, List
 
 from .x import DateTime
 
@@ -136,14 +137,14 @@ class Mapper(MutableMapping[str, Any], ABC):
         )
 
     @abstractmethod
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Mapping[str, Any]:
         """ Get inner map """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.to_dict()'
         )
 
     @abstractmethod
-    def copy_dict(self, deep_copy: bool = False) -> Dict[str, Any]:
+    def copy_dict(self, deep_copy: bool = False) -> Mapping[str, Any]:
         """ Copy inner map """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.copy_dict()'
@@ -167,8 +168,8 @@ class DataWrapper(ABC):
         )
 
     @abstractmethod
-    def get_dict(self, d) -> Optional[Dict]:
-        """ Shallow unwrap Dict value """
+    def get_dict(self, d) -> Optional[Mapping]:
+        """ Shallow unwrap dict value """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_dict()'
         )
@@ -181,8 +182,8 @@ class DataWrapper(ABC):
         )
 
     @abstractmethod
-    def unwrap_dict(self, d) -> Dict:
-        """ Deep unwrap Dict value """
+    def unwrap_dict(self, d) -> Mapping:
+        """ Deep unwrap dict value """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.unwrap_dict()'
         )
@@ -210,12 +211,12 @@ class BaseWrapper(DataWrapper):
             return str(s)
 
     # Override
-    def get_dict(self, d) -> Optional[Dict]:
+    def get_dict(self, d) -> Optional[Mapping]:
         if d is None:
             return None
         elif isinstance(d, Mapper):
             return d.to_dict()
-        elif isinstance(d, Dict):
+        elif isinstance(d, Mapping):
             return d
         else:
             assert False, f'map error: {d}'
@@ -226,7 +227,7 @@ class BaseWrapper(DataWrapper):
             return None
         elif isinstance(o, Mapper):
             return self.unwrap_dict(o.to_dict())
-        elif isinstance(o, Dict):
+        elif isinstance(o, Mapping):
             return self.unwrap_dict(o)
         elif isinstance(o, List):
             return self.unwrap_list(o)
@@ -236,7 +237,7 @@ class BaseWrapper(DataWrapper):
             return o
 
     # Override
-    def unwrap_dict(self, d) -> Dict:
+    def unwrap_dict(self, d) -> Mapping:
         if isinstance(d, Mapper):
             d = d.to_dict()
         dictionary = {}
@@ -268,7 +269,7 @@ class Wrapper:
         return cls.wrapper.get_str(s)
 
     @classmethod
-    def get_dict(cls, d) -> Optional[Dict]:
+    def get_dict(cls, d) -> Optional[Mapping]:
         """
             Get inner map
             ~~~~~~~~~~~~~
@@ -285,7 +286,7 @@ class Wrapper:
         return cls.wrapper.unwrap(o)
 
     @classmethod
-    def unwrap_dict(cls, d) -> Dict:
+    def unwrap_dict(cls, d) -> Mapping:
         """ Unwrap values for keys in map """
         return cls.wrapper.unwrap_dict(d)
 

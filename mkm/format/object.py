@@ -24,8 +24,9 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from typing import TypeVar, Generic
-from typing import Optional, Union, Any, Dict, List
+from typing import Optional, Union, Any, List
 
 
 T = TypeVar('T')
@@ -80,15 +81,15 @@ class JSON:
         return cls.coder.decode(string=string)
 
 
-class MapCoder(ObjectCoder[Dict], ABC):
+class MapCoder(ObjectCoder[Mapping], ABC):
     """ coder for json <=> map """
 
     # Override
-    def encode(self, container: Dict) -> str:
+    def encode(self, container: Mapping) -> str:
         return JSON.coder.encode(container=container)
 
     # Override
-    def decode(self, string: str) -> Optional[Dict]:
+    def decode(self, string: str) -> Optional[Mapping]:
         return JSON.coder.decode(string=string)
 
 
@@ -96,12 +97,12 @@ class JSONMap:
     coder = MapCoder()
 
     @classmethod
-    def encode(cls, container: Dict) -> str:
+    def encode(cls, container: Mapping) -> str:
         # assert JSONMap.coder is not None, 'JSONMap parser not set yet'
         return cls.coder.encode(container=container)
 
     @classmethod
-    def decode(cls, string: str) -> Optional[Dict]:
+    def decode(cls, string: str) -> Optional[Mapping]:
         # assert JSONMap.coder is not None, 'JSONMap parser not set yet'
         return cls.coder.decode(string=string)
 
@@ -111,9 +112,9 @@ class JSONMap:
 #
 
 
-def json_encode(container: Union[Dict, List]) -> str:
+def json_encode(container: Union[Mapping, List]) -> str:
     return JSON.encode(container=container)
 
 
-def json_decode(string: str) -> Union[Dict, List, None]:
+def json_decode(string: str) -> Union[Mapping, List, None]:
     return JSON.decode(string=string)

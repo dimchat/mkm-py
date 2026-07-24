@@ -29,7 +29,8 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any, Dict
+from collections.abc import Mapping
+from typing import Optional, Any
 
 from ..types import Mapper
 from ..crypto import VerifyKey, SignKey
@@ -204,7 +205,7 @@ class MetaFactory(ABC):
         )
 
     @abstractmethod
-    def parse_meta(self, meta: Dict) -> Optional[Meta]:
+    def parse_meta(self, meta: Mapping) -> Optional[Meta]:
         """
         Parse map object to meta
 

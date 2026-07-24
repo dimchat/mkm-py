@@ -29,7 +29,8 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Iterable, Any, List, Dict
+from collections.abc import Mapping
+from typing import Optional, Iterable, Any, List
 
 from ..types import DateTime
 from ..types import Mapper
@@ -81,7 +82,7 @@ class Document(TAI, Mapper, ABC):
         return documents
 
     @classmethod
-    def revert(cls, documents: Iterable) -> List[Dict]:
+    def revert(cls, documents: Iterable) -> List[Mapping]:
         array = []
         for doc in documents:
             assert isinstance(doc, Document), f'document error: {doc}'
@@ -132,7 +133,7 @@ class DocumentFactory(ABC):
         )
 
     @abstractmethod
-    def parse_document(self, document: Dict) -> Optional[Document]:
+    def parse_document(self, document: Mapping) -> Optional[Document]:
         """
         Parse map object to entity document
 

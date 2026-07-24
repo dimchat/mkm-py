@@ -23,9 +23,9 @@
 # SOFTWARE.
 # ==============================================================================
 
-import copy
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List
+from collections.abc import Mapping
+from typing import Any, List
 
 from .wrapper import Mapper
 
@@ -47,7 +47,7 @@ class DataCopier(ABC):
         )
 
     @abstractmethod
-    def copy_map(self, d: Dict) -> Dict:
+    def copy_map(self, d: Mapping) -> Mapping:
         """ Shallow copy the map """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.copy_map()'
@@ -68,7 +68,7 @@ class DataCopier(ABC):
         )
 
     @abstractmethod
-    def deep_copy_map(self, d: Dict) -> Dict:
+    def deep_copy_map(self, d: Mapping) -> Mapping:
         """ Deep copy the map """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.deep_copy_map()'
@@ -90,7 +90,7 @@ class BaseCopier(DataCopier):
             return None
         elif isinstance(o, Mapper):
             return self.copy_map(o.to_dict())
-        elif isinstance(o, Dict):
+        elif isinstance(o, Mapping):
             return self.copy_map(o)
         elif isinstance(o, List):
             return self.copy_list(o)
@@ -98,8 +98,9 @@ class BaseCopier(DataCopier):
             return o
 
     # Override
-    def copy_map(self, d: Dict) -> Dict:
-        return d.copy()
+    def copy_map(self, d: Mapping) -> Mapping:
+        # return d.copy()
+        return dict(d)
 
     # Override
     def copy_list(self, a: List) -> List:
@@ -111,29 +112,31 @@ class BaseCopier(DataCopier):
             return None
         elif isinstance(o, Mapper):
             return self.deep_copy_map(o.to_dict())
-        elif isinstance(o, Dict):
+        elif isinstance(o, Mapping):
             return self.deep_copy_map(o)
         elif isinstance(o, List):
             return self.deep_copy_list(o)
         else:
-            # return o
-            return copy.deepcopy(o)
+            return o
+            # return copy.deepcopy(o)
 
     # Override
-    def deep_copy_map(self, d: Dict) -> Dict:
-        dictionary = {}
-        for key, value in d.items():
-            clone = self.deep_copy(value)
-            dictionary[key] = clone
-        return dictionary
+    def deep_copy_map(self, d: Mapping) -> Mapping:
+        # dictionary = {}
+        # for key, value in d.items():
+        #     clone = self.deep_copy(value)
+        #     dictionary[key] = clone
+        # return dictionary
+        return {key: self.deep_copy(value) for key, value in d.items()}
 
     # Override
     def deep_copy_list(self, a: List) -> List:
-        array = []
-        for item in a:
-            clone = self.deep_copy(item)
-            array.append(clone)
-        return array
+        # array = []
+        # for item in a:
+        #     clone = self.deep_copy(item)
+        #     array.append(clone)
+        # return array
+        return [self.deep_copy_list(item) for item in a]
 
 
 class Copier(ABC):
@@ -150,7 +153,7 @@ class Copier(ABC):
         return cls.copier.copy(o)
 
     @classmethod
-    def copy_map(cls, d: Dict) -> Dict:
+    def copy_map(cls, d: Mapping) -> Mapping:
         return cls.copier.copy_map(d)
 
     @classmethod
@@ -166,7 +169,7 @@ class Copier(ABC):
         return cls.copier.deep_copy(o)
 
     @classmethod
-    def deep_copy_map(cls, d: Dict) -> Dict:
+    def deep_copy_map(cls, d: Mapping) -> Mapping:
         return cls.copier.deep_copy_map(d)
 
     @classmethod
