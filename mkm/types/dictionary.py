@@ -23,9 +23,9 @@
 # SOFTWARE.
 # ==============================================================================
 
-from collections.abc import Mapping
-from typing import Optional, Iterator, Any, Tuple
-from typing import ItemsView, KeysView, ValuesView
+from collections.abc import Mapping, MutableMapping
+from typing import Optional, Iterator, Any, Tuple, Dict
+from typing import AbstractSet, ValuesView
 
 from .x import DateTime
 from .string import Stringer
@@ -46,19 +46,22 @@ class Dictionary(Mapper):
         if dictionary is None:
             dictionary = {}
         elif isinstance(dictionary, Mapper):
-            dictionary = dictionary.to_dict()
-        self.__dictionary = dictionary
+            dictionary = dictionary.to_map()
+        elif not isinstance(dictionary, MutableMapping):
+            assert isinstance(dictionary, Mapping), f'map value error: {dictionary}'
+            dictionary = Copier.copy_map(dictionary)
+        self.__dictionary: MutableMapping = dictionary
 
     # Override
-    def to_dict(self) -> Mapping[str, Any]:
+    def to_map(self) -> MutableMapping[str, Any]:
         return self.__dictionary
 
     # Override
-    def copy_dict(self, deep_copy: bool = False) -> Mapping[str, Any]:
+    def copy_map(self, deep_copy: bool = False) -> Dict[str, Any]:
         if deep_copy:
-            return Copier.deep_copy(self.__dictionary)
+            return Copier.deep_copy_map(self.__dictionary)
         else:
-            return self.__dictionary.copy()
+            return Copier.copy_map(self.__dictionary)
 
     # Override
     def clear(self):
@@ -68,7 +71,7 @@ class Dictionary(Mapper):
     # Override
     def copy(self):
         """ D.copy() -> a shallow copy of D """
-        dictionary = self.__dictionary.copy()
+        dictionary = Copier.copy_map(self.__dictionary)
         return Dictionary(dictionary=dictionary)
 
     @staticmethod
@@ -113,15 +116,21 @@ class Dictionary(Mapper):
     def set_string(self, key: str, value: Optional[Stringer]):
         if value is None:
             self.__dictionary.pop(key, None)
-        else:
+        elif isinstance(value, Stringer):
             self.__dictionary[key] = value.to_str()
+        else:
+            assert isinstance(value, str), f'str value error: {value}'
+            self.__dictionary[key] = value
 
     # Override
     def set_map(self, key: str, value: Optional[Mapper]):
         if value is None:
             self.__dictionary.pop(key, None)
+        elif isinstance(value, Mapper):
+            self.__dictionary[key] = value.to_map()
         else:
-            self.__dictionary[key] = value.to_dict()
+            assert isinstance(value, Mapping), f'map value error: {value}'
+            self.__dictionary[key] = value
 
     # Override
     def get(self, key: str, default: Optional[Any] = None) -> Optional[Any]:
@@ -129,12 +138,12 @@ class Dictionary(Mapper):
         return self.__dictionary.get(key, default)
 
     # Override
-    def items(self) -> ItemsView[str, Any]:
+    def items(self) -> AbstractSet[Tuple[str, Any]]:
         """ D.items() -> a set-like object providing a view on D's items """
         return self.__dictionary.items()
 
     # Override
-    def keys(self) -> KeysView[str]:
+    def keys(self) -> AbstractSet[str]:
         """ D.keys() -> a set-like object providing a view on D's keys """
         return self.__dictionary.keys()
 
@@ -186,7 +195,7 @@ class Dictionary(Mapper):
             if self is o:
                 # same object
                 return True
-            o = o.to_dict()
+            o = o.to_map()
         # check inner map
         return self.__dictionary.__eq__(o)
 
@@ -230,7 +239,7 @@ class Dictionary(Mapper):
             if self is o:
                 # same object
                 return False
-            o = o.to_dict()
+            o = o.to_map()
         # check inner map
         return self.__dictionary.__ne__(o)
 

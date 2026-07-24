@@ -24,7 +24,7 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
+from collections.abc import Mapping, MutableMapping
 from typing import Optional
 
 from ..types import Singleton
@@ -73,7 +73,7 @@ class CryptographyKey(Mapper, ABC):
 class EncryptKey(CryptographyKey, ABC):
 
     @abstractmethod
-    def encrypt(self, plaintext: bytes, extra: Optional[Mapping] = None) -> bytes:
+    def encrypt(self, plaintext: bytes, extra: Optional[MutableMapping] = None) -> bytes:
         """
         1. Symmetric Key:
             ciphertext = encrypt(plaintext, PW)

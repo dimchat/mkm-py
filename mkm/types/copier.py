@@ -25,7 +25,7 @@
 
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
-from typing import Any, List
+from typing import Any, List, Dict
 
 from .wrapper import Mapper
 
@@ -47,7 +47,7 @@ class DataCopier(ABC):
         )
 
     @abstractmethod
-    def copy_map(self, d: Mapping) -> Mapping:
+    def copy_map(self, d: Mapping) -> Dict:
         """ Shallow copy the map """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.copy_map()'
@@ -68,7 +68,7 @@ class DataCopier(ABC):
         )
 
     @abstractmethod
-    def deep_copy_map(self, d: Mapping) -> Mapping:
+    def deep_copy_map(self, d: Mapping) -> Dict:
         """ Deep copy the map """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.deep_copy_map()'
@@ -89,7 +89,7 @@ class BaseCopier(DataCopier):
         if o is None:
             return None
         elif isinstance(o, Mapper):
-            return self.copy_map(o.to_dict())
+            return self.copy_map(o.to_map())
         elif isinstance(o, Mapping):
             return self.copy_map(o)
         elif isinstance(o, List):
@@ -98,7 +98,7 @@ class BaseCopier(DataCopier):
             return o
 
     # Override
-    def copy_map(self, d: Mapping) -> Mapping:
+    def copy_map(self, d: Mapping) -> Dict:
         # return d.copy()
         return dict(d)
 
@@ -111,7 +111,7 @@ class BaseCopier(DataCopier):
         if o is None:
             return None
         elif isinstance(o, Mapper):
-            return self.deep_copy_map(o.to_dict())
+            return self.deep_copy_map(o.to_map())
         elif isinstance(o, Mapping):
             return self.deep_copy_map(o)
         elif isinstance(o, List):
@@ -121,7 +121,7 @@ class BaseCopier(DataCopier):
             # return copy.deepcopy(o)
 
     # Override
-    def deep_copy_map(self, d: Mapping) -> Mapping:
+    def deep_copy_map(self, d: Mapping) -> Dict:
         # dictionary = {}
         # for key, value in d.items():
         #     clone = self.deep_copy(value)
@@ -153,7 +153,7 @@ class Copier(ABC):
         return cls.copier.copy(o)
 
     @classmethod
-    def copy_map(cls, d: Mapping) -> Mapping:
+    def copy_map(cls, d: Mapping) -> Dict:
         return cls.copier.copy_map(d)
 
     @classmethod
@@ -169,7 +169,7 @@ class Copier(ABC):
         return cls.copier.deep_copy(o)
 
     @classmethod
-    def deep_copy_map(cls, d: Mapping) -> Mapping:
+    def deep_copy_map(cls, d: Mapping) -> Dict:
         return cls.copier.deep_copy_map(d)
 
     @classmethod

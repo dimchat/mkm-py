@@ -23,7 +23,8 @@
 # SOFTWARE.
 # ==============================================================================
 
-from typing import Optional, Union, Any, Tuple, Mapping, List, Iterable, Iterator
+from collections.abc import Mapping
+from typing import Optional, Union, Any, Tuple, List, Iterable, Iterator
 
 from .wrapper import Stringer, Wrapper
 
@@ -216,7 +217,7 @@ class String(Stringer):
         Return a formatted version of S, using substitutions from mapping.
         The substitutions are identified by braces ('{' and '}').
         """
-        mapping = Wrapper.unwrap_dict(mapping)
+        mapping = Wrapper.unwrap_map(mapping)
         string = self.__string.format_map(map=mapping)
         return String(string=string)
 

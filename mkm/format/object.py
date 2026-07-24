@@ -26,7 +26,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from typing import TypeVar, Generic
-from typing import Optional, Union, Any, List
+from typing import Optional, Union, Any, List, Dict
 
 
 T = TypeVar('T')
@@ -89,7 +89,7 @@ class MapCoder(ObjectCoder[Mapping], ABC):
         return JSON.coder.encode(container=container)
 
     # Override
-    def decode(self, string: str) -> Optional[Mapping]:
+    def decode(self, string: str) -> Optional[Dict]:
         return JSON.coder.decode(string=string)
 
 
@@ -102,7 +102,7 @@ class JSONMap:
         return cls.coder.encode(container=container)
 
     @classmethod
-    def decode(cls, string: str) -> Optional[Mapping]:
+    def decode(cls, string: str) -> Optional[Dict]:
         # assert JSONMap.coder is not None, 'JSONMap parser not set yet'
         return cls.coder.decode(string=string)
 
@@ -116,5 +116,5 @@ def json_encode(container: Union[Mapping, List]) -> str:
     return JSON.encode(container=container)
 
 
-def json_decode(string: str) -> Union[Mapping, List, None]:
+def json_decode(string: str) -> Union[Dict, List, None]:
     return JSON.decode(string=string)

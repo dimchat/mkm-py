@@ -29,7 +29,7 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
+from collections.abc import Mapping, MutableMapping
 from typing import Optional, Iterable, Any, List
 
 from ..types import DateTime
@@ -82,11 +82,11 @@ class Document(TAI, Mapper, ABC):
         return documents
 
     @classmethod
-    def revert(cls, documents: Iterable) -> List[Mapping]:
+    def revert(cls, documents: Iterable) -> List[MutableMapping]:
         array = []
         for doc in documents:
             assert isinstance(doc, Document), f'document error: {doc}'
-            array.append(doc.to_dict())
+            array.append(doc.to_map())
         return array
 
     #
