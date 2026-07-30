@@ -26,6 +26,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
+from ..types import final
+
 
 class DataCoder(ABC):
     """
@@ -62,7 +64,10 @@ class DataCoder(ABC):
         )
 
 
+@final
 class Hex:
+
+    # Singleton
     coder: DataCoder = None
 
     @classmethod
@@ -76,7 +81,10 @@ class Hex:
         return cls.coder.decode(string=string)
 
 
+@final
 class Base58:
+
+    # Singleton
     coder: DataCoder = None
 
     @classmethod
@@ -90,7 +98,10 @@ class Base58:
         return cls.coder.decode(string=string)
 
 
+@final
 class Base64:
+
+    # Singleton
     coder: DataCoder = None
 
     @classmethod

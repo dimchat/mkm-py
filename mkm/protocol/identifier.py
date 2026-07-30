@@ -29,8 +29,10 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Iterable, List, Any
+from typing import Optional, Any
+from typing import Iterable
 
+from ..types import StrList
 from ..types import Stringer
 
 from .address import Address
@@ -160,7 +162,7 @@ class ID(Stringer, ABC):
         return members
 
     @classmethod
-    def revert(cls, identifiers: Iterable) -> List[str]:
+    def revert(cls, identifiers: Iterable) -> StrList:
         """
         Revert ID list to string array
 

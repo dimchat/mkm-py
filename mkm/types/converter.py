@@ -26,6 +26,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
+from .x import final
 from .x import DateTime
 
 
@@ -165,7 +166,8 @@ def to_str(value: Any) -> str:
         return str(value)
 
 
-class Converter(ABC):
+@final
+class Converter:
     """ Data Convert Interface """
 
     BOOLEAN_STATES = {

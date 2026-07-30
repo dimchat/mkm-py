@@ -23,14 +23,18 @@
 # SOFTWARE.
 # ==============================================================================
 
+from .x import final
+from .x import Mapping, MutableMapping
+from .x import StrMap, MutableStrMap
+from .x import AnyList, StrList
+from .x import URI, DateTime
+
 from .converter import Converter, DataConverter, BaseConverter
 
 from .copier import Copier
 from .wrapper import Wrapper, Stringer, Mapper
 from .string import ConstantString, String
 from .dictionary import Dictionary
-
-from .x import URI, DateTime
 
 
 class Singleton(object):
@@ -55,6 +59,12 @@ class Singleton(object):
 __all__ = [
 
     'Singleton',
+
+    'final',
+
+    'Mapping', 'MutableMapping',
+    'StrMap', 'MutableStrMap',
+    'AnyList', 'StrList',
 
     'URI', 'DateTime',
 

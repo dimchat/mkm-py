@@ -26,6 +26,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
+from ..types import final
+
 
 class StringCoder(ABC):
     """
@@ -62,7 +64,10 @@ class StringCoder(ABC):
         )
 
 
+@final
 class UTF8:
+
+    # Singleton
     coder: StringCoder = None
 
     @classmethod

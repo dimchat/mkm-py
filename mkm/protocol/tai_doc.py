@@ -29,10 +29,11 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, MutableMapping
-from typing import Optional, Iterable, Any, List
+from typing import Optional, Any, List
+from typing import Iterable
 
 from ..types import DateTime
+from ..types import StrMap, MutableStrMap
 from ..types import Mapper
 from ..format import TransportableData
 
@@ -82,7 +83,7 @@ class Document(TAI, Mapper, ABC):
         return documents
 
     @classmethod
-    def revert(cls, documents: Iterable) -> List[MutableMapping]:
+    def revert(cls, documents: Iterable) -> List[MutableStrMap]:
         array = []
         for doc in documents:
             assert isinstance(doc, Document), f'document error: {doc}'
@@ -133,7 +134,7 @@ class DocumentFactory(ABC):
         )
 
     @abstractmethod
-    def parse_document(self, document: Mapping) -> Optional[Document]:
+    def parse_document(self, document: StrMap) -> Optional[Document]:
         """
         Parse map object to entity document
 

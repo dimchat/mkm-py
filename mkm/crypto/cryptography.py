@@ -24,10 +24,10 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, MutableMapping
 from typing import Optional
 
 from ..types import Singleton
+from ..types import StrMap, MutableStrMap
 from ..types import Mapper
 from ..format import TransportableData
 
@@ -73,7 +73,7 @@ class CryptographyKey(Mapper, ABC):
 class EncryptKey(CryptographyKey, ABC):
 
     @abstractmethod
-    def encrypt(self, plaintext: bytes, extra: Optional[MutableMapping] = None) -> bytes:
+    def encrypt(self, plaintext: bytes, extra: Optional[MutableStrMap] = None) -> bytes:
         """
         1. Symmetric Key:
             ciphertext = encrypt(plaintext, PW)
@@ -92,7 +92,7 @@ class EncryptKey(CryptographyKey, ABC):
 class DecryptKey(CryptographyKey, ABC):
 
     @abstractmethod
-    def decrypt(self, ciphertext: bytes, params: Optional[Mapping] = None) -> Optional[bytes]:
+    def decrypt(self, ciphertext: bytes, params: Optional[StrMap] = None) -> Optional[bytes]:
         """
         1. Symmetric Key:
             plaintext = decrypt(ciphertext, PW)

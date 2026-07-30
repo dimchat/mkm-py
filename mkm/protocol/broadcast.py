@@ -30,12 +30,15 @@
 
 from typing import Optional, Union, Any
 
+from ..types import final
 from ..types import ConstantString
+
 from .entity import EntityType
 from .address import Address
 from .identifier import ID
 
 
+@final
 class Identifier(ConstantString, ID):
 
     def __init__(self, identifier: str, name: Optional[str], address: Address, terminal: Optional[str] = None):
@@ -152,6 +155,7 @@ class Identifier(ConstantString, ID):
 """
 
 
+@final
 class BroadcastAddress(ConstantString, Address):
 
     def __init__(self, address: str, network: Union[int, EntityType]):

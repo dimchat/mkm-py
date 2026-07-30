@@ -29,8 +29,9 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any, Dict
+from typing import Optional, Any
 
+from ..types import MutableStrMap
 from ..crypto import VerifyKey, SignKey
 
 
@@ -91,7 +92,7 @@ class TAI(ABC):
 
     @property
     @abstractmethod
-    def properties(self) -> Optional[Dict[str, Any]]:
+    def properties(self) -> Optional[MutableStrMap]:
         """
         Get all properties when valid
 

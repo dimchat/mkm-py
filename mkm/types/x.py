@@ -24,9 +24,54 @@
 # ==============================================================================
 
 import time
-from typing import Union, Any
+from collections.abc import Mapping, MutableMapping
+from typing import Union, Any, List
+
 
 URI = str
+
+
+try:
+    from typing import final
+except ImportError:
+    from typing_extensions import final
+
+
+"""
+    Generic for Maps
+    ~~~~~~~~~~~~~~~~
+"""
+try:
+    StrMap = Mapping[str, Any]
+    MutableStrMap = MutableMapping[str, Any]
+except TypeError:
+    import typing
+    StrMap = typing.Mapping[str, Any]
+    MutableStrMap = typing.MutableMapping[str, Any]
+
+
+"""
+    Generic for List
+    ~~~~~~~~~~~~~~~~
+"""
+AnyList = List[Any]
+StrList = List[str]
+
+
+# def is_mapping(o: Any) -> bool:
+#     return isinstance(o, Mapping)
+#
+#
+# def is_mutable_mapping(o: Any) -> bool:
+#     return isinstance(o, MutableMapping)
+#
+#
+# def is_dict(o: Any) -> bool:
+#     return isinstance(o, dict)
+#
+#
+# def is_list(o: Any) -> bool:
+#     return isinstance(o, list)
 
 
 class DateTime:

@@ -32,6 +32,8 @@
 
 from abc import ABC, abstractmethod
 
+from ..types import final
+
 
 class MessageDigester(ABC):
 
@@ -43,7 +45,10 @@ class MessageDigester(ABC):
         )
 
 
+@final
 class SHA256:
+
+    # Singleton
     digester: MessageDigester = None
 
     @classmethod
@@ -52,7 +57,10 @@ class SHA256:
         return cls.digester.digest(data=data)
 
 
+@final
 class KECCAK256:
+
+    # Singleton
     digester: MessageDigester = None
 
     @classmethod
@@ -61,7 +69,10 @@ class KECCAK256:
         return cls.digester.digest(data=data)
 
 
+@final
 class RIPEMD160:
+
+    # Singleton
     digester: MessageDigester = None
 
     @classmethod

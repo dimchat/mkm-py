@@ -24,9 +24,12 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
+from typing import Optional, Union, Any
 from typing import TypeVar, Generic
-from typing import Optional, Union, Any, List, Dict
+
+from ..types import final
+from ..types import StrMap
+from ..types import AnyList
 
 
 T = TypeVar('T')
@@ -67,7 +70,10 @@ class ObjectCoder(Generic[T], ABC):
         )
 
 
+@final
 class JSON:
+
+    # Singleton
     coder: ObjectCoder[Any] = None
 
     @classmethod
@@ -81,28 +87,31 @@ class JSON:
         return cls.coder.decode(string=string)
 
 
-class MapCoder(ObjectCoder[Mapping], ABC):
+class MapCoder(ObjectCoder[StrMap]):
     """ coder for json <=> map """
 
     # Override
-    def encode(self, container: Mapping) -> str:
+    def encode(self, container: StrMap) -> str:
         return JSON.coder.encode(container=container)
 
     # Override
-    def decode(self, string: str) -> Optional[Dict]:
+    def decode(self, string: str) -> Optional[StrMap]:
         return JSON.coder.decode(string=string)
 
 
+@final
 class JSONMap:
+
+    # Singleton
     coder = MapCoder()
 
     @classmethod
-    def encode(cls, container: Mapping) -> str:
+    def encode(cls, container: StrMap) -> str:
         # assert JSONMap.coder is not None, 'JSONMap parser not set yet'
         return cls.coder.encode(container=container)
 
     @classmethod
-    def decode(cls, string: str) -> Optional[Dict]:
+    def decode(cls, string: str) -> Optional[StrMap]:
         # assert JSONMap.coder is not None, 'JSONMap parser not set yet'
         return cls.coder.decode(string=string)
 
@@ -112,9 +121,9 @@ class JSONMap:
 #
 
 
-def json_encode(container: Union[Mapping, List]) -> str:
+def json_encode(container: Union[StrMap, AnyList]) -> str:
     return JSON.encode(container=container)
 
 
-def json_decode(string: str) -> Union[Dict, List, None]:
+def json_decode(string: str) -> Union[StrMap, AnyList, None]:
     return JSON.decode(string=string)

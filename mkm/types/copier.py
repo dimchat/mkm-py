@@ -24,10 +24,14 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
-from typing import Any, List, Dict
+from typing import Any
 
-from .wrapper import Mapper
+from .x import final
+from .x import Mapping
+from .x import StrMap, MutableStrMap
+from .x import AnyList
+
+from .mapper import Mapper
 
 
 ######################
@@ -47,14 +51,14 @@ class DataCopier(ABC):
         )
 
     @abstractmethod
-    def copy_map(self, d: Mapping) -> Dict:
+    def copy_map(self, d: StrMap) -> MutableStrMap:
         """ Shallow copy the map """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.copy_map()'
         )
 
     @abstractmethod
-    def copy_list(self, a: List) -> List:
+    def copy_list(self, a: AnyList) -> AnyList:
         """ Shallow copy the list """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.copy_list()'
@@ -68,14 +72,14 @@ class DataCopier(ABC):
         )
 
     @abstractmethod
-    def deep_copy_map(self, d: Mapping) -> Dict:
+    def deep_copy_map(self, d: StrMap) -> MutableStrMap:
         """ Deep copy the map """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.deep_copy_map()'
         )
 
     @abstractmethod
-    def deep_copy_list(self, a: List) -> List:
+    def deep_copy_list(self, a: AnyList) -> AnyList:
         """ Deep copy the list """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.deep_copy_list()'
@@ -92,18 +96,18 @@ class BaseCopier(DataCopier):
             return self.copy_map(o.to_map())
         elif isinstance(o, Mapping):
             return self.copy_map(o)
-        elif isinstance(o, List):
+        elif isinstance(o, list):
             return self.copy_list(o)
         else:
             return o
 
     # Override
-    def copy_map(self, d: Mapping) -> Dict:
+    def copy_map(self, d: StrMap) -> MutableStrMap:
         # return d.copy()
         return dict(d)
 
     # Override
-    def copy_list(self, a: List) -> List:
+    def copy_list(self, a: AnyList) -> AnyList:
         return a.copy()
 
     # Override
@@ -114,14 +118,14 @@ class BaseCopier(DataCopier):
             return self.deep_copy_map(o.to_map())
         elif isinstance(o, Mapping):
             return self.deep_copy_map(o)
-        elif isinstance(o, List):
+        elif isinstance(o, list):
             return self.deep_copy_list(o)
         else:
             return o
             # return copy.deepcopy(o)
 
     # Override
-    def deep_copy_map(self, d: Mapping) -> Dict:
+    def deep_copy_map(self, d: StrMap) -> MutableStrMap:
         # dictionary = {}
         # for key, value in d.items():
         #     clone = self.deep_copy(value)
@@ -130,7 +134,7 @@ class BaseCopier(DataCopier):
         return {key: self.deep_copy(value) for key, value in d.items()}
 
     # Override
-    def deep_copy_list(self, a: List) -> List:
+    def deep_copy_list(self, a: AnyList) -> AnyList:
         # array = []
         # for item in a:
         #     clone = self.deep_copy(item)
@@ -139,7 +143,8 @@ class BaseCopier(DataCopier):
         return [self.deep_copy_list(item) for item in a]
 
 
-class Copier(ABC):
+@final
+class Copier:
 
     # Singleton
     copier: DataCopier = BaseCopier()
@@ -153,11 +158,11 @@ class Copier(ABC):
         return cls.copier.copy(o)
 
     @classmethod
-    def copy_map(cls, d: Mapping) -> Dict:
+    def copy_map(cls, d: StrMap) -> MutableStrMap:
         return cls.copier.copy_map(d)
 
     @classmethod
-    def copy_list(cls, a: List) -> List:
+    def copy_list(cls, a: AnyList) -> AnyList:
         return cls.copier.copy_list(a)
 
     #
@@ -169,9 +174,9 @@ class Copier(ABC):
         return cls.copier.deep_copy(o)
 
     @classmethod
-    def deep_copy_map(cls, d: Mapping) -> Dict:
+    def deep_copy_map(cls, d: StrMap) -> MutableStrMap:
         return cls.copier.deep_copy_map(d)
 
     @classmethod
-    def deep_copy_list(cls, a: List) -> List:
+    def deep_copy_list(cls, a: AnyList) -> AnyList:
         return cls.copier.deep_copy_list(a)

@@ -24,9 +24,9 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
 from typing import Optional
 
+from ..types import StrMap
 from ..protocol import ID
 from ..protocol.entity import shared_account_extensions
 
@@ -41,21 +41,21 @@ class GeneralAccountHelper(ABC):
     """ Account GeneralFactory """
 
     @abstractmethod
-    def get_meta_type(self, meta: Mapping, default: Optional[str] = None) -> Optional[str]:
+    def get_meta_type(self, meta: StrMap, default: Optional[str] = None) -> Optional[str]:
         """ Get type from the meta info """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_meta_type()'
         )
 
     @abstractmethod
-    def get_document_type(self, document: Mapping, default: Optional[str] = None) -> Optional[str]:
+    def get_document_type(self, document: StrMap, default: Optional[str] = None) -> Optional[str]:
         """ Get type from the document info """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_document_type()'
         )
 
     @abstractmethod
-    def get_document_id(self, document: Mapping) -> Optional[ID]:
+    def get_document_id(self, document: StrMap) -> Optional[ID]:
         """ Get did from the document info """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_document_id()'

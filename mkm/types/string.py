@@ -23,10 +23,15 @@
 # SOFTWARE.
 # ==============================================================================
 
-from collections.abc import Mapping
-from typing import Optional, Union, Any, Tuple, List, Iterable, Iterator
+from typing import Optional, Union
+from typing import Any, Tuple
+from typing import Iterable, Iterator
 
-from .wrapper import Stringer, Wrapper
+from .x import StrList
+from .x import StrMap
+
+from .stringer import Stringer
+from .wrapper import Wrapper
 
 
 class ConstantString(Stringer):
@@ -210,7 +215,7 @@ class String(Stringer):
         string = self.__string.format(args, kwargs)
         return String(string=string)
 
-    def format_map(self, mapping: Mapping[str, Any]):
+    def format_map(self, mapping: StrMap):
         """
         S.format_map(mapping) -> str
 
@@ -483,7 +488,7 @@ class String(Stringer):
             sep = sep.to_str()
         return self.__string.rpartition(sep)
 
-    def rsplit(self, sep: Optional[str] = None, maxsplit: int = -1) -> List[str]:
+    def rsplit(self, sep: Optional[str] = None, maxsplit: int = -1) -> StrList:
         """
         Return a list of the words in the string, using sep as the delimiter string.
 
@@ -512,7 +517,7 @@ class String(Stringer):
         string = self.__string.rstrip(chars)
         return String(string=string)
 
-    def split(self, sep: Optional[str] = None, maxsplit: int = -1) -> List[str]:
+    def split(self, sep: Optional[str] = None, maxsplit: int = -1) -> StrList:
         """
         Return a list of the words in the string, using sep as the delimiter string.
 
@@ -528,7 +533,7 @@ class String(Stringer):
             sep = sep.to_str()
         return self.__string.split(sep, maxsplit)
 
-    def splitlines(self, keepends: bool = False) -> List[str]:
+    def splitlines(self, keepends: bool = False) -> StrList:
         """
         Return a list of the lines in the string, breaking at line boundaries.
 

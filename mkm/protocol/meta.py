@@ -29,9 +29,9 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
 from typing import Optional, Any
 
+from ..types import StrMap
 from ..types import Mapper
 from ..crypto import VerifyKey, SignKey
 from ..format import TransportableData
@@ -205,7 +205,7 @@ class MetaFactory(ABC):
         )
 
     @abstractmethod
-    def parse_meta(self, meta: Mapping) -> Optional[Meta]:
+    def parse_meta(self, meta: StrMap) -> Optional[Meta]:
         """
         Parse map object to meta
 

@@ -24,131 +24,15 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, MutableMapping
-from typing import Optional, Any, List, Dict
+from typing import Optional, Any
 
-from .x import DateTime
+from .x import final
+from .x import Mapping, MutableMapping
+from .x import MutableStrMap
+from .x import AnyList
 
-
-class Stringer(ABC):
-    """
-        Constant String Wrapper
-        ~~~~~~~~~~~~~~~~~~~~~~~
-    """
-
-    def __hash__(self) -> int:
-        """ Return hash(self). """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.__hash__()'
-        )
-
-    def __len__(self) -> int:
-        """ Return len(self). """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.__len__()'
-        )
-
-    def __eq__(self, other) -> bool:
-        """ Return self==value. """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.__eq__()'
-        )
-
-    def __ne__(self, other) -> bool:
-        """ Return self!=value. """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.__ne__()'
-        )
-
-    def __str__(self) -> str:
-        """ Return str(self). """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.__str__()'
-        )
-
-    @abstractmethod
-    def to_str(self) -> str:
-        """ get inner string """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.to_str()'
-        )
-
-
-class Mapper(MutableMapping[str, Any], ABC):
-    """
-        Mutable Map Wrapper
-        ~~~~~~~~~~~~~~~~~~~
-    """
-
-    @abstractmethod
-    def get_str(self, key: str, default: Optional[str] = None) -> Optional[str]:
-        """ Get string value for key, if value is None, return the default value """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_str()'
-        )
-
-    @abstractmethod
-    def get_bool(self, key: str, default: Optional[bool] = None) -> Optional[bool]:
-        """ Get boolean value for key, if value is None, return the default value """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_bool()'
-        )
-
-    @abstractmethod
-    def get_int(self, key: str, default: Optional[int] = None) -> Optional[int]:
-        """ Get integer value for key, if value is None, return the default value """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_int()'
-        )
-
-    @abstractmethod
-    def get_float(self, key: str, default: Optional[float] = None) -> Optional[float]:
-        """ Get float number for key, if value is None, return the default value """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_float()'
-        )
-
-    @abstractmethod
-    def get_datetime(self, key: str, default: Optional[DateTime] = None) -> Optional[DateTime]:
-        """ Get DataTime object for key, if value is None, return the default value """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_datetime()'
-        )
-
-    @abstractmethod
-    def set_datetime(self, key: str, value: Optional[DateTime]):
-        """ Set DateTime object for key """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.set_datetime()'
-        )
-
-    @abstractmethod
-    def set_string(self, key: str, value: Optional[Stringer]):
-        """ Set Stringer object for key """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.set_string()'
-        )
-
-    @abstractmethod
-    def set_map(self, key: str, value):  # value: Optional[Mapper]
-        """ Set Mapper object for key """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.set_map()'
-        )
-
-    @abstractmethod
-    def to_map(self) -> MutableMapping[str, Any]:
-        """ Get inner map """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.to_map()'
-        )
-
-    @abstractmethod
-    def copy_map(self, deep_copy: bool = False) -> Dict[str, Any]:
-        """ Copy inner map """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.copy_map()'
-        )
+from .mapper import Mapper
+from .stringer import Stringer
 
 
 ######################
@@ -168,7 +52,7 @@ class DataWrapper(ABC):
         )
 
     @abstractmethod
-    def get_map(self, d) -> Optional[MutableMapping]:
+    def get_map(self, d) -> Optional[MutableStrMap]:
         """ Shallow unwrap dict value """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_map()'
@@ -182,14 +66,14 @@ class DataWrapper(ABC):
         )
 
     @abstractmethod
-    def unwrap_map(self, d) -> Optional[Dict]:
+    def unwrap_map(self, d) -> Optional[MutableStrMap]:
         """ Deep unwrap dict value """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.unwrap_map()'
         )
 
     @abstractmethod
-    def unwrap_list(self, a) -> Optional[List]:
+    def unwrap_list(self, a) -> Optional[AnyList]:
         """ Deep unwrap List value """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.unwrap_list()'
@@ -211,7 +95,7 @@ class BaseWrapper(DataWrapper):
             return str(s)
 
     # Override
-    def get_map(self, d) -> Optional[MutableMapping]:
+    def get_map(self, d) -> Optional[MutableStrMap]:
         if d is None:
             return None
         elif isinstance(d, Mapper):
@@ -230,7 +114,7 @@ class BaseWrapper(DataWrapper):
             return self.unwrap_map(o.to_map())
         elif isinstance(o, Mapping):
             return self.unwrap_map(o)
-        elif isinstance(o, List):
+        elif isinstance(o, list):
             return self.unwrap_list(o)
         elif isinstance(o, Stringer):
             return o.to_str()
@@ -238,7 +122,7 @@ class BaseWrapper(DataWrapper):
             return o
 
     # Override
-    def unwrap_map(self, d) -> Optional[Dict]:
+    def unwrap_map(self, d) -> Optional[MutableStrMap]:
         if d is None:
             return None
         elif isinstance(d, Mapper):
@@ -251,7 +135,7 @@ class BaseWrapper(DataWrapper):
         return {key: self.unwrap(value) for key, value in d.items()}
 
     # Override
-    def unwrap_list(self, a) -> Optional[List]:
+    def unwrap_list(self, a) -> Optional[AnyList]:
         if a is None:
             return None
         # array = []
@@ -262,6 +146,7 @@ class BaseWrapper(DataWrapper):
         return [self.unwrap(item) for item in a]
 
 
+@final
 class Wrapper:
 
     # Singleton
@@ -276,7 +161,7 @@ class Wrapper:
         return cls.wrapper.get_str(s)
 
     @classmethod
-    def get_map(cls, d) -> Optional[MutableMapping]:
+    def get_map(cls, d) -> Optional[MutableStrMap]:
         """
             Get inner map
             ~~~~~~~~~~~~~
@@ -293,11 +178,11 @@ class Wrapper:
         return cls.wrapper.unwrap(o)
 
     @classmethod
-    def unwrap_map(cls, d) -> Optional[Dict]:
+    def unwrap_map(cls, d) -> Optional[MutableStrMap]:
         """ Unwrap values for keys in map """
         return cls.wrapper.unwrap_map(d)
 
     @classmethod
-    def unwrap_list(cls, a) -> Optional[List]:
+    def unwrap_list(cls, a) -> Optional[AnyList]:
         """ Unwrap values in the array """
         return cls.wrapper.unwrap_list(a)
