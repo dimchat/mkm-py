@@ -24,10 +24,10 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
+from collections.abc import Mapping, MutableMapping
 from typing import Optional, Any
 
 from .x import final
-from .x import Mapping, MutableMapping
 from .x import MutableStrMap
 from .x import AnyList
 

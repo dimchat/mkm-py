@@ -23,19 +23,22 @@
 # SOFTWARE.
 # ==============================================================================
 
+from collections.abc import Mapping, MutableMapping
 from typing import Optional, Union
 from typing import Any, Tuple
 from typing import Iterable, Iterator
 from typing import AbstractSet, ValuesView
 
 from .x import DateTime
-from .x import Mapping, MutableMapping
 from .x import StrMap, MutableStrMap
 
 from .string import Stringer
 from .converter import Converter
 from .copier import Copier
 from .wrapper import Mapper
+
+
+_SENTINEL = object()
 
 
 class Dictionary(Mapper):
@@ -56,7 +59,7 @@ class Dictionary(Mapper):
             dictionary = Copier.copy_map(dictionary)
         self.__dictionary: MutableStrMap = dictionary
 
-    def __eq__(self, o: StrMap) -> bool:
+    def __eq__(self, o: object) -> bool:
         """ Return self==value. """
         if isinstance(o, Mapper):
             if self is o:
@@ -66,7 +69,7 @@ class Dictionary(Mapper):
         # check inner map
         return self.__dictionary.__eq__(o)
 
-    def __ne__(self, o: StrMap) -> bool:
+    def __ne__(self, o: object) -> bool:
         """ Return self!=value. """
         if isinstance(o, Mapper):
             if self is o:
@@ -78,28 +81,24 @@ class Dictionary(Mapper):
 
     def __repr__(self) -> str:
         """ Return repr(self). """
-        return self.__dictionary.__repr__()
+        clazz = self.__class__.__name__
+        info = self.__dictionary
+        return f'{clazz}({info!r})'
+        # return f'<{clazz}>{info}</{clazz}>'
 
     def __str__(self) -> str:
         """ Return str(self). """
         return self.__dictionary.__str__()
 
-    def __sizeof__(self) -> int:
-        """ D.__sizeof__() -> size of D in memory, in bytes """
-        return self.__dictionary.__sizeof__()
+    # def __sizeof__(self) -> int:
+    #     """ D.__sizeof__() -> size of D in memory, in bytes """
+    #     return self.__dictionary.__sizeof__()
 
     def __len__(self) -> int:
         """ Return len(self). """
         return self.__dictionary.__len__()
 
-    #
-    #   Hashable
-    #
-
-    # Override
-    def __hash__(self) -> int:
-        """ Implement hash(self). """
-        return self.__dictionary.__hash__()
+    __hash__ = None
 
     #
     #   Iterable
@@ -120,9 +119,9 @@ class Dictionary(Mapper):
         return self.__dictionary.__getitem__(k)
 
     # Override
-    def get(self, key: str, default: Optional[Any] = None) -> Optional[Any]:
+    def get(self, k: str, default: Optional[Any] = None) -> Optional[Any]:
         """ Return the value for key if key is in the dictionary, else default. """
-        return self.__dictionary.get(key, default)
+        return self.__dictionary.get(k, default)
 
     # Override
     def items(self) -> AbstractSet[Tuple[str, Any]]:
@@ -154,9 +153,9 @@ class Dictionary(Mapper):
         self.__dictionary.__setitem__(k, v)
 
     # Override
-    def __delitem__(self, v: Any):
+    def __delitem__(self, key: str):
         """ Delete self[key]. """
-        self.__dictionary.__delitem__(v)
+        self.__dictionary.__delitem__(key)
 
     # Override
     def clear(self):
@@ -164,12 +163,15 @@ class Dictionary(Mapper):
         self.__dictionary.clear()
 
     # Override
-    def pop(self, key: str, default: Optional[Any] = None) -> Optional[Any]:
+    def pop(self, k: str, default: Optional[Any] = _SENTINEL) -> Optional[Any]:
         """
         D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
         If key is not found, d is returned if given, otherwise KeyError is raised
         """
-        return self.__dictionary.pop(key, default)
+        if default is _SENTINEL:
+            return self.__dictionary.pop(k)
+        else:
+            return self.__dictionary.pop(k, default)
 
     # Override
     def popitem(self) -> Tuple[str, Any]:
@@ -180,23 +182,26 @@ class Dictionary(Mapper):
         return self.__dictionary.popitem()
 
     # Override
-    def setdefault(self, key: str, default: Any = None) -> Any:
+    def setdefault(self, k: str, default: Any = None) -> Any:
         """
         Insert key with a value of default if key is not in the dictionary.
 
         Return the value for key if key is in the dictionary, else default.
         """
-        self.__dictionary.setdefault(key, default)
+        return self.__dictionary.setdefault(k, default)
 
     # Override
-    def update(self, __m: Union[StrMap, Iterable[Tuple[str, Any]]], **kwargs: Any):
+    def update(self, __m: Union[StrMap, Iterable[Tuple[str, Any]], None] = None, **kwargs: Any):
         """
         D.update([E, ]**F) -> None.  Update D from dict/iterable E and F.
         If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]
         If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v
         In either case, this is followed by: for k in F:  D[k] = F[k]
         """
-        self.__dictionary.update(__m, **kwargs)
+        if __m is None:
+            self.__dictionary.update(**kwargs)
+        else:
+            self.__dictionary.update(__m, **kwargs)
 
     #
     #   Mapper
@@ -260,7 +265,9 @@ class Dictionary(Mapper):
 
     # Override
     def copy_map(self, deep_copy: bool = False) -> MutableStrMap:
+        # info = self.__dictionary
+        info = self.to_map()
         if deep_copy:
-            return Copier.deep_copy_map(self.__dictionary)
+            return Copier.deep_copy_map(info)
         else:
-            return Copier.copy_map(self.__dictionary)
+            return Copier.copy_map(info)

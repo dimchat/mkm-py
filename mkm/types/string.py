@@ -41,7 +41,7 @@ class ConstantString(Stringer):
         A container with inner string
     """
 
-    def __init__(self, string: Union[str, Stringer] = None):
+    def __init__(self, string: Union[str, Stringer, None] = None):
         super().__init__()
         if string is None:
             string = ''
@@ -60,7 +60,14 @@ class ConstantString(Stringer):
         return self.__string.__len__()
 
     # Override
-    def __eq__(self, x: str) -> bool:
+    def __contains__(self, s: str) -> bool:
+        """ Return True if substring exists in the string. """
+        if isinstance(s, Stringer):
+            s = s.to_str()
+        return self.__string.__contains__(s)
+
+    # Override
+    def __eq__(self, x: object) -> bool:
         """ Return self==value. """
         if isinstance(x, Stringer):
             if self is x:
@@ -71,7 +78,7 @@ class ConstantString(Stringer):
         return self.__string.__eq__(x)
 
     # Override
-    def __ne__(self, x: str) -> bool:
+    def __ne__(self, x: object) -> bool:
         """ Return self!=value. """
         if isinstance(x, Stringer):
             if self is x:
@@ -91,7 +98,8 @@ class ConstantString(Stringer):
         """ Return repr(self). """
         clazz = self.__class__.__name__
         text = self.__string
-        return f'<{clazz}>{text}</{clazz}>'
+        return f'{clazz}({text!r})'
+        # return f'<{clazz}>{text}</{clazz}>'
 
     # Override
     def to_str(self) -> str:
@@ -714,7 +722,10 @@ class String(Stringer):
 
     def __repr__(self) -> str:
         """ Return repr(self). """
-        return self.__string
+        clazz = self.__class__.__name__
+        text = self.__string
+        return f'{clazz}({text!r})'
+        # return f'<{clazz}>{text}</{clazz}>'
 
     def __rmod__(self, value: Any):
         """ Return value%self. """
@@ -731,4 +742,4 @@ class String(Stringer):
 
     def __str__(self) -> str:
         """ Return str(self). """
-        return self.__string
+        return self.__string.__str__()

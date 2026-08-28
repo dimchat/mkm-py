@@ -24,11 +24,11 @@
 # ==============================================================================
 
 from abc import ABC, abstractmethod
+from collections.abc import MutableMapping
 from typing import Optional
 
 from .x import DateTime
 from .x import MutableStrMap
-from .x import MutableMapping
 
 from .stringer import Stringer
 

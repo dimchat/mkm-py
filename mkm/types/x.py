@@ -24,7 +24,6 @@
 # ==============================================================================
 
 import time
-from collections.abc import Mapping, MutableMapping
 from typing import Union, Any, List
 
 
@@ -42,8 +41,9 @@ except ImportError:
     ~~~~~~~~~~~~~~~~
 """
 try:
-    StrMap = Mapping[str, Any]
-    MutableStrMap = MutableMapping[str, Any]
+    import collections.abc as abc
+    StrMap = abc.Mapping[str, Any]
+    MutableStrMap = abc.MutableMapping[str, Any]
 except TypeError:
     import typing
     StrMap = typing.Mapping[str, Any]
@@ -203,7 +203,10 @@ class DateTime:
     # Override
     def __repr__(self) -> str:
         """ Return repr(self). """
-        return time.strftime('%a %b %d %H:%M:%S %Y', self.localtime)
+        clazz = self.__class__.__name__
+        seconds = self.__timestamp
+        return f'{clazz}({seconds})'
+        # return time.strftime('%a %b %d %H:%M:%S %Y', self.localtime)
 
     @property
     def localtime(self) -> time.struct_time:

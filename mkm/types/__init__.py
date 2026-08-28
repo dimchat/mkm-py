@@ -24,7 +24,6 @@
 # ==============================================================================
 
 from .x import final
-from .x import Mapping, MutableMapping
 from .x import StrMap, MutableStrMap
 from .x import AnyList, StrList
 from .x import URI, DateTime
@@ -62,7 +61,6 @@ __all__ = [
 
     'final',
 
-    'Mapping', 'MutableMapping',
     'StrMap', 'MutableStrMap',
     'AnyList', 'StrList',
 

@@ -53,7 +53,6 @@ __all__ = [
 
     'final',
 
-    'Mapping', 'MutableMapping',
     'StrMap', 'MutableStrMap',
     'AnyList', 'StrList',
 
