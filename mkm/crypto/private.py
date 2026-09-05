@@ -28,9 +28,9 @@ from typing import Optional, Any
 
 from ..types import StrMap
 
-from .asymmetric import SignKey
+from .keys import SignKey
 from .public import PublicKey
-from .cryptography import shared_crypto_extensions
+from .keys import shared_crypto_extensions
 
 
 class PrivateKey(SignKey, ABC):

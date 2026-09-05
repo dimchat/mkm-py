@@ -33,7 +33,7 @@ from ..crypto.private import PrivateKeyHelper
 from ..crypto.symmetric import SymmetricKeyExtension
 from ..crypto.public import PublicKeyExtension
 from ..crypto.private import PrivateKeyExtension
-from ..crypto.cryptography import CryptoExtensions, shared_crypto_extensions
+from ..crypto.keys import CryptoExtensions, shared_crypto_extensions
 
 from ..protocol.address import AddressHelper
 from ..protocol.identifier import IDHelper

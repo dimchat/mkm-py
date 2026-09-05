@@ -30,8 +30,8 @@
     SymmetricKey, PrivateKey, PublicKey
 """
 
-from .cryptography import CryptographyKey, EncryptKey, DecryptKey
-from .asymmetric import AsymmetricKey, SignKey, VerifyKey
+from .keys import CryptographyKey, EncryptKey, DecryptKey
+from .keys import AsymmetricKey, SignKey, VerifyKey
 from .symmetric import SymmetricKey, SymmetricKeyFactory
 from .public import PublicKey, PublicKeyFactory
 from .private import PrivateKey, PrivateKeyFactory
@@ -43,7 +43,7 @@ from .private import PrivateKey, PrivateKeyFactory
 # from .symmetric import SymmetricKeyExtension
 # from .public import PublicKeyExtension
 # from .private import PrivateKeyExtension
-# from .cryptography import CryptoExtensions, shared_crypto_extensions
+# from .keys import CryptoExtensions, shared_crypto_extensions
 
 
 name = "Crypto"

@@ -121,6 +121,58 @@ class DecryptKey(CryptographyKey, ABC):
         )
 
 
+# noinspection PyAbstractClass
+class AsymmetricKey(CryptographyKey, ABC):
+
+    # RSA = 'RSA'  # -- "RSA/ECB/PKCS1Padding", "SHA256withRSA"
+    # ECC = 'ECC'
+    pass
+
+
+class SignKey(AsymmetricKey, ABC):
+
+    @abstractmethod
+    def sign(self, data: bytes) -> bytes:
+        """
+        signature = sign(data, SK)
+
+        :param data: message data
+        :return: signature
+        """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.sign()'
+        )
+
+
+class VerifyKey(AsymmetricKey, ABC):
+
+    @abstractmethod
+    def verify(self, data: bytes, signature: bytes) -> bool:
+        """
+        OK = verify(data, signature, PK)
+
+        :param data:      message data
+        :param signature: signature of message data
+        :return: True on signature matched
+        """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.verify()'
+        )
+
+    @abstractmethod
+    def match_sign_key(self, key: SignKey) -> bool:
+        """
+        signature = sign(data, SK)
+        OK = verify(data, signature, PK)
+
+        :param key: private key
+        :return: True on signature matched
+        """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.match_sign_key()'
+        )
+
+
 # -----------------------------------------------------------------------------
 #  Crypto Extensions
 # -----------------------------------------------------------------------------

@@ -29,7 +29,7 @@ from typing import Optional
 from ..types import StrMap
 from ..crypto import SignKey, VerifyKey
 from ..crypto import EncryptKey, DecryptKey
-from ..crypto.cryptography import shared_crypto_extensions
+from ..crypto.keys import shared_crypto_extensions
 
 
 # -----------------------------------------------------------------------------

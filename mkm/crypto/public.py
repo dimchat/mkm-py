@@ -28,8 +28,8 @@ from typing import Optional, Any
 
 from ..types import StrMap
 
-from .asymmetric import VerifyKey
-from .cryptography import shared_crypto_extensions
+from .keys import VerifyKey
+from .keys import shared_crypto_extensions
 
 
 # noinspection PyAbstractClass
