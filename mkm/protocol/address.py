@@ -63,11 +63,6 @@ class Address(Stringer, ABC):
     #
 
     @classmethod
-    def generate(cls, meta, network: Optional[int] = None):  # -> Address:
-        helper = address_helper()
-        return helper.generate_address(meta, network)
-
-    @classmethod
     def parse(cls, address: Any):  # -> Optional[Address]:
         helper = address_helper()
         return helper.parse_address(address)
@@ -85,19 +80,6 @@ class Address(Stringer, ABC):
 
 class AddressFactory(ABC):
     """ Address Factory """
-
-    @abstractmethod
-    def generate_address(self, meta, network: Optional[int]) -> Address:
-        """
-        Generate address with meta & type
-
-        :param meta: meta info
-        :param network: address type
-        :return: Address
-        """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_address()'
-        )
 
     @abstractmethod
     def parse_address(self, address: str) -> Optional[Address]:
@@ -132,13 +114,6 @@ class AddressHelper(ABC):
         """ Get address factory """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_address_factory()'
-        )
-
-    @abstractmethod
-    def generate_address(self, meta, network: Optional[int]) -> Address:
-        """ Generate address from meta with network id """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_address()'
         )
 
     @abstractmethod

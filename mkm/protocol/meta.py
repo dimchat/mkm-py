@@ -36,7 +36,7 @@ from ..types import Mapper
 from ..crypto import VerifyKey, SignKey
 from ..format import TransportableData
 
-from .address import Address
+from .identifier import ID
 from .entity import shared_account_extensions
 
 
@@ -132,15 +132,15 @@ class Meta(Mapper, ABC):
         )
 
     @abstractmethod
-    def generate_address(self, network: int = None) -> Address:
+    def generate_id(self, network: int) -> ID:
         """
-        Generate Address with network ID
+        Generate ID with network ID
 
-        :param network:  Address.type
-        :return: Address
+        :param network:  ID.type
+        :return: ID
         """
         raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_address()'
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_id()'
         )
 
     #

@@ -180,11 +180,6 @@ class ID(Stringer, ABC):
     #
 
     @classmethod
-    def generate(cls, meta, network: int = None, terminal: Optional[str] = None):  # -> ID:
-        helper = id_helper()
-        return helper.generate_id(meta, network, terminal=terminal)
-
-    @classmethod
     def create(cls, name: Optional[str], address: Address, terminal: Optional[str] = None):  # -> ID:
         helper = id_helper()
         return helper.create_id(name=name, address=address, terminal=terminal)
@@ -207,20 +202,6 @@ class ID(Stringer, ABC):
 
 class IDFactory(ABC):
     """ ID Factory """
-
-    @abstractmethod
-    def generate_id(self, meta, network: Optional[int], terminal: Optional[str]) -> ID:
-        """
-        Generate ID
-
-        :param meta:     meta info
-        :param network:  ID.type
-        :param terminal: ID.terminal
-        :return: ID
-        """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_id()'
-        )
 
     @abstractmethod
     def create_id(self, name: Optional[str], address: Address, terminal: Optional[str]) -> ID:
@@ -269,13 +250,6 @@ class IDHelper(ABC):
         """ Get ID factory """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.get_id_factory()'
-        )
-
-    @abstractmethod
-    def generate_id(self, meta, network: Optional[int], terminal: Optional[str]) -> ID:
-        """ Generate ID from meta with terminal """
-        raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.generate_id()'
         )
 
     @abstractmethod
