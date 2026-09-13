@@ -36,8 +36,8 @@ from ..protocol.entity import shared_account_extensions
 # -----------------------------------------------------------------------------
 
 
-# class GeneralAccountHelper(AddressHelper, IDHelper, MetaHelper, DocumentHelper, ABC):
-class GeneralAccountHelper(ABC):
+# class AccountHandler(AddressHelper, IDHelper, MetaHelper, DocumentHelper, ABC):
+class AccountHandler(ABC):
     """ Account GeneralFactory """
 
     @abstractmethod
@@ -65,21 +65,21 @@ class GeneralAccountHelper(ABC):
 class GeneralAccountExtension:
 
     @property
-    def helper(self) -> Optional[GeneralAccountHelper]:
-        """ Get general account helper """
+    def handler(self) -> Optional[AccountHandler]:
+        """ Get general account handler """
         raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.helper getter'
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.handler getter'
         )
 
-    @helper.setter
-    def helper(self, delegate: GeneralAccountHelper):
-        """ Set general account helper """
+    @handler.setter
+    def handler(self, delegate: AccountHandler):
+        """ Set general account handler """
         raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.helper setter'
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.handler setter'
         )
 
 
-shared_account_extensions.helper: Optional[GeneralAccountHelper] = None
+shared_account_extensions.handler: Optional[AccountHandler] = None
 
 
 # def account_extensions() -> Union[GeneralAccountExtension, AccountExtensions]:

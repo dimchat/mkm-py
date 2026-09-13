@@ -46,8 +46,8 @@ from ..protocol.meta import MetaExtension
 from ..protocol.tai_doc import DocumentExtension
 from ..protocol.entity import AccountExtensions, shared_account_extensions
 
-from .crypto import GeneralCryptoHelper, GeneralCryptoExtension
-from .account import GeneralAccountHelper, GeneralAccountExtension
+from .crypto import CryptoKeyHandler, GeneralCryptoExtension
+from .account import AccountHandler, GeneralAccountExtension
 
 
 __all__ = [
@@ -83,7 +83,7 @@ __all__ = [
     #   General Extensions
     #
 
-    'GeneralCryptoHelper', 'GeneralCryptoExtension',
-    'GeneralAccountHelper', 'GeneralAccountExtension',
+    'CryptoKeyHandler', 'GeneralCryptoExtension',
+    'AccountHandler', 'GeneralAccountExtension',
 
 ]

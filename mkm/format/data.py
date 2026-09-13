@@ -113,32 +113,3 @@ class Base64:
     def decode(cls, string: str) -> Optional[bytes]:
         # assert Base64.coder is not None, 'Base64 coder not set yet'
         return cls.coder.decode(string=string)
-
-
-#
-#   Interfaces
-#
-
-
-def base64_encode(data: bytes) -> str:
-    return Base64.encode(data)
-
-
-def base64_decode(string: str) -> Optional[bytes]:
-    return Base64.decode(string)
-
-
-def base58_encode(data: bytes) -> str:
-    return Base58.encode(data)
-
-
-def base58_decode(string: str) -> Optional[bytes]:
-    return Base58.decode(string)
-
-
-def hex_encode(data: bytes) -> str:
-    return Hex.encode(data)
-
-
-def hex_decode(string: str) -> Optional[bytes]:
-    return Hex.decode(string)

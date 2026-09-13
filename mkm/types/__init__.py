@@ -30,8 +30,9 @@ from .x import URI, DateTime
 
 from .converter import Converter, DataConverter, BaseConverter
 
-from .copier import Copier
-from .wrapper import Wrapper, Stringer, Mapper
+from .copier import Copier, DataCopier, BaseCopier
+from .wrapper import Wrapper, DataWrapper, BaseWrapper
+from .wrapper import Stringer, Mapper
 from .string import ConstantString, String
 from .dictionary import Dictionary
 
@@ -67,9 +68,10 @@ __all__ = [
     'URI', 'DateTime',
 
     'Converter', 'DataConverter', 'BaseConverter',
+    'Copier', 'DataCopier', 'BaseCopier',
+    'Wrapper', 'DataWrapper', 'BaseWrapper',
 
-    'Copier',
-    'Wrapper', 'Stringer', 'Mapper',
+    'Stringer', 'Mapper',
     'ConstantString',  # 'String',
     'Dictionary',
 

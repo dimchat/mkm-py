@@ -79,20 +79,3 @@ class RIPEMD160:
     def digest(cls, data: bytes) -> bytes:
         # assert RIPEMD160.digester is not None, 'RIPEMD160 coder not set yet'
         return cls.digester.digest(data=data)
-
-
-#
-#   Interfaces
-#
-
-
-def sha256(data: bytes) -> bytes:
-    return SHA256.digest(data=data)
-
-
-def keccak256(data: bytes) -> bytes:
-    return KECCAK256.digest(data=data)
-
-
-def ripemd160(data: bytes) -> bytes:
-    return RIPEMD160.digest(data=data)

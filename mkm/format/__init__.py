@@ -32,15 +32,11 @@
 """
 
 from .data import DataCoder, Hex, Base58, Base64
-from .data import hex_encode, hex_decode
-from .data import base58_encode, base58_decode, base64_encode, base64_decode
 
 from .object import ObjectCoder, JSON
 from .object import MapCoder, JSONMap
-from .object import json_encode, json_decode
 
 from .string import StringCoder, UTF8
-from .string import utf8_encode, utf8_decode
 
 
 from .ted import TransportableResource
@@ -60,12 +56,6 @@ __all__ = [
     'ObjectCoder', 'JSON',
     'MapCoder', 'JSONMap',
     'StringCoder', 'UTF8',
-
-    'hex_encode', 'hex_decode',
-    'base58_encode', 'base58_decode',
-    'base64_encode', 'base64_decode',
-    'json_encode', 'json_decode',
-    'utf8_encode', 'utf8_decode',
 
     'TransportableResource',
     'TransportableData',

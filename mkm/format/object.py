@@ -114,16 +114,3 @@ class JSONMap:
     def decode(cls, string: str) -> Optional[StrMap]:
         # assert JSONMap.coder is not None, 'JSONMap parser not set yet'
         return cls.coder.decode(string=string)
-
-
-#
-#   Interfaces
-#
-
-
-def json_encode(container: Union[StrMap, AnyList]) -> str:
-    return JSON.encode(container=container)
-
-
-def json_decode(string: str) -> Union[StrMap, AnyList, None]:
-    return JSON.decode(string=string)

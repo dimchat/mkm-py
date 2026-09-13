@@ -79,16 +79,3 @@ class UTF8:
     def decode(cls, data: bytes) -> Optional[str]:
         # assert UTF8.coder is not None, 'UTF8 parser not set yet'
         return cls.coder.decode(data=data)
-
-
-#
-#   Interfaces
-#
-
-
-def utf8_encode(string: str) -> bytes:
-    return UTF8.encode(string=string)
-
-
-def utf8_decode(data: bytes) -> Optional[str]:
-    return UTF8.decode(data=data)

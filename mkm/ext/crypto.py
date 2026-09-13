@@ -37,8 +37,8 @@ from ..crypto.keys import shared_crypto_extensions
 # -----------------------------------------------------------------------------
 
 
-# class GeneralCryptoHelper(SymmetricKeyHelper, PrivateKeyHelper, PublicKeyHelper, ABC):
-class GeneralCryptoHelper(ABC):
+# class CryptoKeyHandler(SymmetricKeyHelper, PrivateKeyHelper, PublicKeyHelper, ABC):
+class CryptoKeyHandler(ABC):
     """ CryptographyKey GeneralFactory """
 
     """ sample data for checking keys """
@@ -73,21 +73,21 @@ class GeneralCryptoHelper(ABC):
 class GeneralCryptoExtension:
 
     @property
-    def helper(self) -> Optional[GeneralCryptoHelper]:
-        """ Get general crypto helper """
+    def handler(self) -> Optional[CryptoKeyHandler]:
+        """ Get general crypto handler """
         raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.helper getter'
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.handler getter'
         )
 
-    @helper.setter
-    def helper(self, delegate: GeneralCryptoHelper):
-        """ Set general crypto helper """
+    @handler.setter
+    def handler(self, delegate: CryptoKeyHandler):
+        """ Set general crypto handler """
         raise NotImplementedError(
-            f'Not implemented: {type(self).__module__}.{type(self).__name__}.helper setter'
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.handler setter'
         )
 
 
-shared_crypto_extensions.helper: Optional[GeneralCryptoHelper] = None
+shared_crypto_extensions.handler: Optional[CryptoKeyHandler] = None
 
 
 # def crypto_extensions() -> Union[GeneralCryptoExtension, CryptoExtensions]:

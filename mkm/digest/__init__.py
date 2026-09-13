@@ -32,7 +32,6 @@
 
 from .md import MessageDigester
 from .md import SHA256, KECCAK256, RIPEMD160
-from .md import sha256, keccak256, ripemd160
 
 
 __all__ = [
@@ -43,6 +42,5 @@ __all__ = [
 
     'MessageDigester',
     'SHA256', 'KECCAK256', 'RIPEMD160',
-    'sha256', 'keccak256', 'ripemd160',
 
 ]
