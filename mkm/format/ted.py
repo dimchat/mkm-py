@@ -162,6 +162,22 @@ class TransportableData(Stringer, TransportableResource, ABC):
     #
 
     @classmethod
+    def create(cls, data: bytes, encoding: Optional[str] = None,
+               mime_type: Optional[str] = None,
+               parameters: Optional[StrMap] = None):  # -> TransportableData:
+        """
+        Create TED
+
+        :param data:       bytes
+        :param encoding:   algorithm name ("base64", ...)
+        :param mime_type:  content-type ("image/jpeg", ...), default is None
+        :param parameters: extra info (charset, filename, ...), default is None
+        :return: TED object
+        """
+        helper = ted_helper()
+        return helper.create_transportable_data(data, encoding, mime_type, parameters)
+
+    @classmethod
     def parse(cls, ted: Any):  # -> Optional[TransportableData]:
         helper = ted_helper()
         return helper.parse_transportable_data(ted)
@@ -198,6 +214,23 @@ class TransportableDataFactory(ABC):
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_transportable_data()'
         )
 
+    @abstractmethod
+    def create_transportable_data(self, data: bytes, encoding: Optional[str],
+                                  mime_type: Optional[str],
+                                  parameters: Optional[StrMap]) -> TransportableData:
+        """
+        Create TED
+
+        :param data:       bytes
+        :param encoding:   algorithm name ("base64", ...)
+        :param mime_type:  content-type ("image/jpeg", ...), default is None
+        :param parameters: extra info (charset, filename, ...), default is None
+        :return: TED object
+        """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.create_transportable_data()'
+        )
+
 
 # -----------------------------------------------------------------------------
 #  Format Extensions
@@ -226,6 +259,15 @@ class TransportableDataHelper(ABC):
         """ Parse any object to TED """
         raise NotImplementedError(
             f'Not implemented: {type(self).__module__}.{type(self).__name__}.parse_transportable_data()'
+        )
+
+    @abstractmethod
+    def create_transportable_data(self, data: bytes, encoding: Optional[str],
+                                  mime_type: Optional[str],
+                                  parameters: Optional[StrMap]) -> TransportableData:
+        """ Create TED """
+        raise NotImplementedError(
+            f'Not implemented: {type(self).__module__}.{type(self).__name__}.create_transportable_data()'
         )
 
 

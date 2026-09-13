@@ -47,6 +47,7 @@ class ConstantString(Stringer):
             string = ''
         elif isinstance(string, Stringer):
             string = string.to_str()
+        assert isinstance(string, str), f'string value error: {string}'
         self.__string = string
 
     # Override
@@ -220,7 +221,7 @@ class String(Stringer):
         Return a formatted version of S, using substitutions from args and kwargs.
         The substitutions are identified by braces ('{' and '}').
         """
-        string = self.__string.format(args, kwargs)
+        string = self.__string.format(*args, **kwargs)
         return String(string=string)
 
     def format_map(self, mapping: StrMap):
@@ -231,7 +232,7 @@ class String(Stringer):
         The substitutions are identified by braces ('{' and '}').
         """
         mapping = Wrapper.unwrap_map(mapping)
-        string = self.__string.format_map(map=mapping)
+        string = self.__string.format_map(mapping)
         return String(string=string)
 
     def index(self, sub: str, __start: Optional[int] = None, __end: Optional[int] = None) -> int:
@@ -274,6 +275,7 @@ class String(Stringer):
         Empty string is ASCII too.
         """
         pass
+        # return self.__string.isascii()
 
     def isdecimal(self) -> bool:
         """
@@ -407,7 +409,7 @@ class String(Stringer):
         character at the same position in y. If there is a third argument, it
         must be a string, whose characters will be mapped to None in the result.
         """
-        pass
+        return self.__string.maketrans(*args, **kwargs)
 
     def partition(self, sep: str) -> Tuple[str, str, str]:
         """
@@ -589,7 +591,7 @@ class String(Stringer):
         string = self.__string.title()
         return String(string=string)
 
-    def translate(self):
+    def translate(self, *args, **kwargs):
         """
         Replace each character in the string using the given translation table.
 
@@ -601,7 +603,7 @@ class String(Stringer):
         dictionary or list.  If this operation raises LookupError, the character is
         left untouched.  Characters mapped to None are deleted.
         """
-        pass
+        return self.__string.translate(*args, **kwargs)
 
     def upper(self):
         """ Return a copy of the string converted to uppercase. """

@@ -140,7 +140,7 @@ class BaseCopier(DataCopier):
         #     clone = self.deep_copy(item)
         #     array.append(clone)
         # return array
-        return [self.deep_copy_list(item) for item in a]
+        return [self.deep_copy(item) for item in a]
 
 
 @final
